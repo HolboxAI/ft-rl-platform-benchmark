@@ -5,11 +5,13 @@ platforms happens here.
 
 - [`schema.md`](schema.md) — the exact JSON schema every platform writes its
   `final_results.json` in.
-- [`plot_results.py`](plot_results.py) — reads a platform's metrics and writes
-  charts to `plots/`. Run it after each platform adds data.
-- [`plots/`](plots/) — generated PNG charts (Fireworks results so far).
-- `compare.py` (to add) — joins the three platforms' `final_results.json` files
-  and prints side-by-side metric and cost tables.
+- [`compare_platforms.py`](compare_platforms.py) — the cross-platform script.
+  Auto-discovers every `*/metrics/final_results.json`, joins them on the
+  `experiment` key, and writes side-by-side charts + a metric table.
+- [`plot_results.py`](plot_results.py) — the original Fireworks-only plotting
+  script (kept for the raw Fireworks `*_metrics.jsonl` loss curves). Superseded
+  by `compare_platforms.py` for cross-platform comparison.
+- [`plots/`](plots/) — generated PNG charts.
 
 ## How comparison works
 
@@ -19,8 +21,28 @@ Each platform writes:
 <platform>/metrics/final_results.json
 ```
 
-A single script reads all three and joins them on the `experiment` key. That is
-why the schema must match exactly — the join is on identical field names.
+`compare_platforms.py` reads all of them and joins on the `experiment` key. That
+is why the schema must match exactly — the join is on identical field names.
+Runs that are `BLOCKED` / `NOT_STARTED` (or that simply omit a curve field) are
+skipped gracefully rather than erroring, and are flagged "missing" on the chart.
+
+### Running it
+
+```bash
+# needs matplotlib (e.g. `pip install matplotlib`, or use a venv)
+python3 analysis/compare_platforms.py
+```
+
+Outputs (under `analysis/plots/`):
+
+| File | What it shows |
+|---|---|
+| `platform_comparison_summary.png` | final metric per experiment, one bar per platform |
+| `sft_loss_curves.png` | SFT train-loss curves (platforms that log them: Fireworks JSONL, Prime Intellect CSV) |
+| `rl_curves.png` | RL reward/score curves (platforms that log them) |
+
+It also prints a markdown table of each experiment's final metric by platform to
+stdout.
 
 ## Fields to compare
 
