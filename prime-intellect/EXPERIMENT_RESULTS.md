@@ -1,7 +1,7 @@
 # Experiment Results — Prime Intellect (Fireworks-parity, 4 experiments)
 
-**Last updated:** 2026-10-05
-**Status:** 2 of 4 experiments complete (GoEmotions SFT + RL); ORena SFT blocked by a pod-image version gap; ORena RL feasible but not started.
+**Last updated:** 2026-10-06
+**Status:** 2 of 4 experiments complete (GoEmotions SFT + RL); **both** ORena VLM legs blocked by pod-image dependency drift (SFT: VLM-SFT validator; RL: TileLang/CCCL/CUDA kernel-JIT mismatch).
 
 ---
 
@@ -16,7 +16,7 @@ The 4 reference experiments are reproduced on Prime Intellect via **on-demand po
 | Exp | Task | Model | Method | Status | Final metric |
 |---|---|---|---|---|---|
 | 1 | ORena SFT | Qwen3.5-9B (VLM) | LoRA r=64 | 🚫 **BLOCKED** (VLM SFT version drift) | — |
-| 2 | ORena GRPO | Qwen3.5-9B (VLM) | LoRA r=16 | ⏳ not started (feasible) | meanAccuracy |
+| 2 | ORena GRPO | Qwen3.5-9B (VLM) | LoRA r=16 | 🚫 **BLOCKED** (TileLang/CCCL/CUDA image drift) | — |
 | 3 | GoEmotions SFT | Qwen3-0.6B | LoRA r=16 | ✅ **COMPLETE** | micro-F1 **0.4956** / Jaccard 0.3294 |
 | 4 | GoEmotions GRPO | Qwen3-0.6B | LoRA r=16 | ✅ **COMPLETE** | micro-F1 **0.0349** / Jaccard 0.0178 |
 
@@ -114,31 +114,65 @@ upgrade on the pod was judged too risky; recorded as a version-drift finding ins
 
 ---
 
-## 5. Final results (parity table)
+## 5. Exp 2 — ORena GRPO (🚫 BLOCKED — TileLang / CCCL / CUDA image drift)
+
+**Config** (`configs/rl_orena.toml`):
+- model `Qwen/Qwen3.5-9B` (VLM); LoRA r=16 α=32 dropout=0.05; optim lr 1e-5
+- 128 prompts, batch 64 / group 8 (8 rollouts/prompt), `max_steps = 48`
+- sampling temperature 0.7, `max_completion_tokens = 512`
+- reward = exact match after normalization (taskset `orena_v1`)
+- `[orchestrator.renderer] name="qwen3.5" enable_thinking=false`
+- `[trainer.model] impl="custom"` + `optimization_dtype/reduce_dtype="bfloat16"` (VLM requirement)
+- `[inference] gpu_memory_utilization=0.6`; `[inference.model] max_model_len=8192`
+- `save_adapter_separately=true`
+
+**Outcome:** the trainer crashed **three times**, each a deeper layer of the same broken
+dependency chain in the `prime_rl 0.7.0` image. Qwen3.5-9B's architecture exercises the `fla`
+(flash-linear-attention) path, whose kernels are JIT-compiled during the trainer's backward
+pass via **TileLang 0.1.9** — a path the text-only Qwen3-0.6B (Exps 3–4) never touches:
+
+1. `cuda/atomic: No such file` → fixed with `CPLUS_INCLUDE_PATH` pointing at the shipped CCCL.
+2. `cccl/cuda/std/utility: No such file` → the bundled cutlass expects the **CUDA 13 CCCL
+   `cccl/` layout**; the image ships CUDA 12.9's `cuda/` layout → symlinked `cccl/*→*`.
+3. `cuModuleLoadData … CUDA_ERROR_INVALID_IMAGE` → the kernel now *compiled* but produced a
+   cubin the driver rejects.
+
+**Root cause:** the image carries a stray **CUDA 13 nvcc** (`nvidia/cu13` 13.2.78) that
+TileLang discovers, mismatched with the CUDA 12.8 driver + CUDA 12.9 CCCL;
+`nvidia-cuda-cccl-cu13` is only a `0.0.1` stub, so the toolchain cannot be made self-consistent
+in place. Two steps *did* train (reward 0.09 → 0.23, `Error 0%`, `Truncation 0%`), so the RL
+method itself is sound on this model — the image simply can't compile the linear-attention
+kernels. Mirror image of Exp 1: the pod image runs **neither** ORena VLM leg.
+
+---
+
+## 6. Final results (parity table)
 
 | Exp | Metric | Fireworks (ref) | Prime Intellect | Δ |
 |---|---|---|---|---|
 | 1 ORena SFT | meanAccuracy (4-bucket) | — | 🚫 blocked (VLM SFT version drift) | — |
-| 2 ORena RL | meanAccuracy (4-bucket) | — | ⏳ not started | — |
+| 2 ORena RL | meanAccuracy (4-bucket) | — | 🚫 blocked (TileLang/CCCL/CUDA image drift) | — |
 | 3 GoEmotions SFT | micro-F1 | 0.313 (train loss; no F1 reported) | **0.4956** (train loss 0.167) | not like-for-like (800 vs 43k samples) |
 | 4 GoEmotions RL | micro-F1 / Jaccard | 0.175 → 0.377 (F1) | **0.0349** / 0.0178 | fresh 0.6B + Jaccard over 64 steps ≈ no signal |
 
 ---
 
-## 6. Billing / resource visibility (headless)
+## 7. Billing / resource visibility (headless)
 
-- **Balance:** $48.79 USD (wallet `cmuqrcy9q003v5jp12qivuuu9`)
-- **Pod spend ≈ $20 total:**
+- **Balance:** **−$87.10 USD** (wallet overdrawn; team "Holbox AI"). All pods terminated — no
+  further billing accrues.
+- **Pod spend (final, per `prime wallet`):**
   | Pod | GPU | Rate | Used for | Spend |
   |---|---|---|---|---|
-  | facc8311… / 0c22b573… | A100 | — | key/setup smoke (2 recreations) | $0.34 + $0.38 |
-  | 234fc42f… | A100 40GB | $1.99/hr | Exp 3 SFT | ~$1.22 |
-  | 484b6053… | A10 24GB | ~$1.24/hr | Exp 4 RL (+ 3 failed launches) | $4.16 |
-  | 19b97318… | H200 141GB | $4.50/hr | provisioned for ORena, **idle** (blocked) | $15.51 |
+  | 484b6053… | A10 24GB | ~$1.24/hr | Exp 4 RL (+ failed launches) | $6.01 |
+  | 19b97318… | H200 141GB | $4.50/hr | ORena SFT attempt, **idle** (blocked) | $16.15 |
+  | cd5f26c0… | H200 141GB | $4.50/hr | ORena RL attempt, **idle** (blocked) | **$114.94** |
 
-  The H200 was the single largest cost and produced no run — a direct consequence of the
-  VLM SFT version-drift block being discovered *after* provisioning. Both live pods are
-  terminated; no further billing accrues.
+  Total ≈ **$137.10**. The two H200 pods were the overwhelming cost and produced **no run** —
+  a direct consequence of the VLM blocks being discovered *after* provisioning, with the
+  `cd5f26c0…` pod sitting idle overnight while the TileLang/CCCL/CUDA crash chain was
+  debugged. This is the lesson to carry forward: confirm the image can actually run a VLM
+  forward+backward on a cheap text-only pod *before* paying for an H200.
 - **Why the web UI shows nothing:** these are on-demand **pods**, not hosted **training runs**
   (`prime train list` = empty). The pods/credits are visible via `prime pods list` and
   `prime wallet`; they may not be surfaced in the dashboard's "Jobs" view.

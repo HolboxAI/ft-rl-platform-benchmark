@@ -7,7 +7,7 @@
 - 🚫 **Blocked** — waiting on the user / an external gate.
 - ✔ **Done** — completed.
 
-_Last updated: 2026-10-05._
+_Last updated: 2026-10-06._
 
 ---
 
@@ -63,6 +63,7 @@ If a run hits the 30-min wall → halve the subset and rerun (record the partial
 | S11 | — | Run Exp 2 (ORena GRPO). Feasible on 0.7.0 (the RL config supports `[model.vlm]`; rollout via vLLM). Deferred. | ⏳ |
 | S12 | 2026-10-05 | Run Exp 4 (GoEmotions GRPO). **DONE** (pod `484b6053…` A10): 64 steps, final Jaccard 0.0178, held-out micro-F1 0.0349. | ✔ |
 | S13 | 2026-10-05 | Run `09` → consolidated into `final_results.json` (canonical schema) + benchmark repo PR. | ✔ |
+| S14 | 2026-10-06 | Run Exp 2 (ORena GRPO, Qwen3.5-9B) on H200. **BLOCKED** — trainer crashes on the `fla` linear-attention JIT (TileLang/CCCL/CUDA image drift); 3 launch attempts, root-caused, pod terminated. | 🚫 |
 
 ✔ 2026-10-02 — **Installation:** `uv` already present; installed `prime` 0.9.1 + `hf` (huggingface-hub 2.1.1) via `uv tool install`. Confirmed auth commands: `prime login` / `prime config set-api-key`; HF: `hf auth login`.
 
@@ -85,6 +86,8 @@ If a run hits the 30-min wall → halve the subset and rerun (record the partial
 ✔ 2026-10-05 — **Exp 1 (ORena SFT) BLOCKED — VLM SFT version drift.** The pod's prime-rl 0.7.0 SFT path is renderer-only and raises `validate_renderer_vs_vlm`: "renderer-only SFT does not support VLMs yet. The renderer tokenizes text-only message dicts client-side and cannot handle image inputs." GitHub main has **removed** this validator (its only remaining VLM/SFT constraint is `freeze_vision_encoder=false` being LoRA-incompatible), so this is a pod-image version gap, not a hard platform limit. The mirror-image of Fireworks' gap: Fireworks can't RL `qwen3p5-9b`; Prime Intellect 0.7.0 can't SFT a VLM but **can** RL one (`rl.py:109` carries `vlm`, rollout through vLLM). The H200 provisioned for Exp 1/2 was **terminated** (idle at $4.50/hr, $15.51 wasted) rather than attempt a risky prime-rl upgrade.
 
 ✔ 2026-10-05 — **Exp 4 COMPLETE (GoEmotions GRPO).** pod `484b6053…` (A10 24GB), 64 steps, fresh base model, reward = multi-label Jaccard, `enable_thinking=false`. Final held-out dev (200 rows, greedy): **micro-F1 0.0349, Jaccard 0.0178**; `jaccard_curve` flat/noisy (0–0.073). A fresh 0.6B + Jaccard over 64 steps is not enough signal vs Fireworks' 0.175→0.377 on 5000 prompts. **Three launch fixes:** (a) `CUDA_VISIBLE_DEVICES="0,0"` for the single-GPU disjoint-GPU check; (b) `[inference] gpu_memory_utilization=0.6` + `[inference.model] max_model_len=512` (vLLM otherwise fails: trainer holds ~3.8 GiB); (c) `enable_thinking=false` (default thinking ate the 64-token budget → Truncation 100%) + `post_batch_filters` `enforce=false` (zero_advantage dropped every group → "10 consecutive empty train batches").
+
+✔ 2026-10-06 — **Exp 2 (ORena GRPO) BLOCKED — image dependency drift (TileLang / CCCL / CUDA 13 nvcc).** The H200 (pod `cd5f26c0…`) RL run for Qwen3.5-9B crashed the trainer **three times**, each a deeper layer of the same broken dependency chain in the `prime_rl 0.7.0` image. Qwen3.5-9B's architecture exercises the `fla` (flash-linear-attention) path, whose kernels are JIT-compiled during the trainer's backward pass via **TileLang 0.1.9** — a path the text-only Qwen3-0.6B (Exps 3–4) never touches. The chain, each fixed in turn: (1) `cuda/atomic: No such file` (TileLang's own include) → `CPLUS_INCLUDE_PATH` to the shipped CCCL → (2) `cccl/cuda/std/utility: No such file` (bundled cutlass expects the **CUDA 13 CCCL `cccl/` layout**; the image ships CUDA 12.9's `cuda/` layout) → symlinked `cccl/{cuda,cub,thrust,nv}→*` → (3) `cuModuleLoadData … CUDA_ERROR_INVALID_IMAGE` — the kernel now *compiled* but produced a cubin the driver rejects. **Root cause:** the image carries a stray **CUDA 13 nvcc** (`nvidia/cu13` 13.2.78) that TileLang discovers, mismatched with the CUDA 12.8 driver + CUDA 12.9 CCCL; `nvidia-cuda-cccl-cu13` is only a `0.0.1` stub so the toolchain cannot be made self-consistent in place. Two steps *did* train (reward 0.09→0.23, `Error 0%`, `Truncation 0%`), so the RL method itself is sound on this model — the image simply can't compile the linear-attention kernels. This is the mirror image of Exp 1's VLM-SFT block: the pod image can run **neither** ORena VLM leg, only the GoEmotions text legs. Recorded BLOCKED; pod terminated to stop idle billing (final H200 cost **$114.94**, wallet $-87.10).
 
 ## Recon findings (01, 2026-10-02)
 
@@ -115,7 +118,7 @@ If a run hits the 30-min wall → halve the subset and rerun (record the partial
 | Exp | Metric | Fireworks (ref) | Prime Intellect | Δ |
 |---|---|---|---|---|
 | 1 ORena SFT | meanAccuracy (4-bucket) | — | 🚫 blocked (VLM SFT version drift) | — |
-| 2 ORena RL | meanAccuracy (4-bucket) | — | ⏳ not started (feasible) | — |
+| 2 ORena RL | meanAccuracy (4-bucket) | — | 🚫 blocked (TileLang/CCCL/CUDA image drift) | — |
 | 3 GoEmotions SFT | micro-F1 | 0.313 (train loss) | **0.4956** | 800 vs 43k samples |
 | 4 GoEmotions RL | micro-F1 / Jaccard | 0.175→0.377 (F1) | **0.0349** / 0.0178 | fresh 0.6B + Jaccard over 64 steps ≈ no signal |
 

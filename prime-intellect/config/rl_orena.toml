@@ -1,44 +1,96 @@
 # Exp 2 — ORena VLM RL (GRPO, small) on Qwen/Qwen3.5-9B, parity with Fireworks §5.
 #
-# ⚠️ SCHEMA NOT VERIFIED. The [orchestrator]/[[source]]/env.id fields below are the
-#    prime-rl GitHub-main RL schema (from 06_EXP2_ORENA_RL.md); the pod's prime-rl
-#    is OLDER than main and already rejected [run], so reconcile these at run time
-#    exactly the way we did for SFT ([run] removed, name lives in output_dir).
-#    Do NOT launch until the RL schema is confirmed against `prime-rl` on the pod.
+# Schema VERIFIED against the pod's prime-rl (0.7.0) by reading
+# prime-rl-configs/src/prime_rl/configs/{rl,orchestrator,algorithm,trainer,shared}.py
+# and the goemotions_v1 RL run (single-GPU LoRA RL). RLConfig = trainer +
+# orchestrator + inference + top-level [model] (SharedModelConfig) + [deployment].
+# VLM = [model.vlm] (vision_encoder_attr + language_model_attr); trainer.py
+# requires bfloat16 for VLM and freeze_vision_encoder=true under LoRA.
 #
-# Parity hyperparameters (locked — D6): lr 1e-5, LoRA r=16, KL beta 0.04,
-# temperature 0.7, max output 512, 8 rollouts/prompt, GRPO, fresh (no warm-start).
-max_steps = 48                 # small-run cap
+# Parity (locked — D6): lr 1e-5, LoRA r=16 α=32, temperature 0.7, max output 512,
+# 8 rollouts/prompt, GRPO, fresh (no warm-start from Exp 1). Reward = exact match
+# after normalization (taskset orena_v1); 4-bucket meanAccuracy at held-out eval.
+#
+# ⚠️ KNOWN DIVERGENCE: prime-rl GRPO (GRPOAlgoConfig) has no KL-to-reference term
+#    (no kl_beta field); the reference's KL beta 0.04 has no equivalent knob here.
+#    Recorded in results.
+max_steps = 48                 # small-run cap (128 prompts / batch 64 = 2 -> 48 steps)
+seq_len = 4096                 # image tokens + short question; ref 65536
 output_dir = "/workspace/outputs/orena-rl-exp2"
-seq_len = 4096                 # ref 65536; rows are ~1-2k tokens
 
 [model]
 name = "Qwen/Qwen3.5-9B"
-impl = "custom"
-vlm = true
 
-[model.lora]
+[model.vlm]
+vision_encoder_attr = "model.visual"
+language_model_attr = "model.language_model"
+freeze_vision_encoder = true   # required under LoRA (vlm_freeze_incompatible_with_lora)
+
+[trainer.model]
+# "auto" resolves a VLM to impl='hf', which flash_attention_3 rejects; set
+# 'custom' explicitly (prime-rl's own model wrapper: FA3 + [model.vlm] support).
+impl = "custom"
+# VLM training must match vLLM inference (bf16); the default float32 is rejected
+# by TrainerConfig.vlms_require_bfloat16.
+optimization_dtype = "bfloat16"
+reduce_dtype = "bfloat16"
+
+[trainer.model.lora]
 rank = 16
 alpha = 32
 dropout = 0.05
 
-[data]
-name = "/workspace/data/orena/rl"
+[trainer.optim]
+lr = 1e-5
 
 [orchestrator]
 batch_size = 64
 group_size = 8                # 8 rollouts per prompt
-max_off_policy_steps = 8
 
-[orchestrator.algo]
-type = "grpo"
-# kl_beta = 0.04
-# temperature = 0.7
-# max_output_tokens = 512
+[orchestrator.renderer]
+name = "qwen3.5"
+# Qwen3.5 opens a <think> block by default; a fresh base model then spends the
+# whole 512-token budget "reasoning" and never emits the answer (same footgun as
+# goemotions_rl — Truncation 100%). Disable thinking so the model answers directly.
+enable_thinking = false
 
-[trainer.optim]
-lr = 1e-5
+[orchestrator.train.sampling]
+temperature = 0.7
+max_completion_tokens = 512
 
-[ckpt]
-[ckpt.weights]
+[[orchestrator.train.env]]
+name = "orena"
+taskset = { id = "orena-v1" }
+harness = { id = "null", runtime = { type = "subprocess" } }
+
+# GRPO's default post_batch_filters enforce zero_advantage, which drops every
+# group whose 8 rollouts earned the same reward (the common case for a fresh
+# model). Keep the filters in monitor mode so training actually proceeds.
+[[orchestrator.post_batch_filters]]
+type = "gibberish"
+enforce = false
+
+[[orchestrator.post_batch_filters]]
+type = "repetition"
+enforce = false
+
+[[orchestrator.post_batch_filters]]
+type = "zero_advantage"
+enforce = false
+
+[inference]
+# The trainer shares physical GPU 0 with the vLLM inference server (single-GPU
+# pod -> CUDA_VISIBLE_DEVICES="0,0" hack). vLLM's default 0.9 utilization would
+# over-subscribe next to the ~18-20 GiB bf16 trainer, so leave headroom.
+gpu_memory_utilization = 0.6
+
+[inference.model]
+# seq_len (4096) + max_completion_tokens (512) + image-token margin.
+max_model_len = 8192
+
+[ckpt] # checkpoint at the end of training
+
+[trainer.ckpt.weights]
+# Same prime-rl LoRA bug class as SFT: save the adapter separately so we can
+# merge it for eval (W' = W + (B@A)·α/r).
 save_adapter_separately = true
