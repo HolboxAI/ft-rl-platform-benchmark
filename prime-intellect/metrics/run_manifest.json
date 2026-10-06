@@ -1,14 +1,14 @@
 {
-  "updated": "2026-10-05",
+  "updated": "2026-10-06",
   "platform": "prime-intellect",
   "account": "purchase@holbox.ai",
-  "wallet_id": "cmuqrcy9q003v5jp12qivuuu9",
-  "balance_usd": 48.79,
-  "spent_usd": 20.0,
+  "wallet_id": "cmuqrd7h9003plkytw5shpjgv",
+  "balance_usd": -87.10,
+  "spent_usd": 137.10,
   "compute": "on-demand pods, self-run prime-rl 0.7.0 (headless CLI + API)",
-  "instance_types": "A100 40GB SXM4 ($1.99/hr); A10 24GB (~$1.24/hr); H200 141GB ($4.50/hr, idle)",
+  "instance_types": "A100 40GB SXM4 ($1.99/hr); A10 24GB (~$1.24/hr); H200 141GB ($4.50/hr, both idle/terminated)",
   "sdk": "prime CLI 0.9.1 + api.primeintellect.ai",
-  "note": "2 of 4 complete (GoEmotions SFT + RL); ORena SFT blocked by pod-image version drift; ORena RL not started. Canonical results: final_results.json.",
+  "note": "2 of 4 complete (GoEmotions SFT + RL); both ORena VLM legs blocked (SFT: VLM-SFT version drift; RL: TileLang/CCCL/CUDA image drift). Canonical results: final_results.json.",
   "experiments": {
     "orena_sft": {
       "job_name": null,
@@ -24,9 +24,9 @@
       "blocked_reason": "prime-rl 0.7.0 rejects [model.vlm] for SFT ('renderer-only SFT does not support VLMs yet'); GitHub main removed the check."
     },
     "orena_rl": {
-      "job_name": null,
-      "instance_type": "H200 141GB (idle, terminated)",
-      "state": "NOT_STARTED",
+      "job_name": "pod cd5f26c0334c49fe96080e592e729c2c (self-run)",
+      "instance_type": "H200 141GB (crashed, terminated)",
+      "state": "BLOCKED",
       "base_model": "Qwen/Qwen3.5-9B",
       "method": "grpo",
       "epochs": 1,
@@ -34,7 +34,7 @@
       "lora_rank": 16,
       "subset": "128 prompts",
       "step_cap": 48,
-      "note": "Feasible on 0.7.0 (RL supports [model.vlm] via vLLM). PI can RL Qwen3.5-9B directly (unlike Fireworks)."
+      "blocked_reason": "prime_rl 0.7.0 image dependency drift: fla linear-attention kernels JIT-compiled via TileLang 0.1.9; stray CUDA 13 nvcc + CUDA 12.9 CCCL + CUDA 12.8 driver -> cuModuleLoadData CUDA_ERROR_INVALID_IMAGE. Two steps trained (reward 0.09 -> 0.23) before the crash."
     },
     "goemotions_sft": {
       "job_name": "pod 234fc42f (self-run)",

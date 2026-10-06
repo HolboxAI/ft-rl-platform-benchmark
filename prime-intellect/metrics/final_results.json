@@ -3,7 +3,7 @@
   "account_id": "cmuqrd7h9003plkytw5shpjgv",
   "account_email": "purchase@holbox.ai",
   "sdk": "prime CLI 0.9.1 + api.primeintellect.ai (headless; self-run prime-rl 0.7.0 on on-demand pods)",
-  "generated_utc": "2026-10-05",
+  "generated_utc": "2026-10-06",
   "shared": {
     "fresh_runs": true,
     "epochs": 1,
@@ -28,15 +28,15 @@
       "dataset_size": 300,
       "steps": null,
       "final_train_loss": null,
-      "estimated_cost_usd": null,
+      "estimated_cost_usd": 16.15,
       "wall_time_s": null,
       "blocked_reason": "prime-rl 0.7.0 (the pod image) rejects [model.vlm] for SFT: the SFT data path is renderer-only and tokenizes text-only message dicts client-side ('renderer-only SFT does not support VLMs yet'). GitHub main has removed this check and supports VLM SFT, so this is version drift, not a hard platform limit."
     },
     "orena_rl": {
       "experiment": "orena_rl",
       "method": "grpo",
-      "job_id": null,
-      "state": "NOT_STARTED",
+      "job_id": "pod-cd5f26c0334c49fe96080e592e729c2c (H200 141GB, self-run)",
+      "state": "BLOCKED",
       "base_model": "Qwen/Qwen3.5-9B",
       "hf_model_id": "Qwen/Qwen3.5-9B",
       "output_model": null,
@@ -44,14 +44,14 @@
       "learning_rate": 1e-5,
       "max_output_tokens": 512,
       "dataset_size": 128,
-      "steps": null,
+      "steps": 2,
       "start_score": null,
       "final_score": null,
       "start_exact_match": null,
       "final_exact_match": null,
-      "estimated_cost_usd": null,
+      "estimated_cost_usd": 114.94,
       "wall_time_s": null,
-      "note": "Feasible on 0.7.0 (the RL config supports [model.vlm]; rollout renders through vLLM which handles images natively). Prime Intellect can RL Qwen3.5-9B directly, unlike Fireworks which is limited to qwen3-vl-8b-instruct."
+      "blocked_reason": "prime_rl 0.7.0 image dependency drift: Qwen3.5-9B exercises the fla (flash-linear-attention) path, whose kernels are JIT-compiled during the trainer backward pass via TileLang 0.1.9. The image ships a stray CUDA 13 nvcc (nvidia/cu13 13.2.78) mismatched with the CUDA 12.8 driver + CUDA 12.9 CCCL (nvidia-cuda-cccl-cu13 is a 0.0.1 stub). Three crashes, each deeper in the chain: (1) cuda/atomic missing -> CPLUS_INCLUDE_PATH fix; (2) cccl/cuda/std/utility missing -> bundled cutlass expects the CUDA 13 cccl/ layout, symlinked cccl/{cuda,cub,thrust,nv}->*; (3) cuModuleLoadData CUDA_ERROR_INVALID_IMAGE -> kernel compiled but produced a cubin the driver rejects. Unrecoverable in place. Two steps DID train (reward 0.09 -> 0.23, Error 0%, Truncation 0%), so the RL method itself is sound on this model; the image simply cannot compile the linear-attention kernels. Mirror of orena_sft: the pod image runs neither ORena VLM leg."
     },
     "goemotions_sft": {
       "experiment": "goemotions_sft",
@@ -103,20 +103,21 @@
   },
   "findings": [
     "VLM SFT is blocked by version drift: the pod image ships prime-rl 0.7.0 whose SFT path is renderer-only and rejects [model.vlm] ('renderer-only SFT does not support VLMs yet'); GitHub main supports VLM SFT. This is the mirror-image of Fireworks' gap (Fireworks cannot RL qwen3p5-9b; Prime Intellect 0.7.0 cannot SFT a VLM but CAN RL it).",
+    "VLM RL (ORena GRPO, Qwen3.5-9B) is also blocked by image dependency drift: the fla linear-attention kernels are JIT-compiled via TileLang 0.1.9, and the image's stray CUDA 13 nvcc + CUDA 12.9 CCCL + CUDA 12.8 driver mismatch ends in cuModuleLoadData CUDA_ERROR_INVALID_IMAGE (kernel compiles to a cubin the driver rejects). Two steps trained (reward 0.09 -> 0.23, Error 0%, Truncation 0%) before the crash, so GRPO itself is fine; the image simply cannot compile Qwen3.5-9B's linear-attention kernels. Together with orena_sft, the pod image runs neither ORena VLM leg.",
     "GoEmotions RL did not learn (final micro-F1 0.035, jaccard_curve flat/noisy): a fresh Qwen3-0.6B base model + Jaccard reward over 64 steps is not enough signal, versus Fireworks' 0.175 -> 0.377 on 5000 prompts.",
     "Qwen3 thinking-mode is the dominant RL footgun: with enable_thinking=true (default) every completion ran to max_completion_length (Truncation 100%, reward 0). Disabling it in [orchestrator.renderer] (enable_thinking=false) fixed truncation to ~0-3%. SageMaker hit the same issue and did not disable it (reward stayed 0); Prime Intellect disabled it.",
     "GRPO has no KL term on prime-rl 0.7.0: GRPOAlgoConfig has no kl_beta field (only length_penalty). The reference's KL beta 0.04 has no equivalent knob.",
     "GRPO zero-advantage post-batch filter (enforce=true by default) drops every group whose rollouts share a reward — the common case for a fresh model — and aborts the run with '10 consecutive empty train batches'. Overriding it to enforce=false lets training proceed.",
     "LoRA checkpoint bug: default save_adapter_separately=false silently strips the adapter at checkpoint; the saved model.safetensors is the un-fine-tuned base. save_adapter_separately=true + merge (W' = W + (B@A)*alpha/r) is required.",
     "Single-GPU RL needs CUDA_VISIBLE_DEVICES='0,0' to satisfy the launcher's disjoint-GPU check, and vLLM's gpu_memory_utilization must be lowered (0.9 -> 0.6) because the trainer and inference server share the physical GPU.",
-    "On-demand pods bill per-hour, not per-job, so per-experiment cost is an estimate; a provisioned-but-unused H200 pod sat idle at $4.50/hr (blocked by the VLM SFT version drift) and accumulated $15.51 of the ~$20 total pod spend."
+    "On-demand pods bill per-hour, not per-job, so per-experiment cost is an estimate; two provisioned-but-unused H200 pods ($4.50/hr) accumulated the bulk of the ~$137 spend — one $16.15 (idle during the VLM SFT block) and one $114.94 (idle overnight while the TileLang/CCCL/CUDA crash chain was debugged). Final wallet balance -$87.10; all pods terminated."
   ],
   "notes": {
-    "compute": "All runs are self-run prime-rl 0.7.0 on on-demand pods (headless CLI + SSH), not the hosted 'training runs' surface. GoEmotions SFT ran on an A100 40GB ($1.99/hr); GoEmotions RL on an A10 24GB (~$1.24/hr); an H200 141GB ($4.50/hr) was provisioned for ORena but sat idle (VLM SFT blocked).",
-    "cost": "estimated_cost_usd is approximate: pods bill per-hour and a pod can host multiple attempts. Wall-time for SFT is estimated from the 100-step loss curve; for RL from the trainer step timestamps (64 steps in ~14 min). A10 pod total was $4.16 (includes 3 failed RL launches + debugging); H200 total $15.51 (idle).",
+    "compute": "All runs are self-run prime-rl 0.7.0 on on-demand pods (headless CLI + SSH), not the hosted 'training runs' surface. GoEmotions SFT ran on an A100 40GB ($1.99/hr); GoEmotions RL on an A10 24GB (~$1.24/hr); two H200 141GB pods ($4.50/hr) were provisioned for the ORena VLM legs — one sat idle during the VLM SFT block, the other crashed on the TileLang/CCCL/CUDA chain. Both terminated.",
+    "cost": "estimated_cost_usd is approximate: pods bill per-hour and a pod can host multiple attempts. Final pod spend ≈ $137.10 (A10 $6.01, H200 #1 $16.15 idle, H200 #2 $114.94 idle); wallet -$87.10. The two H200s produced no run — a direct consequence of the VLM blocks being discovered after provisioning.",
     "data": "dataset_size is the small-run subset (800 train / 200 dev GoEmotions), not the full canonical set (43,410). This is a recorded D6 deviation (shrink data volume to fit a small budget).",
     "kl_beta": "shared.rl_kl_beta=0.04 is the reference target only; prime-rl 0.7.0 GRPO has no KL-to-reference term, so no KL was actually applied.",
     "goemotions_rl_metrics": "final_jaccard/final_micro_f1 are greedy held-out dev scores (200 rows, thinking disabled). jaccard_curve is the per-step mean training reward (sampled rollouts, Jaccard), 64 steps. start_micro_f1 was not measured (no base-model greedy eval); the base model scores ~0.02-0.035.",
-    "orena": "ORena SFT is BLOCKED and ORena RL NOT_STARTED. A H200 pod was provisioned for both; it is terminated to stop idle billing. ORena RL is feasible on 0.7.0 and remains the outstanding leg."
+    "orena": "ORena SFT is BLOCKED (VLM-SFT version drift) and ORena RL is BLOCKED (TileLang/CCCL/CUDA image drift). Both H200 pods are terminated. GRPO on Qwen3.5-9B trained 2 steps cleanly (reward 0.09 -> 0.23) before the kernel JIT crash, so the RL method is sound — the blocker is purely the pod image toolchain."
   }
 }
