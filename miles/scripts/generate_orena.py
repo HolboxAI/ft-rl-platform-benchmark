@@ -1,40 +1,32 @@
-"""ORena VLM rollout generate function for Miles (TEMPLATE).
+"""ORena VLM rollout generate function for Miles.
 
-Miles builds multimodal rollouts through a custom generate function, wired via
-`--custom-generate-function-path <module>.<fn>`, plus
-`--multimodal-keys '{"image": "images"}'`. The canonical example is
-`examples/geo3k_vlm/rollout/generate.py` in the Miles repo.
+Mirrors the canonical `examples/geo3k_vlm/rollout.py` single-turn VLM generate
+function. The base `miles.rollout.sglang_rollout.generate` does the actual SGLang
+request (it calls the Qwen3-VL processor on `sample.prompt` + the multimodal
+inputs and sends `image_data` to the SGLang server). This wrapper exists for one
+reason: Qwen3-VL's processor returns `mm_token_type_ids` as a Python list, and
+the Megatron data path assumes every `multimodal_train_inputs` value is a torch
+tensor, so the list-valued field raises "AttributeError: 'list' object has no
+attribute 'to'". We drop the non-tensor fields, matching the geo3k example.
 
-Our ORena data stores each frame as a base64 data URL inside the user message
-(see prepare_data.py). SGLang accepts image data URLs, so this generate function
-passes the image through unchanged.
-
-WARNING: the exact GenerateFn signature differs between Miles releases. Before
-running the ORena RL leg, diff this file against the installed
-`examples/geo3k_vlm/rollout/generate.py` and adjust the return shape. The
-GoEmotions leg needs no generate function (text only).
+The legacy `(args, sample, sampling_params)` signature is detected by
+`load_generate_function` and wrapped in `LegacyGenerateFnAdapter`, which calls it
+as `fn(args, sample, sampling_params)` and wraps the returned `Sample` in
+`GenerateFnOutput`.
 """
 from __future__ import annotations
 
+import torch
 
-def generate(args, sample, **kwargs):
-    """Build the SGLang request for one ORena sample.
+from miles.rollout.sglang_rollout import generate as _generate
+from miles.utils.types import Sample
 
-    Expected return (mirrors the geo3k example): a dict SGLang understands,
-    with the chat `messages` and the image under the `image` multimodal key.
-    """
-    messages = list(getattr(sample, "prompt", []) or [])
-    images = getattr(sample, "multimodal_inputs", None) or {}
-    image = images.get("image")
 
-    if image is not None:
-        # Inject the image into the last user message, OpenAI vision style.
-        messages = [dict(m) for m in messages]
-        if messages and messages[-1]["role"] == "user":
-            content = messages[-1]["content"]
-            if isinstance(content, str):
-                content = [{"type": "image", "image": image},
-                           {"type": "text", "text": content}]
-            messages[-1]["content"] = content
-
-    return {"messages": messages}
+async def generate(args, sample: Sample, sampling_params: dict) -> Sample:
+    sample = await _generate(args, sample, sampling_params)
+    mm = sample.multimodal_train_inputs
+    if mm:
+        sample.multimodal_train_inputs = {
+            k: v for k, v in mm.items() if isinstance(v, torch.Tensor)
+        } or None
+    return sample

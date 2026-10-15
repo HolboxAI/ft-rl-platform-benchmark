@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-14",
+  "updated": "2026-10-15",
   "platform": "miles",
   "framework": "miles (fork of slime) — SGLang rollout + FSDP training",
   "sdk": "radixark/miles:latest (Docker), self-hosted",
@@ -16,17 +16,26 @@
     "orena_rl": {
       "experiment": "orena_rl",
       "method": "grpo",
-      "state": "NOT_STARTED",
+      "state": "COMPLETED",
       "base_model": "Qwen3-VL-8B-Instruct",
       "hf_model_id": "Qwen/Qwen3-VL-8B-Instruct",
       "lora_rank": null,
       "learning_rate": 1e-5,
+      "kl_beta": 0.04,
+      "temperature": 0.7,
       "n_samples_per_prompt": 8,
+      "rollout_batch_size": 64,
+      "global_batch_size": 512,
       "rollout_max_response_len": 512,
-      "dataset": "data/orena/orena_rl.jsonl (regenerate; 66 MB base64 images, not committed)",
+      "dataset": "miles/data/orena_rl_miles.jsonl (65 MB base64 images, not committed)",
       "dataset_size": 2000,
-      "reward": "miles/scripts/reward_orena.py (dense correctness; exact-match reported)",
-      "note": "VLM RL on the exact Fireworks base model. Blocked by 8-GPU g6e capacity. Same thinking-disable fix applies (Qwen3-VL defaults to thinking)."
+      "num_rollout_steps": 31,
+      "reward": "miles/scripts/reward_orena.py (dense correctness = training signal; exact_match = reported)",
+      "exact_match": { "start": 0.1465, "final": 0.375, "peak": 0.4199, "trailing5_mean": 0.326 },
+      "correctness": { "start": 0.1792, "final": 0.4412 },
+      "wall_time_s": 3654,
+      "estimated_cost_usd": 18.3,
+      "note": "Comparable to Fireworks ORena RL: same base model, 2000 rows, 8 samples/prompt, 512-token cap, temp 0.7, kl 0.04. exact_match 0.146 -> 0.375 (vs Fireworks 0.191 -> 0.282). Per-step exact_match is over 64 prompts (vs Fireworks 200-row chunks), so noisy; see orena_rl_final_results.json + analysis/plots/orena_rl_miles_vs_fireworks.png."
     },
     "goemotions_sft": {
       "experiment": "goemotions_sft",
@@ -59,6 +68,8 @@
     "Base model for text RL matches Fireworks exactly: Qwen3-0.6B. Same dataset, same 64-token cap, same Jaccard reward — apples-to-apples.",
     "Qwen3's chat template defaults to enable_thinking=True, which made the model fill the whole 64-token budget with <think> reasoning and score zero. Fix = --apply-chat-template-kwargs '{\"enable_thinking\": false}' (Fireworks runs this model with enable_thinking=False).",
     "Miles (self-hosted GRPO, KL=0) reaches final Jaccard 0.60 vs Fireworks 0.34, and sampled micro-F1 ~0.44 vs 0.38 — but ends at 100% truncated responses, so the higher Jaccard is partly verbose-but-parseable output.",
-    "FSDP saves DCP (torch.distributed.checkpoint); export_hf is Megatron-only, so a held-out eval needs a DCP->HF loader."
+    "FSDP saves DCP (torch.distributed.checkpoint); export_hf is Megatron-only, so a held-out eval needs a DCP->HF loader.",
+    "ORena VLM RL (Qwen3-VL-8B-Instruct, 2000 rows, 1 epoch) on a p4d.24xlarge spot node: exact_match 0.146 -> 0.375 (peak 0.420), correctness 0.179 -> 0.441. Fireworks on the same setup: 0.191 -> 0.282. Miles starts lower but finishes higher; both are training-signal curves, and Miles' per-step points are over 64 prompts (vs Fireworks' 200-row chunks) so the Miles curve is noisier (it dips to ~0.01-0.08 around steps 4-14 before recovering).",
+    "Three A100-specific gotchas cost ~2.5 hrs of spot time before the run trained: (1) the image bundles flash-attn-4, which transformer_engine selects OVER FA2 on sm80 and which crashes on Qwen3-VL-8B's 32Q/8KV GQA layout — fix = pip uninstall flash-attn-4; (2) --num-rollout counts rollout STEPS not rollouts (--num-rollout 2000 = 64 epochs), fix = --num-epoch 1; (3) exact_match (the reported metric) is not logged by default — only correctness is — fix = a --custom-rollout-log-function-path hook."
   ]
 }

@@ -69,7 +69,7 @@ Full matrix and all hyperparameters: [`fireworks/config/FIREWORKS_4EXP_CONFIG.md
 | Fireworks | ✅ complete (4/4 jobs) | [`fireworks/metrics/final_results.json`](fireworks/metrics/final_results.json) |
 | SageMaker | ⏳ pending — team to add | — |
 | Prime Intellect | ✅ partial — 2 complete, 1 blocked, 1 not started | [`prime-intellect/metrics/final_results.json`](prime-intellect/metrics/final_results.json) |
-| Miles | ✅ complete — GoEmotions RL (256 rollouts, GRPO) on g5.2xlarge | [`miles/metrics/final_results.json`](miles/metrics/final_results.json) |
+| Miles | ✅ complete — GoEmotions RL + ORena VLM RL | [`miles/metrics/final_results.json`](miles/metrics/final_results.json) · [`miles/metrics/orena_rl_final_results.json`](miles/metrics/orena_rl_final_results.json) |
 | Baseten (CholecT50) | 🚫 blocked — training not authorized | [`baseten/EXPERIENCE_REPORT.md`](baseten/EXPERIENCE_REPORT.md) |
 | Together AI (CholecT50) | ❌ not feasible — no RL/GRPO | [`together-ai/EXPERIENCE_REPORT.md`](together-ai/EXPERIENCE_REPORT.md) |
 | Tinker (CholecT50) | ✅ complete — SFT → RL/GRPO | [`tinker/metrics/final_results.json`](tinker/metrics/final_results.json) |
@@ -129,6 +129,35 @@ Details: [`miles/metrics/run_manifest.json`](miles/metrics/run_manifest.json) an
 [`miles/metrics/final_results.json`](miles/metrics/final_results.json).
 Comparison chart: [`analysis/plots/miles_vs_fireworks_goemotions.png`](analysis/plots/miles_vs_fireworks_goemotions.png)
 (regenerate with `python3 analysis/plot_miles_vs_fireworks.py`).
+
+### Miles ORena VLM RL (self-hosted GRPO, Qwen3-VL-8B-Instruct, 2000 rows, 1 epoch, spot p4d.24xlarge)
+
+| Metric | Start → final | Peak |
+|---|---|---|
+| exact_match (reported) | 0.146 → **0.375** | 0.420 |
+| correctness (training signal) | 0.179 → **0.441** | 0.465 |
+
+**vs Fireworks (same base model, same 2000 rows, same 8 samples/prompt, same 512-token cap, temp 0.7, kl 0.04):**
+
+| Metric | Fireworks | Miles | Δ |
+|---|---|---|---|
+| ORena RL exact_match final | 0.282 | **0.375** | +0.09 |
+| ORena RL correctness final | 0.311 | **0.441** | +0.13 |
+
+Miles reaches a higher final exact_match than Fireworks on the same VLM RL task, but
+two caveats keep the comparison from being perfectly clean:
+
+- **Reporting granularity**: Fireworks reports 10 chunks of 200 rows; Miles reports 31
+  steps of 64 prompts × 8 samples. The Miles per-step points are ~3× noisier — the
+  exact_match curve dips to ~0.01–0.08 around steps 4–14 before recovering. The trailing
+  5-step mean (0.326) is the fairer "final" than the raw last step (0.375).
+- **Baseline gap**: Miles' first step scores 0.146 exact_match vs Fireworks' 0.191, because
+  the per-step batch is a different (shuffled) 64-prompt subset. The absolute gain is
+  comparable-to-larger (+0.23 vs +0.09).
+
+Details: [`miles/metrics/orena_rl_final_results.json`](miles/metrics/orena_rl_final_results.json).
+Comparison chart: [`analysis/plots/orena_rl_miles_vs_fireworks.png`](analysis/plots/orena_rl_miles_vs_fireworks.png)
+(regenerate with `python3 analysis/plot_orena_rl_miles_vs_fireworks.py`).
 
 ---
 

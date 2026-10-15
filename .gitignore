@@ -16,6 +16,7 @@ __pycache__/
 # Large derived datasets (documented in data/manifest.json; regenerate via fireworks/scripts/20_build_datasets.py)
 data/orena/orena_sft.jsonl
 data/orena/orena_rl.jsonl
+miles/data/orena_rl_miles.jsonl
 data/goemotions/data/full_dataset/*.csv
 *.tar.gz
 *.pkl

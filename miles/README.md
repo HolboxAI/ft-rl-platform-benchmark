@@ -26,16 +26,24 @@ platforms.
   backend + VLM generate function, follow-on.
 - [`scripts/generate_orena.py`](scripts/generate_orena.py) — VLM generate
   function (template).
+- [`scripts/log_rollout_orena.py`](scripts/log_rollout_orena.py) — rollout-log
+  hook that reports `exact_match` alongside `reward_value` (correctness).
+- [`scripts/extract_orena_rl_metrics.py`](scripts/extract_orena_rl_metrics.py) —
+  parses a run log into per-step curves and writes `metrics/orena_rl_final_results.json`.
 - [`data/goemotions_rl_miles.jsonl`](data/goemotions_rl_miles.jsonl) — 5,000
   rows, committed, runnable now.
 - [`data/orena_rl_miles_sample.jsonl`](data/orena_rl_miles_sample.jsonl) — 2
   rows, smoke only. Full ORena data is regenerated before the run.
 - [`metrics/run_manifest.json`](metrics/run_manifest.json) — status.
+- [`metrics/orena_rl_final_results.json`](metrics/orena_rl_final_results.json) —
+  ORena RL result (curves + summary), comparable to Fireworks' `orena_rl` block.
+- [`logs/run_orena.log`](logs/run_orena.log) — ORena RL console log (spot run).
 
 ## Status
 
-Launch-ready. GoEmotions RL reward and data are built and smoke-tested offline.
-The GPU run is the next step.
+Both RL legs are complete. GoEmotions RL ran on a g5.2xlarge (FSDP); ORena VLM
+RL ran on a p4d.24xlarge spot node (Megatron). Results are in `metrics/` and the
+comparison charts are in `analysis/plots/`.
 
 ## Run it
 
@@ -43,3 +51,7 @@ The GPU run is the next step.
 2. Pull the Miles image: `docker pull radixark/miles:latest`.
 3. Copy `scripts/` and `data/goemotions_rl_miles.jsonl` to the node.
 4. Inside the container, run `BENCH_DIR=/root/miles_bench bash run_goemotions_rl.sh`.
+
+For the ORena VLM leg, `run_orena_rl.sh` already bakes in the three A100
+gotchas (uninstall flash-attn-4, `--num-epoch 1` not `--num-rollout`, and the
+exact_match log hook) — see `metrics/run_manifest.json` findings.
