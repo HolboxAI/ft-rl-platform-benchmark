@@ -1,0 +1,34 @@
+{
+  "platform": "verl",
+  "generated_utc": "2026-10-16T10:15:00Z",
+  "experiments": {
+    "cholec_rl": {
+      "experiment": "cholec_t50_grpo_rlvr",
+      "method": "grpo",
+      "job_id": "verl-cholec-rl-qwen3.5-4b",
+      "state": "succeeded",
+      "base_model": "Qwen/Qwen3.5-4B",
+      "hf_model_id": "Qwen/Qwen3.5-4B",
+      "output_model": "s3://stanford-train-data/cholec-rl-output/global_step_14/",
+      "lora_rank": null,
+      "learning_rate": 1e-5,
+      "max_context_length": 4096,
+      "epochs": 1,
+      "dataset_size": 256,
+      "steps": 14,
+      "final_train_loss": null,
+      "estimated_cost_usd": 8.5,
+      "wall_time_s": 5400,
+      "start_score": 0.0,
+      "final_score": 0.715,
+      "reward_curve": [0.001, 0.268, 0.429, 0.312, 0.350, 0.389, 0.453, 0.550, 0.478, 0.436, 0.441, 0.502, 0.601, 0.548],
+      "findings": [
+        "Full-model FSDP RL (no LoRA) on verl, with param+optimizer offload so Qwen3.5-4B fits on 4x A10G 24GB.",
+        "Qwen3.5's 3D mRoPE position_ids crash vanilla verl; three patches (patch_qwen35.py, patch_tensordict.py, patch_fix.py) are required and applied in the Dockerfile.",
+        "start_score=0.0 is the thinking-DISABLED SFT checkpoint (it emits empty output). This is not comparable to Tinker's thinking-enabled SFT-at-0.364 baseline.",
+        "Effective data after verl's filter_overlong_prompts is 235 train / 28 val (max_prompt_length=2048), so the val split is much smaller than Tinker's n=300.",
+        "estimated_cost_usd and wall_time_s are approximate (ml.g5.12xlarge on-demand ~$5.67/hr, ~90-100 min, ~388 s/step)."
+      ]
+    }
+  }
+}

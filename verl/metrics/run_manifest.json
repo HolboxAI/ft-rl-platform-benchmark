@@ -1,0 +1,29 @@
+{
+  "updated": "2026-10-16T10:15:00Z",
+  "platform": "verl",
+  "compute": "AWS SageMaker training job",
+  "instance_types": ["ml.g5.12xlarge"],
+  "sdk": "verl (ByteDance) — uv.cu130 base image, self-managed Docker + Hydra overrides",
+  "orchestrator": "SageMaker training job (containerized, offline)",
+  "note": "RL / GRPO stage only. SFT was produced on Tinker and loaded as the merged, thinking-disabled checkpoint. Full-model FSDP (no LoRA), bfloat16, param+optimizer offload. Three Qwen3.5 mRoPE patches applied at image build.",
+  "experiments": [
+    {
+      "name": "cholec_rl",
+      "method": "grpo",
+      "base_model": "Qwen/Qwen3.5-4B",
+      "sft_checkpoint": "Tinker output, merged + thinking-disabled",
+      "job_id": "verl-cholec-rl-qwen3.5-4b",
+      "state": "succeeded",
+      "dataset_size": 256,
+      "val_size": 28,
+      "steps": 14,
+      "learning_rate": 1e-5,
+      "rollout_n": 8,
+      "temperature": 0.7,
+      "kl_loss_coef": 0.04,
+      "max_tokens": 256,
+      "start_score": 0.0,
+      "final_score": 0.715
+    }
+  ]
+}
