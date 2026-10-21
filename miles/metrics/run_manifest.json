@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-15",
+  "updated": "2026-10-21",
   "platform": "miles",
   "framework": "miles (fork of slime) — SGLang rollout + FSDP training",
   "sdk": "radixark/miles:latest (Docker), self-hosted",
@@ -62,6 +62,31 @@
       "micro_f1_mean_sampled": 0.4392,
       "truncated_mean": 0.835,
       "note": "First run invalidated by Qwen3 default enable_thinking=True (model rambled to the 64-token cap, reward ~0). Rerun with enable_thinking=False fixed it; see final_results.json."
+    },
+    "cholect50_rl": {
+      "experiment": "cholect50_rl",
+      "method": "grpo",
+      "state": "COMPLETED",
+      "base_model": "cholec-sft-qwen3.5-4b (Qwen3.5-4B VLM, model_type qwen3_5, custom SFT checkpoint)",
+      "hf_model_id": null,
+      "lora_rank": null,
+      "learning_rate": 1e-5,
+      "kl_beta": 0.04,
+      "temperature": 0.7,
+      "n_samples_per_prompt": 8,
+      "rollout_batch_size": 16,
+      "global_batch_size": 128,
+      "rollout_max_response_len": 256,
+      "dataset": "miles/data/cholect50_{train,val}.jsonl (170 MB / 21 MB base64 images, not committed)",
+      "dataset_size": 256,
+      "val_dataset_size": 32,
+      "num_rollout_steps": 16,
+      "reward": "miles/scripts/reward_cholect50.py (0.4*triplet_f1 + 0.6*mean(inst,verb,targ)_f1)",
+      "val_reward": { "start": 0.31875, "final": 0.65125 },
+      "rollout_reward": { "start": 0.3369, "final": 0.5367, "peak": 0.6958 },
+      "wall_time_s": 4193,
+      "estimated_cost_usd": 11.6,
+      "note": "Strict reproduction of verl cholec-t50-grpo (target val greedy mean@1 = 0.715). Final val 0.651 vs verl 0.715; SFT baseline 0.319 vs verl's reported 0.000. See cholect50_rl_final_results.json + docs/cholect50-miles-plan.md for the three divergences (reward EOS-token bug, filter_overlong_prompts not reproduced, SFT-baseline gap)."
     }
   },
   "findings": [
@@ -70,6 +95,9 @@
     "Miles (self-hosted GRPO, KL=0) reaches final Jaccard 0.60 vs Fireworks 0.34, and sampled micro-F1 ~0.44 vs 0.38 — but ends at 100% truncated responses, so the higher Jaccard is partly verbose-but-parseable output.",
     "FSDP saves DCP (torch.distributed.checkpoint); export_hf is Megatron-only, so a held-out eval needs a DCP->HF loader.",
     "ORena VLM RL (Qwen3-VL-8B-Instruct, 2000 rows, 1 epoch) on a p4d.24xlarge spot node: exact_match 0.146 -> 0.375 (peak 0.420), correctness 0.179 -> 0.441. Fireworks on the same setup: 0.191 -> 0.282. Miles starts lower but finishes higher; both are training-signal curves, and Miles' per-step points are over 64 prompts (vs Fireworks' 200-row chunks) so the Miles curve is noisier (it dips to ~0.01-0.08 around steps 4-14 before recovering).",
-    "Three A100-specific gotchas cost ~2.5 hrs of spot time before the run trained: (1) the image bundles flash-attn-4, which transformer_engine selects OVER FA2 on sm80 and which crashes on Qwen3-VL-8B's 32Q/8KV GQA layout — fix = pip uninstall flash-attn-4; (2) --num-rollout counts rollout STEPS not rollouts (--num-rollout 2000 = 64 epochs), fix = --num-epoch 1; (3) exact_match (the reported metric) is not logged by default — only correctness is — fix = a --custom-rollout-log-function-path hook."
+    "Three A100-specific gotchas cost ~2.5 hrs of spot time before the run trained: (1) the image bundles flash-attn-4, which transformer_engine selects OVER FA2 on sm80 and which crashes on Qwen3-VL-8B's 32Q/8KV GQA layout — fix = pip uninstall flash-attn-4; (2) --num-rollout counts rollout STEPS not rollouts (--num-rollout 2000 = 64 epochs), fix = --num-epoch 1; (3) exact_match (the reported metric) is not logged by default — only correctness is — fix = a --custom-rollout-log-function-path hook.",
+    "CholecT50 reward-zero bug: Miles passes sample.response to the reward WITH the generated <|im_end|> EOS token (and the baked-in <think> block); verl strips the chat template first, so solution_str is bare triplets. The trailing <|im_end|> corrupted the last target (e.g. cystic_artery<|im_end|> not in TARGETS -> parse None -> reward 0.0), so the first attempt trained on all-zero advantages. Fix = reward_cholect50.py._bare_response(): take text after <|im_start|>assistant and strip every <|...|> special token. This is a real Miles-vs-verl divergence to report, not a config error.",
+    "CholecT50 confound #2 — filter_overlong_prompts not reproduced: verl drops prompts >2048 tokens (235 train / 28 val / 14 steps); the Miles run used all 256 / 32 rows -> 16 steps. So the 0.651-vs-0.715 gap is not a clean apples-to-apples comparison.",
+    "CholecT50 confound #3 — SFT baseline gap: our cholec-sft-qwen3.5-4b checkpoint scores 0.319 greedy on val vs verl's reported 0.000 baseline. Either the checkpoint is stronger than verl's (RL delta 0.319->0.651 understates headroom) or verl's baseline metric differs. Needs investigation before claiming the reproduction is off."
   ]
 }

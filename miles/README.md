@@ -37,13 +37,34 @@ platforms.
 - [`metrics/run_manifest.json`](metrics/run_manifest.json) — status.
 - [`metrics/orena_rl_final_results.json`](metrics/orena_rl_final_results.json) —
   ORena RL result (curves + summary), comparable to Fireworks' `orena_rl` block.
+- [`metrics/cholect50_rl_final_results.json`](metrics/cholect50_rl_final_results.json) —
+  CholecT50 RL result (curves + summary), a strict reproduction of the verl
+  `cholec-t50-grpo` reference (target val greedy mean@1 = 0.715).
+- [`scripts/reward_cholect50.py`](scripts/reward_cholect50.py) — CholecT50
+  surgical-triplet reward (F1-blended), verbatim port of the verl reward.
+- [`scripts/generate_cholect50.py`](scripts/generate_cholect50.py) — VLM generate
+  function (Qwen3.5 template).
+- [`scripts/log_rollout_cholect50.py`](scripts/log_rollout_cholect50.py) —
+  rollout-log hook.
+- [`scripts/prepare_cholect50_data.py`](scripts/prepare_cholect50_data.py) —
+  verl parquet → Miles JSONL.
+- [`scripts/run_cholect50_rl.sh`](scripts/run_cholect50_rl.sh) — launch, FSDP
+  backend + CPU offload.
+- [`scripts/extract_cholect50_rl_metrics.py`](scripts/extract_cholect50_rl_metrics.py) —
+  parses a run log into `metrics/cholect50_rl_final_results.json`.
 - [`logs/run_orena.log`](logs/run_orena.log) — ORena RL console log (spot run).
+- [`logs/run_cholect50.log`](logs/run_cholect50.log) — CholecT50 RL console log
+  (spot run). `run_cholect50_broken.log` is the first, reward-zero run that
+  documented the EOS-token bug before the fix.
 
 ## Status
 
-Both RL legs are complete. GoEmotions RL ran on a g5.2xlarge (FSDP); ORena VLM
-RL ran on a p4d.24xlarge spot node (Megatron). Results are in `metrics/` and the
-comparison charts are in `analysis/plots/`.
+Three RL legs are complete. GoEmotions RL ran on a g5.2xlarge (FSDP); ORena VLM
+RL ran on a p4d.24xlarge spot node (Megatron); CholecT50 GRPO ran on a
+p4d.24xlarge spot node (FSDP, 4×A100). Results are in `metrics/` and the
+comparison charts are in `analysis/plots/`. The CholecT50 leg (val 0.651 vs verl
+0.715) has three documented divergences from the verl reference — see the
+`cholect50_rl` findings in `metrics/run_manifest.json`.
 
 ## Run it
 
