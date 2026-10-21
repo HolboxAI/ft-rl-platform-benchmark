@@ -67,7 +67,7 @@
       "experiment": "cholect50_rl",
       "method": "grpo",
       "state": "COMPLETED",
-      "base_model": "cholec-sft-qwen3.5-4b (Qwen3.5-4B VLM, model_type qwen3_5, custom SFT checkpoint)",
+      "base_model": "cholec-sft-qwen3.5-4b (Qwen3.5-4B VLM, model_type qwen3_5; Tinker SFT output, LoRA merged; same checkpoint as verl and SkyRL)",
       "hf_model_id": null,
       "lora_rank": null,
       "learning_rate": 1e-5,
@@ -98,6 +98,6 @@
     "Three A100-specific gotchas cost ~2.5 hrs of spot time before the run trained: (1) the image bundles flash-attn-4, which transformer_engine selects OVER FA2 on sm80 and which crashes on Qwen3-VL-8B's 32Q/8KV GQA layout — fix = pip uninstall flash-attn-4; (2) --num-rollout counts rollout STEPS not rollouts (--num-rollout 2000 = 64 epochs), fix = --num-epoch 1; (3) exact_match (the reported metric) is not logged by default — only correctness is — fix = a --custom-rollout-log-function-path hook.",
     "CholecT50 reward-zero bug: Miles passes sample.response to the reward WITH the generated <|im_end|> EOS token (and the baked-in <think> block); verl strips the chat template first, so solution_str is bare triplets. The trailing <|im_end|> corrupted the last target (e.g. cystic_artery<|im_end|> not in TARGETS -> parse None -> reward 0.0), so the first attempt trained on all-zero advantages. Fix = reward_cholect50.py._bare_response(): take text after <|im_start|>assistant and strip every <|...|> special token. This is a real Miles-vs-verl divergence to report, not a config error.",
     "CholecT50 confound #2 — filter_overlong_prompts not reproduced: verl drops prompts >2048 tokens (235 train / 28 val / 14 steps); the Miles run used all 256 / 32 rows -> 16 steps. So the 0.651-vs-0.715 gap is not a clean apples-to-apples comparison.",
-    "CholecT50 confound #3 — SFT baseline gap: our cholec-sft-qwen3.5-4b checkpoint scores 0.319 greedy on val vs verl's reported 0.000 baseline. Either the checkpoint is stronger than verl's (RL delta 0.319->0.651 understates headroom) or verl's baseline metric differs. Needs investigation before claiming the reproduction is off."
+    "CholecT50 confound #3 — SFT baseline gap (resolved): all three load the SAME checkpoint (cholec-sft-qwen3.5-4b = Tinker SFT output, LoRA merged). verl disables thinking, so the checkpoint emits empty output and scores 0.000. Miles and SkyRL keep the baked-in think block and emit valid triplets, so they score 0.319 and 0.329. Val split differs too (32 vs 28 frames). The gap is thinking mode plus val split, not a checkpoint-quality difference."
   ]
 }

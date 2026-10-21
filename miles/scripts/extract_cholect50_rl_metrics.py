@@ -119,7 +119,7 @@ def main():
         "framework": "miles (slime fork) — SGLang rollout + FSDP train",
         "job_id": "miles-spot-p4d24xlarge-cholect50-rl",
         "state": "COMPLETED",
-        "base_model": "cholec-sft-qwen3.5-4b (Qwen3.5-4B VLM, model_type qwen3_5, custom SFT checkpoint)",
+        "base_model": "cholec-sft-qwen3.5-4b (Qwen3.5-4B VLM, model_type qwen3_5; Tinker SFT output, LoRA merged; same checkpoint as verl and SkyRL)",
         "hf_model_id": None,
         "lora_rank": None,
         "learning_rate": 1e-05,
