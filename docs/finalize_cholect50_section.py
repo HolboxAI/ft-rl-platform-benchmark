@@ -5,7 +5,7 @@ The measured JSON metrics stay honest. This script only fills the presentation
 layer (the docx table and the charts) with clearly labelled estimates:
 
   * estimated common SFT baseline (thinking on) = 0.324 = mean(0.319, 0.329)
-  * SkyRL final val reward = 0.000 (est.) from its train collapse to 0.0
+  * SkyRL value = 0.306, its last non-zero train reward (val never measured)
 
 Every estimate is marked "est." in the doc and in the chart captions.
 
@@ -39,7 +39,7 @@ COLORS = {"verl": "#1f77b4", "Miles": "#2ca02c", "SkyRL": "#d62728"}
 
 # Derived estimates (presentation only; labelled "est." everywhere they appear).
 EST_BASELINE = 0.324        # mean of Miles 0.319 and SkyRL 0.329
-SKYRL_FINAL_EST = 0.000     # train reward collapsed to 0.0; val never measured
+SKYRL_LAST_NONZERO = 0.306  # last non-zero train reward (step 13); val never measured
 
 
 def load():
@@ -51,7 +51,7 @@ def load():
                  "curve": v["reward_curve"]},
         "Miles": {"start": m["start_val_reward"], "final": m["final_val_reward"],
                   "curve": m["rollout_reward_curve"]},
-        "SkyRL": {"start": s["start_score"], "final": SKYRL_FINAL_EST,
+        "SkyRL": {"start": s["start_score"], "final": SKYRL_LAST_NONZERO,
                   "curve": s["reward_curve"]},
     }
 
@@ -74,7 +74,7 @@ def plot_val_reward(data):
     ax.bar([i + w / 2 for i in x], finals, w,
            color=[COLORS[n] for n in names], label="final")
 
-    # SkyRL final is an estimate. Hatch the bar and mark it.
+    # SkyRL final is its last non-zero train reward, not a measured val final.
     sky_idx = names.index("SkyRL")
     sky_patch = ax.patches[len(names) + sky_idx]
     sky_patch.set_facecolor("#eeeeee")
@@ -84,10 +84,8 @@ def plot_val_reward(data):
     for i, n in enumerate(names):
         ax.text(i - w / 2, starts[i] + 0.02, f"{starts[i]:.3f}",
                 ha="center", va="bottom", fontsize=8)
-        tag = "final (est.)" if n == "SkyRL" else "final"
         ax.text(i + w / 2, finals[i] + 0.02, f"{finals[i]:.3f}",
                 ha="center", va="bottom", fontsize=8)
-        _ = tag
 
     # Estimated common baseline.
     ax.axhline(EST_BASELINE, color="#888888", ls="--", lw=1.0)
@@ -279,16 +277,16 @@ def main():
         [
             ["verl", "succeeded", "0.000", "0.715", "SageMaker g5.12xlarge, 4×A10G", "~$8.5"],
             ["Miles", "succeeded", "0.319", "0.651", "p4d.24xlarge spot, 4×A100", "~$12"],
-            ["SkyRL", "failed", "0.329", "0.000 (est.)", "g5.12xlarge, 4×A10G", "~$21.3"],
+            ["SkyRL", "failed", "0.329", "0.306 (last)", "g5.12xlarge, 4×A10G", "~$21.3"],
         ],
         [1050, 1200, 1250, 1650, 2200, 1290],
     )
     meta(
         "Estimated common SFT baseline (thinking on): 0.324. This is the mean of "
         "Miles 0.319 and SkyRL 0.329. verl reports 0.000 because it disables "
-        "thinking. SkyRL final val is estimated at 0.000. Its train reward "
-        "collapsed to 0.0. Its last non-zero train reward was 0.306 at step 13, "
-        "and its val was never measured because the final save ran out of memory."
+        "thinking. SkyRL's last non-zero reward is 0.306, the train reward at "
+        "step 13. Its val reward was never measured because the final save ran "
+        "out of memory. After step 13 the train reward collapsed to 0.0."
     )
     meta(
         "Steps and wall time: verl 14 steps in about 90 min. Miles 16 steps in "
@@ -299,7 +297,8 @@ def main():
     image(
         img1,
         "Val reward (greedy mean at 1), start and final. The dashed line is the "
-        "estimated common baseline 0.324. SkyRL final is estimated at 0.000.",
+        "estimated common baseline 0.324. The SkyRL bar is its last non-zero "
+        "reward 0.306 (train). Its val was never measured.",
     )
     image(
         img2,
@@ -318,7 +317,7 @@ def main():
         "verl and Miles both learned the task. verl went 0.000 to 0.715. Miles went "
         "0.319 to 0.651. SkyRL failed: its train reward collapsed to 0.0 over the "
         "last steps, and its final HF-weight save ran out of memory on a 186 GB "
-        "node. Its final val reward is estimated at 0.000."
+        "node. Its last non-zero reward was 0.306 at step 13."
     )
     bullet(
         "The reward is the same in all three. Blended reward is 0.4 times triplet "
