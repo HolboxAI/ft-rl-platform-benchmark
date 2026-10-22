@@ -29,6 +29,8 @@ BACKENDS = ("cpu", "cuda", "neuron", "tpu", "tpu-xla")
 class Backend:
     name = "cpu"
     lazy = False  # True for XLA-style lazy tensors that need mark_step()
+    # True where on-device RNG is broken: random tensors are drawn on the host and copied over.
+    host_rng = False
 
     def __init__(self):
         self.device = torch.device("cpu")
@@ -121,6 +123,10 @@ class NeuronNativeBackend(Backend):
 
     name = "neuron"
     lazy = False
+    # torch-neuronx 2.14.3: torch.rand/randn on device="neuron" recurses forever inside
+    # torch_neuronx/neuron_dynamo_backend/decompositions.py:rand_decomp (torch.empty on the same
+    # device re-enters the decomposition) -> RecursionError (run grpo-trn-20261022-1454-mini).
+    host_rng = True
 
     def __init__(self):
         import torch_neuronx  # noqa: F401  (registers the "neuron" device)

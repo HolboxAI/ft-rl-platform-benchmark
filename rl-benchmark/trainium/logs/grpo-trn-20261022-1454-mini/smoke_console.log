@@ -1,0 +1,30 @@
+On-device RNG not available - CPU RNG will be used
+[neuron_compat] CPU index helpers: get_vision_attention_seqlens, get_vision_bilinear_indices_and_weights, get_vision_cu_seqlens, get_vision_interpolation_indices_and_weights, get_vision_merged_shape, get_vision_nearest_position_ids, get_vision_position_ids, get_vision_window_index, Qwen3_5Model.get_rope_index, Qwen3_5Model.get_vision_position_ids, Qwen3_5Model.get_placeholder_mask
+{
+  "backend": "neuron",
+  "model": "/data/models/cholec-sft-qwen3.5-4b",
+  "stages": {},
+  "ok": false,
+  "describe": {
+    "backend": "neuron",
+    "device": "neuron",
+    "torch": "2.14.0+cu130",
+    "neuron_mode": "native",
+    "torch_neuronx": "2.14.3.0.1+b1b6c66"
+  },
+  "neuron_compat_patched": [
+    "get_vision_attention_seqlens",
+    "get_vision_bilinear_indices_and_weights",
+    "get_vision_cu_seqlens",
+    "get_vision_interpolation_indices_and_weights",
+    "get_vision_merged_shape",
+    "get_vision_nearest_position_ids",
+    "get_vision_position_ids",
+    "get_vision_window_index",
+    "Qwen3_5Model.get_rope_index",
+    "Qwen3_5Model.get_vision_position_ids",
+    "Qwen3_5Model.get_placeholder_mask"
+  ],
+  "failed_stage": "device",
+  "error": "RecursionError: maximum recursion depth exceeded"
+}

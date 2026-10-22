@@ -1,0 +1,27 @@
+/data/code/accelerator-rl-benchmark/data/cholect50/parquet:
+total 140576
+drwxr-xr-x 2 root root      4096 Oct 22 11:06 .
+drwxr-xr-x 3 root root      4096 Oct 22 11:06 ..
+-rw-r--r-- 1 root root 127638193 Oct 14 15:17 train.parquet
+-rw-r--r-- 1 root root  16298647 Oct 14 15:17 val.parquet
+
+/data/models/cholec-sft-qwen3.5-4b:
+total 10365544
+drwxr-xr-x 2 root root        4096 Oct 22 11:06 .
+drwxr-xr-x 3 root root        4096 Oct 22 11:05 ..
+-rw-r--r-- 1 root root        1570 Oct 19 14:20 .gitattributes
+-rw-r--r-- 1 root root       11544 Oct 19 14:20 LICENSE
+-rw-r--r-- 1 root root       77661 Oct 19 14:20 README.md
+-rw-r--r-- 1 root root        7622 Oct 19 14:20 chat_template.jinja
+-rw-r--r-- 1 root root        2693 Oct 19 14:20 config.json
+-rw-r--r-- 1 root root          26 Oct 19 14:20 generation_config.json
+-rw-r--r-- 1 root root     3353259 Oct 19 14:20 merges.txt
+-rw-r--r-- 1 root root 10591227144 Oct 19 14:20 model.safetensors
+-rw-r--r-- 1 root root       56314 Oct 19 14:20 model.safetensors.index.json
+-rw-r--r-- 1 root root         390 Oct 19 14:20 preprocessor_config.json
+-rw-r--r-- 1 root root    12807982 Oct 19 14:20 tokenizer.json
+-rw-r--r-- 1 root root       15001 Oct 19 14:20 tokenizer_config.json
+-rw-r--r-- 1 root root         385 Oct 19 14:20 video_preprocessor_config.json
+-rw-r--r-- 1 root root     6722759 Oct 19 14:20 vocab.json
+7463bb11bd6518b469f0cfe248218090fe6896b6e10f70721ee7a0910fb1bd10  train.parquet
+5c6f3191fedd088b9dbd2c1c8e3e2089e075259cdc2ed01a19010686ef5c4c8c  val.parquet

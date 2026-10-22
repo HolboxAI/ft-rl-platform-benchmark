@@ -1,0 +1,278 @@
+{
+  "name": "skyrl",
+  "root": "/private/tmp/claude-501/-Users-dev-Documents-RL-benchmark/dba023e7-4c19-43be-af4c-a8b7eebb09b2/scratchpad/ext/skyrl",
+  "commit": "b304652 2026-10-21",
+  "scope": "production code (tests/docs/examples/benchmarks/ci excluded)",
+  "py_files": 378,
+  "py_lines": 109577,
+  "totals": {
+    "cuda_runtime": {
+      "call_sites": 172,
+      "files": 36
+    },
+    "nccl": {
+      "call_sites": 56,
+      "files": 15
+    },
+    "gpu_kernels": {
+      "call_sites": 20,
+      "files": 9
+    },
+    "nvidia_stack": {
+      "call_sites": 140,
+      "files": 34
+    },
+    "sglang": {
+      "call_sites": 0,
+      "files": 0
+    },
+    "vllm": {
+      "call_sites": 131,
+      "files": 28
+    },
+    "jax": {
+      "call_sites": 62,
+      "files": 22
+    },
+    "xla_or_neuron": {
+      "call_sites": 0,
+      "files": 0
+    }
+  },
+  "top_files": {
+    "nccl": [
+      [
+        "skyrl/backends/skyrl_train/weight_sync/weight_senders.py",
+        10
+      ],
+      [
+        "skyrl/train/config/config.py",
+        9
+      ],
+      [
+        "skyrl/train/utils/utils.py",
+        9
+      ],
+      [
+        "skyrl/backends/skyrl_train/weight_sync/__init__.py",
+        5
+      ],
+      [
+        "skyrl/backends/skyrl_train/weight_sync/weight_receivers.py",
+        4
+      ],
+      [
+        "skyrl/backends/skyrl_train/weight_sync/control_plane.py",
+        4
+      ],
+      [
+        "skyrl/backends/skyrl_train/workers/megatron/megatron_worker.py",
+        4
+      ],
+      [
+        "skyrl/backends/skyrl_train/workers/worker.py",
+        3
+      ]
+    ],
+    "jax": [
+      [
+        "skyrl/backends/jax.py",
+        6
+      ],
+      [
+        "skyrl/tx/layers/util.py",
+        5
+      ],
+      [
+        "skyrl/tx/utils/models.py",
+        5
+      ],
+      [
+        "skyrl/tx/layers/stacked.py",
+        4
+      ],
+      [
+        "skyrl/tx/models/qwen3_5.py",
+        4
+      ],
+      [
+        "skyrl/tx/models/deepseekv3.py",
+        4
+      ],
+      [
+        "skyrl/tx/models/llama3.py",
+        4
+      ],
+      [
+        "skyrl/tx/models/qwen3.py",
+        4
+      ]
+    ],
+    "vllm": [
+      [
+        "skyrl/backends/skyrl_train/inference_servers/vllm_server_actor.py",
+        20
+      ],
+      [
+        "skyrl/backends/skyrl_train/weight_sync/sharded_rdt/sharded_rdt_engine.py",
+        18
+      ],
+      [
+        "skyrl/backends/skyrl_train/patches/vllm/patch_routed_experts_pp_relay.py",
+        14
+      ],
+      [
+        "skyrl/backends/skyrl_train/patches/vllm/patch_glm5next_lora_packing.py",
+        9
+      ],
+      [
+        "skyrl/backends/skyrl_train/inference_servers/render_server.py",
+        8
+      ],
+      [
+        "skyrl/backends/skyrl_train/patches/vllm/patch_lora_in_memory.py",
+        7
+      ],
+      [
+        "skyrl/backends/skyrl_train/weight_sync/weight_senders.py",
+        5
+      ],
+      [
+        "skyrl/backends/skyrl_train/weight_sync/delta/engine.py",
+        5
+      ]
+    ],
+    "cuda_runtime": [
+      [
+        "skyrl/backends/skyrl_train/workers/worker.py",
+        28
+      ],
+      [
+        "skyrl/backends/skyrl_train/weight_sync/sharded_rdt/sharded_rdt_engine.py",
+        11
+      ],
+      [
+        "skyrl/backends/skyrl_train/workers/megatron/megatron_worker.py",
+        10
+      ],
+      [
+        "skyrl/backends/skyrl_train/distributed/strategy.py",
+        9
+      ],
+      [
+        "skyrl/backends/skyrl_train/distributed/fsdp_utils.py",
+        9
+      ],
+      [
+        "skyrl/backends/skyrl_train/weight_sync/sharded_rdt/rdt_send.py",
+        8
+      ],
+      [
+        "skyrl/backends/skyrl_train/distributed/megatron/megatron_strategy.py",
+        8
+      ],
+      [
+        "skyrl/backends/skyrl_train/inference_servers/vllm_server_actor.py",
+        8
+      ]
+    ],
+    "nvidia_stack": [
+      [
+        "skyrl/backends/skyrl_train/weight_sync/sharded_rdt/rdt_send.py",
+        12
+      ],
+      [
+        "skyrl/backends/skyrl_train/utils/replay_utils.py",
+        11
+      ],
+      [
+        "skyrl/backends/skyrl_train/patches/megatron/glm5_next/layer_specs.py",
+        10
+      ],
+      [
+        "skyrl/backends/skyrl_train/workers/megatron/model_bridges.py",
+        10
+      ],
+      [
+        "skyrl/backends/skyrl_train/distributed/megatron/megatron_utils.py",
+        8
+      ],
+      [
+        "skyrl/backends/skyrl_train/distributed/megatron/megatron_strategy.py",
+        8
+      ],
+      [
+        "skyrl/backends/skyrl_train/patches/megatron/mcore_ext/mhc_transformer_layer.py",
+        7
+      ],
+      [
+        "skyrl/backends/skyrl_train/patches/megatron/glm5_next/dsa.py",
+        7
+      ]
+    ],
+    "gpu_kernels": [
+      [
+        "skyrl/backends/skyrl_train/distributed/megatron/fused_linear_logprob_triton.py",
+        3
+      ],
+      [
+        "skyrl/backends/skyrl_train/patches/te/verify_fa2_head_dim.py",
+        3
+      ],
+      [
+        "skyrl/backends/skyrl_train/patches/te/patch_fa2_head_dim.py",
+        3
+      ],
+      [
+        "skyrl/backends/skyrl_train/patches/megatron/mcore_ext/kda.py",
+        3
+      ],
+      [
+        "skyrl/backends/skyrl_train/weight_sync/fp8/quantize.py",
+        2
+      ],
+      [
+        "skyrl/backends/skyrl_train/patches/te/disable_fa4.py",
+        2
+      ],
+      [
+        "skyrl/backends/skyrl_train/workers/model_wrapper.py",
+        2
+      ],
+      [
+        "skyrl/backends/skyrl_train/distributed/megatron/megatron_strategy.py",
+        1
+      ]
+    ]
+  },
+  "by_area": {
+    "skyrl/backends": {
+      "nccl": 36,
+      "vllm": 128,
+      "jax": 7,
+      "cuda_runtime": 163,
+      "nvidia_stack": 140,
+      "gpu_kernels": 20
+    },
+    "skyrl/tx": {
+      "jax": 53
+    },
+    "skyrl/train": {
+      "nccl": 18,
+      "cuda_runtime": 7
+    },
+    "skyrl-agent/skyrl_agent": {
+      "cuda_runtime": 2,
+      "vllm": 3
+    },
+    "skyrl/tinker": {
+      "jax": 2
+    },
+    "skyrl": {
+      "nccl": 1
+    },
+    "integrations/arctic_rl": {
+      "nccl": 1
+    }
+  }
+}

@@ -80,10 +80,22 @@ run_grpo() {  # $1 = name, rest = extra args
 }
 
 if want rl1; then
+  # Mini GRPO step: the full code path (sample -> reward -> group advantages -> clipped loss + KL
+  # -> LoRA update) on 2 frames x 4 samples, <= 64 tokens: one sampler batch, ~5-15 min.
   stage rl1
   t0=$(date +%s)
-  run_grpo rl1 --num-steps 1 --eval-split "" || { log "rl1 FAILED after $(( $(date +%s) - t0 )) s"; exit 4; }
+  run_grpo rl1 --num-steps 1 --eval-split "" --rollout-batch-size 2 --n-samples 4 \
+    --max-new-tokens 64 --gen-micro-batch 8 --train-micro-batch 1 \
+    || { log "rl1 FAILED after $(( $(date +%s) - t0 )) s"; exit 4; }
   log "rl1 done in $(( $(date +%s) - t0 )) s"
+fi
+
+if want rl1full; then
+  # One full-size GRPO step (16 frames x 8 samples, 256 tokens): ~1-2.5 h with the static sampler.
+  stage rl1full
+  t0=$(date +%s)
+  run_grpo rl1full --num-steps 1 --eval-split "" || { log "rl1full FAILED after $(( $(date +%s) - t0 )) s"; exit 6; }
+  log "rl1full done in $(( $(date +%s) - t0 )) s"
 fi
 
 if want full; then

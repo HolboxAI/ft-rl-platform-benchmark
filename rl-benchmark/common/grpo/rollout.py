@@ -77,7 +77,10 @@ def generate_static(model, batch, max_new_tokens, temperature, pad_id, backend,
         else:
             # Gumbel-max sampling == multinomial over softmax(logits / T), using
             # only rand/log/argmax, which every backend supports.
-            u = torch.rand_like(logits).clamp_(1e-10, 1.0 - 1e-7)
+            if getattr(backend, "host_rng", False):  # on-device RNG broken (torch-neuronx 2.14.3)
+                u = torch.rand(logits.shape, dtype=logits.dtype).to(logits.device).clamp_(1e-10, 1.0 - 1e-7)
+            else:
+                u = torch.rand_like(logits).clamp_(1e-10, 1.0 - 1e-7)
             tok = (logits / temperature - torch.log(-torch.log(u))).argmax(-1)
         buf.index_copy_(1, read_idx + 1, tok.unsqueeze(1).to(buf.dtype))
         read_idx = read_idx + 1

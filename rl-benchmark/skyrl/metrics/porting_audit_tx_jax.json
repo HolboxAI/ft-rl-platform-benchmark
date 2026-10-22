@@ -1,0 +1,92 @@
+{
+  "name": "skyrl-tx-jax",
+  "root": "/private/tmp/claude-501/-Users-dev-Documents-RL-benchmark/dba023e7-4c19-43be-af4c-a8b7eebb09b2/scratchpad/ext/skyrl/skyrl/tx",
+  "commit": "b304652 2026-10-21",
+  "scope": "production code (tests/docs/examples/benchmarks/ci excluded)",
+  "py_files": 25,
+  "py_lines": 4970,
+  "totals": {
+    "cuda_runtime": {
+      "call_sites": 0,
+      "files": 0
+    },
+    "nccl": {
+      "call_sites": 0,
+      "files": 0
+    },
+    "gpu_kernels": {
+      "call_sites": 0,
+      "files": 0
+    },
+    "nvidia_stack": {
+      "call_sites": 0,
+      "files": 0
+    },
+    "sglang": {
+      "call_sites": 0,
+      "files": 0
+    },
+    "vllm": {
+      "call_sites": 0,
+      "files": 0
+    },
+    "jax": {
+      "call_sites": 53,
+      "files": 19
+    },
+    "xla_or_neuron": {
+      "call_sites": 0,
+      "files": 0
+    }
+  },
+  "top_files": {
+    "jax": [
+      [
+        "layers/util.py",
+        5
+      ],
+      [
+        "utils/models.py",
+        5
+      ],
+      [
+        "layers/stacked.py",
+        4
+      ],
+      [
+        "models/qwen3_5.py",
+        4
+      ],
+      [
+        "models/deepseekv3.py",
+        4
+      ],
+      [
+        "models/llama3.py",
+        4
+      ],
+      [
+        "models/qwen3.py",
+        4
+      ],
+      [
+        "layers/connectors.py",
+        3
+      ]
+    ]
+  },
+  "by_area": {
+    "layers": {
+      "jax": 22
+    },
+    "models": {
+      "jax": 18
+    },
+    "utils": {
+      "jax": 10
+    },
+    "loaders": {
+      "jax": 3
+    }
+  }
+}

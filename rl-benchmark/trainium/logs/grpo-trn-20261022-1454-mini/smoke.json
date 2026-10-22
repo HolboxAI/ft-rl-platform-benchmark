@@ -1,0 +1,29 @@
+{
+  "backend": "neuron",
+  "model": "/data/models/cholec-sft-qwen3.5-4b",
+  "stages": {},
+  "ok": false,
+  "describe": {
+    "backend": "neuron",
+    "device": "neuron",
+    "torch": "2.14.0+cu130",
+    "neuron_mode": "native",
+    "torch_neuronx": "2.14.3.0.1+b1b6c66"
+  },
+  "neuron_compat_patched": [
+    "get_vision_attention_seqlens",
+    "get_vision_bilinear_indices_and_weights",
+    "get_vision_cu_seqlens",
+    "get_vision_interpolation_indices_and_weights",
+    "get_vision_merged_shape",
+    "get_vision_nearest_position_ids",
+    "get_vision_position_ids",
+    "get_vision_window_index",
+    "Qwen3_5Model.get_rope_index",
+    "Qwen3_5Model.get_vision_position_ids",
+    "Qwen3_5Model.get_placeholder_mask"
+  ],
+  "failed_stage": "device",
+  "error": "RecursionError: maximum recursion depth exceeded",
+  "traceback": "tensor.py\", line 2198, in __torch_dispatch__\n    return proxy_call(self, func, self.pre_dispatch, args, kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/fx/experimental/proxy_tensor.py\", line 1328, in proxy_call\n    r = maybe_handle_decomp(proxy_mode, func, args, kwargs)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/fx/experimental/proxy_tensor.py\", line 3495, in maybe_handle_decomp\n    out = decomp_table[op](*args, **kwargs)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/neuron_dynamo_backend/decompositions.py\", line 5708, in rand_decomp\n    ref = torch.empty((), device=device, dtype=out_dtype)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/_compile.py\", line 54, in inner\n    return disable_fn(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py\", line 1548, in _fn\n    return fn(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/utils/_stats.py\", line 29, in wrapper\n    return fn(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/fx/experimental/proxy_tensor.py\", line 2198, in __torch_dispatch__\n    return proxy_call(self, func, self.pre_dispatch, args, kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/fx/experimental/proxy_tensor.py\", line 1440, in proxy_call\n    proxy_out = proxy_mode.tracer.create_proxy(\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/fx/proxy.py\", line 360, in create_proxy\n    args_ = self.create_arg(args)\n            ^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/fx/experimental/proxy_tensor.py\", line 1647, in create_arg\n    return super().create_arg(a)  # type: ignore[return-value]\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/fx/_symbolic_trace.py\", line 492, in create_arg\n    return super().create_arg(a)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/fx/proxy.py\", line 434, in create_arg\n    return handler(self, a)\n           ^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/fx/proxy.py\", line 983, in <lambda>\n    _create_arg_bypass[tuple] = lambda self, a: tuple(self.create_arg(elem) for elem in a)\n                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/fx/proxy.py\", line 983, in <genexpr>\n    _create_arg_bypass[tuple] = lambda self, a: tuple(self.create_arg(elem) for elem in a)\n                                                      ^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/fx/experimental/proxy_tensor.py\", line 1642, in create_arg\n    if isinstance(a, (FakeScriptObject, CustomClassBase)):\n       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/_custom_class_base.py\", line 15, in __instancecheck__\n    return is_custom_class_obj(instance)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRecursionError: maximum recursion depth exceeded\n"
+}

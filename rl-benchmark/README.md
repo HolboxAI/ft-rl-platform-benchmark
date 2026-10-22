@@ -1,62 +1,113 @@
-# rl-benchmark: CholecT50 GRPO on AWS Trainium (torch-neuronx)
+# Accelerator RL Benchmark: CholecT50 GRPO on Trainium and TPU
 
-Self-contained folder. Nothing outside `rl-benchmark/` is changed or imported.
-It asks whether the CholecT50 surgical action-triplet GRPO run (the verl /
-Miles / SkyRL / NeMo-RL / Tinker legs elsewhere in this repo) can run on **AWS
-Trainium through torch-neuronx**, and records exactly where each stack stops.
+This is a companion to `ft-rl-platform-benchmark-main 2`. That repo ran the
+CholecT50 surgical action-triplet task through RL platforms on NVIDIA GPUs:
+Tinker, verl, Miles, SkyRL and NeMo-RL. This repo asks whether **the same
+CholecT50 GRPO** can run on non-NVIDIA accelerators, and how it compares:
 
-**CholecT50 only:** the same verl parquet (256 train / 32 val frames), the same
-merged SFT checkpoint (`cholec-sft-qwen3.5-4b`, Qwen3.5-4B VLM) and the same
-triplet-F1 reward as the GPU legs.
+1. **AWS Trainium**: via **torch-neuronx** (PyTorch/XLA + Neuron compiler).
+2. **Google Cloud TPU**: via **TorchTPU** (`torch_tpu`), with PyTorch/XLA as a baseline.
 
-## Contents
+The task is **CholecT50 only**: the same frames, SFT checkpoint and reward as
+the GPU runs ([`data/README.md`](data/README.md)). Plan, risks and validation
+status are in [`EXPERIMENT_PLAN.md`](EXPERIMENT_PLAN.md).
 
-| Folder | Experiment | Status (2026-10-22) |
-|---|---|---|
-| [`miles/`](miles/) | Can Miles run on Trainium? Static porting audit + on-hardware probe | ❌ **Not compatible.** No Neuron platform (`MILES_ACCELERATOR` accepts only `cuda`/`tpu`), and SGLang does not install on the Neuron venv. Evidence: [`miles/TRAINIUM_INCOMPATIBILITY.md`](miles/TRAINIUM_INCOMPATIBILITY.md) |
-| [`hf-trl/`](hf-trl/) | Stock Hugging Face TRL `GRPOTrainer` on native TorchNeuron | 🟡 TorchNeuron, accelerate (picks `"neuron"`), TRL / transformers / peft and the Qwen3.5 vision tower all work. Blocked in `generate` prefill (int64 `input_ids` corrupted). Log: [`hf-trl/config/TRL_CHOLECT50_CONFIG.md`](hf-trl/config/TRL_CHOLECT50_CONFIG.md) |
-| [`common/`](common/) + [`trainium/`](trainium/) | Our own plain-PyTorch GRPO loop (no RL framework) on native TorchNeuron | 🟢 First Trainium run in progress (smoke test + 1 GRPO step) |
-
-Supporting files: [`analysis/`](analysis/) (metrics schema, comparison script),
-[`data/`](data/) (CholecT50 data notes; the parquet is fetched from S3, not
-committed), [`EXPERIMENT_PLAN.md`](EXPERIMENT_PLAN.md) (also covers a TPU leg
-that is not part of this folder).
-
-## Environment (all three experiments)
+## The task
 
 | | |
 |---|---|
-| Instance | `trn1.2xlarge` (1 Trainium1 chip, 2 NeuronCores, 32 GB HBM), us-east-1 |
-| AMI | Neuron DLAMI `torch-neuronx-2.14.0`, Ubuntu 24.04 |
-| Stack | torch 2.14.0, torch-neuronx 2.14.3 (**native TorchNeuron**, device `"neuron"`, no `torch_xla`), neuronx-cc 2.28 |
-| Launch | S3-driven EC2 runner per experiment (`*/ec2/` or `*/trainium/ec2/`): `submit.sh` → `launch_instance.sh` → `status.sh --fetch`. No SSH; hard time limit; results synced to S3 |
+| Data | CholecT50 endoscopic frames: 256 train / 32 val (verl parquet) |
+| Task | list every `instrument-verb-target` action triplet in a frame |
+| Model | `Qwen3.5-4B` VLM, merged SFT checkpoint (`cholec-sft-qwen3.5-4b`) |
+| Reward | 0.4 × triplet F1 + 0.6 × mean(instrument, verb, target F1) |
+| RL | GRPO, 16 frames × 8 samples per step, 16 steps (1 epoch), 256-token responses |
+| Headline metric | greedy val reward before → after (32 frames) |
 
-## Findings so far
+GPU reference results (val reward): Tinker 0.364 → 0.419 (LoRA), verl 0.000 → 0.715,
+Miles 0.319 → 0.651, NeMo-RL 0.000 → 0.471, SkyRL collapsed (0.329 → 0.0).
 
-- **Native TorchNeuron works on Trn1.** The Neuron docs list Trn2 / Trn3, but
-  `torch.neuron.is_available()` is true and tensor ops run on `trn1.2xlarge`.
-- **accelerate ≥ 1.15 selects `torch.device("neuron")` by itself.** TRL needs
-  no device code.
-- **Qwen3.5 vision on TorchNeuron** needs its data-dependent index helpers
-  (`repeat_interleave` with tensor repeats, mRoPE indices) run on CPU:
-  [`common/neuron_compat.py`](common/neuron_compat.py). After that the vision
-  tower compiles (~12 min cold) and runs.
-- **Op correctness on neuron vs CPU (20 cases):** 18 match. `int64.sum()` and
-  `int64.cumsum()` are wrong for large values (float32 accumulation; garbage
-  cumsum). Mask and count ops used by RL are correct at realistic sizes.
-- **Miles:** 552 NVIDIA-specific + 67 SGLang call sites in production code,
-  0 JAX. Not portable without new platform and rollout code.
+## Library × chip matrix
+
+| Library | Trainium | TPU | GPU reference / control |
+|---|---|---|---|
+| **Plain PyTorch** (`common/grpo`) | [`trainium/`](trainium/): torch-neuronx, LoRA 16 | [`torchtpu/`](torchtpu/): TorchTPU (+ PyTorch/XLA), LoRA 16 | `--backend cuda` |
+| **Miles** | [`miles/trainium/`](miles/): probe; no Neuron platform | [`miles/tpu/`](miles/): probe; experimental `torch_tpu` training hook, no TPU rollout | Miles GPU run: 0.319 → 0.651 |
+| **SkyRL** | [`skyrl/trainium/`](skyrl/): JAX backend on jax-neuronx (beta) | [`skyrl/tpu/`](skyrl/): JAX backend via Tinker API | [`skyrl/gpu_control/`](skyrl/): same client, FSDP backend |
+| **HF TRL** (`GRPOTrainer`) | [`hf-trl/`](hf-trl/): stock TRL on native TorchNeuron (accelerate picks `"neuron"`), LoRA 16 | — | — |
+
+The source already shows two blockers before any hardware run:
+- **Miles:** no non-CUDA rollout engine.
+- **SkyRL:** its JAX backend has no image input, and CholecT50 needs images.
+
+So the Miles and SkyRL accelerator legs start as staged probes that record
+where each stack stops. Their CholecT50 runs are scripted for when the blocking
+stage passes.
+
+## Status
+
+_As of 2026-10-22, 15:20 UTC._
+
+| Leg | Probe / smoke | CholecT50 run |
+|---|---|---|
+| Trainium: our GRPO loop (`trainium/`) | 🟡 run `-mini` failed at stage `device`: on-device RNG recurses in torch-neuronx 2.14.3; fixed (host-side RNG), rerunning as `-mini2` | ⏳ mini GRPO step (2 frames × 4 samples) |
+| Trainium: HF TRL (`hf-trl/`) | 🟡 TorchNeuron, accelerate, TRL stack and Qwen3.5 vision tower work; blocked in `generate` prefill (int64 `input_ids` corrupted) | — not reached |
+| TPU: TorchTPU / PyTorch/XLA | ⏳ | ⏳ |
+| Miles | ❌ not compatible with Trainium: audit (552 NVIDIA + 67 SGLang call sites, 0 JAX) + probe; see `miles/TRAINIUM_INCOMPATIBILITY.md` | 🚫 no Neuron platform, no non-CUDA rollout |
+| SkyRL: GPU control (g5.24xlarge) | 🟡 attempt 2: connect / train / RL-loss OK, vLLM engine failed to start for sampling; log capture added | ⏳ `tinker` + `skyrl-grpo` presets |
+| SkyRL: TPU / Trainium | ⏳ (TPU waits on gcloud setup) | 🚫 no image input in JAX backend |
+
+TorchNeuron issues found so far (torch-neuronx 2.14.3, trn1.2xlarge): data-dependent
+`repeat_interleave` not lowered (worked around: `common/neuron_compat.py`); `int64.sum()` /
+`int64.cumsum()` wrong for large values; int64 `input_ids` corrupted inside transformers'
+`generate`; `torch.rand*` on device recurses (worked around: host-side RNG).
+
+## Repository layout
+
+```
+.
+├── README.md, EXPERIMENT_PLAN.md
+├── requirements-common.txt    # transformers/peft etc. — installed on top of each chip's torch
+├── common/
+│   ├── grpo/                  # hardware-agnostic GRPO trainer (CholecT50)
+│   │   ├── device.py          # the ONLY per-chip code: cpu | cuda | neuron | tpu | tpu-xla
+│   │   ├── rollout.py         # static-shape sampler (compile-friendly) + log-probs
+│   │   ├── tasks.py           # CholecT50 data / prompt / reward wiring
+│   │   └── train_grpo.py      # trainer → steps.jsonl + final_results.json
+│   ├── rewards/cholect50.py   # triplet-F1 reward (verbatim from the verl leg)
+│   ├── smoke_test.py          # Phase 0 on the real checkpoint + frame
+│   ├── fetch_cholect50.sh     # SFT checkpoint + parquet from S3, hash-checked
+│   ├── porting_audit.py       # static NVIDIA-dependency audit of a framework
+│   └── tests/                 # CPU correctness tests (rollout, GRPO update direction)
+├── data/cholect50/            # parquet lands here (not committed)
+├── trainium/                  # torch-neuronx leg
+├── torchtpu/                  # TorchTPU (+ PyTorch/XLA) leg
+├── miles/                     # Miles probes + porting audit
+├── skyrl/                     # SkyRL: Tinker-API client, probes, GPU control + TPU/Trainium servers
+└── analysis/                  # schema.md + compare.py (joins runs with the GPU references)
+```
 
 ## Quick start
 
 ```bash
-cd rl-benchmark
-# CPU correctness tests for the GRPO loop (any small Qwen3 text checkpoint)
+# Local correctness checks (CPU; any small Qwen3 text checkpoint)
 pip install torch -r requirements-common.txt
 python -m common.tests.test_rollout --model Qwen/Qwen3-0.6B
 python -m common.tests.test_grpo_direction Qwen/Qwen3-0.6B
 
-# On AWS (profile stanford-gpu): our GRPO loop on Trainium
-bash trainium/ec2/submit.sh --no-start && bash trainium/ec2/launch_instance.sh
-bash trainium/ec2/status.sh --fetch
+# On the accelerator: see trainium/README.md or torchtpu/README.md
+bash common/fetch_cholect50.sh
+bash trainium/scripts/run_smoke.sh        # or torchtpu/scripts/run_smoke.sh
+
+# After runs land in */metrics/
+python3 analysis/compare.py --plot
 ```
+
+## How to add a result
+
+1. Run the leg's script. It copies `final_results.json` and `steps.jsonl` into
+   `<leg>/metrics/`.
+2. Fill in the ⏳ cells in `<leg>/config/*_CONFIG.md`: instance, SDK versions,
+   and cold or warm compile cache.
+3. Add every workaround or failure to that file's findings log, and to
+   `findings` in the results JSON.
+4. Update the status table above.

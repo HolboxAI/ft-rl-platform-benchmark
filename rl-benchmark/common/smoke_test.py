@@ -54,7 +54,8 @@ def main():
 
         stage = "device"
         t = time.perf_counter()
-        a = torch.randn(2048, 2048, device=backend.device, dtype=torch.bfloat16)
+        # Random data is drawn on the host: on-device RNG recurses in torch-neuronx 2.14.3 (see device.py).
+        a = torch.randn(2048, 2048, dtype=torch.bfloat16).to(backend.device)
         c = (a @ a).float().abs().mean()
         backend.mark_step()
         summary["matmul_check"] = float(c.item())
@@ -95,7 +96,7 @@ def main():
         stage = "train"
         model.train()
         opt = torch.optim.AdamW([q for q in model.parameters() if q.requires_grad], lr=1e-5)
-        target = torch.randint(0, task.tok.vocab_size, (1, 16), device=backend.device)
+        target = torch.randint(0, task.tok.vocab_size, (1, 16)).to(backend.device)
         for i in range(2):
             with backend.timed(summary["stages"], f"train_step_{i}_s"):
                 loss = -response_logprobs(model, enc, target, temperature=0.7, pass_position_ids=False).mean()

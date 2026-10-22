@@ -1,0 +1,1376 @@
+2026-10-22 11:22:01,197 - INFO - uvicorn.error: Started server process [3790]   
+2026-10-22 11:22:01,200 - INFO - uvicorn.error: Waiting for application startup.
+2026-10-22 11:22:01,286 - INFO - skyrl: Using internal engine for inference     
+2026-10-22 11:22:01,287 - DEBUG - skyrl: Detected API server uv run flags:      
+['--no-sync', '--extra', 'tinker', '--extra', 'fsdp']                           
+2026-10-22 11:22:01,322 - INFO - skyrl: Started background engine with PID 3875:
+uv run --no-sync --extra tinker --extra fsdp --extra tinker --extra fsdp -m     
+skyrl.tinker.engine --base-model /data/models/cholec-sft-qwen3.5-4b             
+--runtime-role combined --backend fsdp --backend-config                         
+{"trainer.remove_microbatch_padding": false, "trainer.placement.colocate_all":  
+true, "trainer.placement.policy_num_gpus_per_node": 4,                          
+"trainer.placement.ref_num_gpus_per_node": 4,                                   
+"generator.inference_engine.num_engines": 4,                                    
+"generator.inference_engine.tensor_parallel_size": 1,                           
+"generator.inference_engine.gpu_memory_utilization": 0.6,                       
+"generator.inference_engine.engine_init_kwargs.max_model_len": 8192,            
+"generator.inference_engine.max_num_seqs": 64,                                  
+"trainer.policy.fsdp_config.cpu_offload": true} --checkpoints-base              
+/data/ckpts/probe --database-url sqlite:////data/SkyRL/skyrl/tinker/tinker.db   
+--external-inference-api-key EMPTY --external-inference-lora-base               
+/tmp/lora_models --forwarding-inference-timeout-sec 2048.0                      
+--external-future-retrieved-ttl-sec 300.0 --external-future-completed-ttl-sec   
+600.0 --session-cleanup-interval-sec 60 --session-timeout-sec 300               
+2026-10-22 11:22:01,327 - INFO - uvicorn.error: Application startup complete.   
+2026-10-22 11:22:01,329 - INFO - uvicorn.error: Uvicorn running on              
+http://0.0.0.0:8000 (Press CTRL+C to quit)                                      
+2026-10-22 11:22:08,381 - INFO - uvicorn.access: 127.0.0.1:55070 - "GET / HTTP/1.1" 200
+2026-10-22 11:22:19,448 - INFO - uvicorn.access: 127.0.0.1:54190 - "POST /api/v1/client/config HTTP/1.1" 200
+2026-10-22 11:22:19,580 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/client/dynamic_config HTTP/1.1" 404
+2026-10-22 11:22:19,595 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/create_session HTTP/1.1" 200
+2026-10-22 11:22:19,619 - INFO - uvicorn.access: 127.0.0.1:54198 - "POST /api/v1/create_model HTTP/1.1" 200
+2026-10-22 11:22:29,615 - INFO - uvicorn.access: 127.0.0.1:43834 - "POST /api/v1/telemetry HTTP/1.1" 200
+2026-10-22 11:22:29,617 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:22:30.690 | DEBUG    | skyrl.backends.skyrl_train.patches.vllm.patch_lora_in_memory:apply_lora_in_memory_patch:316 - in-memory LoRA patch installed on vllm WorkerLoRAManager._load_adapter and on add_adapter of WorkerLoRAManager and LRUCacheWorkerLoRAManager
+2026-10-22 11:22:31,068 - INFO -                                                
+skyrl.backends.skyrl_train.inference_servers.vllm_compat: Patched vLLM KV-cache 
+methods to normalize FP8 scales at boot (pre-capture)                           
+2026-10-22 11:22:31,106 - INFO -                                                
+skyrl.backends.skyrl_train.inference_servers.vllm_compat: Patched vLLM worker   
+wake-up FP8 KV scale reset (q/prob scales + float mirrors)                      
+2026-10-22 11:22:31,116 - DEBUG -                                               
+skyrl.backends.skyrl_train.weight_sync.register: Registered receive-side weight 
+transfer engines.                                                               
+2026-10-22 11:22:31.117 | INFO     | skyrl.backends.skyrl_train.patches.vllm.patch_compile_cache_device_path:_apply_compile_cache_device_path_patch:116 - Patched vLLM AOT compile cache to use a per-device artifact directory
+2026-10-22 11:22:32,104 - INFO -                                                
+skyrl.backends.skyrl_train.patches.vllm.patch_glm5next_lora_packing: Patched    
+vLLM for GLM-5.3-Flash LoRA (vllm#56327): packed_modules_mapping on             
+['Glm5NextForConditionalGeneration', 'Glm5NextForCausalLM'],                    
+replicated_shard_ids honored in merged LoRA-B loading, non-contiguous LoRA      
+shrink inputs accepted, kv_b_proj adapter applied to the absorbed MLA           
+projections and to MHA prefill (vllm#56718)                                     
+2026-10-22 11:22:32.855 | INFO     | skyrl.backends.skyrl_train.patches.vllm.patch_per_block_fp8_param:apply_per_block_fp8_param_patch:45 - Installed per_block_cast_to_fp8 plain-tensor patch
+2026-10-22 11:22:32.856 | INFO     | skyrl.backends.skyrl_train.patches.vllm.patch_routed_experts_rebind:apply_routed_experts_rebind_patch:74 - Installed routed-experts rebind patch (vllm#59455 backport)
+2026-10-22 11:22:32.857 | INFO     | skyrl.backends.skyrl_train.patches.vllm.patch_routed_experts_pp_relay:apply_pp_relay_worker_patch:285 - Installed the R3 pipeline-parallel relay patch
+2026-10-22 11:22:38,102 - INFO - skyrl: Continuous sampling enabled: per-request
+future completion, drain-before-blocking-ops (set                               
+SKYRL_TINKER_CONTINUOUS_SAMPLING=0 for the serial loop)                         
+2026-10-22 11:22:38,104 - INFO - skyrl: Initialized TinkerEngine with           
+backend=SkyRLTrainBackend                                                       
+2026-10-22 11:22:38,104 - INFO - skyrl: Starting background engine...           
+2026-10-22 11:22:38,143 - INFO - skyrl: SkyRL-Train config:                     
+data:                                                                           
+  dataloader:                                                                   
+    num_workers: 8                                                              
+    persistent_workers: false                                                   
+  train_data:                                                                   
+  - /root/data/gsm8k/train.parquet                                              
+  val_data:                                                                     
+  - /root/data/gsm8k/validation.parquet                                         
+environment:                                                                    
+  env_class: gsm8k                                                              
+  skyrl_gym:                                                                    
+    llm_as_a_judge:                                                             
+      base_url: null                                                            
+      model: gpt-4o-mini                                                        
+    max_env_workers: 32                                                         
+    search:                                                                     
+      log_requests: false                                                       
+      search_url: http://127.0.0.1:8000/retrieve                                
+      timeout: 30                                                               
+      topk: 3                                                                   
+    text2sql:                                                                   
+      db_path: /home/ray/default/sql_data                                       
+generator:                                                                      
+  append_eos_token_after_stop_str_in_multi_turn: true                           
+  apply_overlong_filtering: false                                               
+  batched: false                                                                
+  chat_template:                                                                
+    name_or_path: null                                                          
+    source: name                                                                
+  chat_template_kwargs: {}                                                      
+  eval_n_samples_per_prompt: 1                                                  
+  eval_sampling_params:                                                         
+    additional_kwargs: null                                                     
+    logprobs: 1                                                                 
+    max_generate_length: 1024                                                   
+    min_p: 0.0                                                                  
+    repetition_penalty: 1.0                                                     
+    stop: null                                                                  
+    temperature: 0.0                                                            
+    top_k: -1                                                                   
+    top_p: 1.0                                                                  
+  inference_engine:                                                             
+    backend: vllm                                                               
+    data_parallel_size: 1                                                       
+    decode_init_kwargs: {}                                                      
+    delta_weight_sync: null                                                     
+    distributed_executor_backend: ray                                           
+    enable_chunked_prefill: true                                                
+    enable_pd: false                                                            
+    enable_prefix_caching: true                                                 
+    enable_ray_prometheus_stats: true                                           
+    enable_return_routed_experts: false                                         
+    enable_return_sample_support_set: false                                     
+    enforce_eager: false                                                        
+    engine_init_kwargs:                                                         
+      max_model_len: 8192                                                       
+    expert_parallel_size: 1                                                     
+    external_proxy_url: null                                                    
+    external_server_urls: null                                                  
+    fp8_weight_sync_mode: null                                                  
+    fully_sharded_loras: false                                                  
+    gpu_memory_utilization: 0.6                                                 
+    language_model_only: false                                                  
+    max_num_batched_tokens: 8192                                                
+    max_num_seqs: 64                                                            
+    model_dtype: bfloat16                                                       
+    num_engines: 4                                                              
+    num_prefill: 0                                                              
+    offload_kv_for_weight_sync: false                                           
+    pipeline_parallel_size: 1                                                   
+    prefill_init_kwargs: {}                                                     
+    router_init_kwargs: {}                                                      
+    run_engines_locally: true                                                   
+    scale_moe_lora_rank: false                                                  
+    served_model_name: null                                                     
+    speculative_config: null                                                    
+    tensor_parallel_size: 1                                                     
+    use_expandable_segments: false                                              
+    vllm_v1_disable_multiproc: true                                             
+    weight_sync_backend: nccl                                                   
+    weight_transfer_threshold_cuda_ipc_GB: 1.0                                  
+  max_input_length: 512                                                         
+  max_turns: 1                                                                  
+  merge_stepwise_output: false                                                  
+  n_samples_per_prompt: 5                                                       
+  sampling_params:                                                              
+    additional_kwargs: null                                                     
+    logprobs: 1                                                                 
+    max_generate_length: 1024                                                   
+    min_p: 0.0                                                                  
+    repetition_penalty: 1.0                                                     
+    stop: null                                                                  
+    temperature: 1.0                                                            
+    top_k: -1                                                                   
+    top_p: 1.0                                                                  
+  step_wise_trajectories: false                                                 
+  use_cache_salt: true                                                          
+  use_conversation_multi_turn: true                                             
+  vision_language_generator: false                                              
+  zero_reward_on_non_stop: false                                                
+trainer:                                                                        
+  algorithm:                                                                    
+    advantage_batch_normalize: false                                            
+    advantage_estimator: grpo                                                   
+    cispo:                                                                      
+      cispo_anchor: old                                                         
+      cispo_eps_clip_high: 4.0                                                  
+      cispo_eps_clip_low: 1.0                                                   
+    clip_cov:                                                                   
+      clip_cov_lb: 1.0                                                          
+      clip_cov_ub: 5.0                                                          
+      clip_ratio: 0.0002                                                        
+    clip_ratio_c: 3.0                                                           
+    dppo:                                                                       
+      delta_high: 0.2                                                           
+      delta_low: 0.2                                                            
+      dppo_type: binary_tv                                                      
+    dynamic_sampling:                                                           
+      max_sample_batches: 30                                                    
+      min_replace_ratio: 0.3                                                    
+      type: null                                                                
+    enable_sample_support_replay: false                                         
+    entropy_loss_coef: 0.01                                                     
+    eps_clip_high: 0.2                                                          
+    eps_clip_low: 0.2                                                           
+    gamma: 1.0                                                                  
+    grpo_norm_by_std: true                                                      
+    kl_cov:                                                                     
+      kl_cov_frac: 0.2                                                          
+      ppo_kl_coef: 1.0                                                          
+    kl_ctrl:                                                                    
+      horizon: 10000                                                            
+      kl_target: 0.1                                                            
+      type: fixed                                                               
+    kl_estimator_type: k3                                                       
+    kl_loss_coef: 0.001                                                         
+    lambd: 1.0                                                                  
+    loss_reduction: token_mean                                                  
+    max_seq_len: null                                                           
+    off_policy_correction:                                                      
+      geo_mask_high: 1.01                                                       
+      geo_mask_low: 0.99                                                        
+      outlier_token_is_threshold_high: null                                     
+      outlier_token_is_threshold_low: null                                      
+      product_mask_high: 2.0                                                    
+      product_mask_low: 0.5                                                     
+      sequence_mask_metric: null                                                
+      sequence_tis_ratio_clip_high: 5.0                                         
+      tis_ratio_type: null                                                      
+      token_mask_is_threshold_high: null                                        
+      token_mask_is_threshold_low: null                                         
+      token_tis_ratio_clip_high: 2.0                                            
+    policy_loss_type: regular                                                   
+    sapo:                                                                       
+      tau_neg: 1.05                                                             
+      tau_pos: 1.0                                                              
+    temperature: 1.0                                                            
+    tis_imp_ratio_cap: -1.0                                                     
+    use_entropy_loss: false                                                     
+    use_kl_in_reward: false                                                     
+    use_kl_loss: false                                                          
+    use_tis: false                                                              
+    value_clip: 0.2                                                             
+    value_head_prefix: value_head                                               
+    zero_variance_filter: false                                                 
+    zero_variance_filter_tol: 1.0e-06                                           
+  bf16: true                                                                    
+  ckpt_interval: 10                                                             
+  ckpt_path: /root/ckpts/                                                       
+  critic:                                                                       
+    fsdp_config:                                                                
+      cpu_offload: false                                                        
+      fsdp_size: -1                                                             
+      mixed_precision: null                                                     
+      reshard_after_forward: true                                               
+      wrap_policy: {}                                                           
+    model:                                                                      
+      fake_int4_qat:                                                            
+        bf16_base_path: null                                                    
+        enabled: false                                                          
+        group_size: 32                                                          
+        q_min: -8.0                                                             
+        scale_divisor: 7.5                                                      
+        symmetric: true                                                         
+      lora:                                                                     
+        alpha: 16                                                               
+        dropout: 0.0                                                            
+        exclude_modules: null                                                   
+        init_adapter_path: null                                                 
+        init_method: kaiming                                                    
+        lora_sync_path: /tmp/skyrl_lora_sync                                    
+        max_cpu_loras: null                                                     
+        max_lora_rank: null                                                     
+        max_loras: 1                                                            
+        rank: 0                                                                 
+        share_expert_adapters: true                                             
+        sync_mode: disk                                                         
+        target_modules: all-linear                                              
+      path: /data/models/cholec-sft-qwen3.5-4b                                  
+    model_config_kwargs: {}                                                     
+    optimizer_config:                                                           
+      adam_betas:                                                               
+      - 0.9                                                                     
+      - 0.999                                                                   
+      lr: 5.0e-06                                                               
+      max_grad_norm: 1.0                                                        
+      num_warmup_steps: 0                                                       
+      offload_after_step: true                                                  
+      scheduler: constant_with_warmup                                           
+      weight_decay: 0.01                                                        
+    sequence_parallel_size: 1                                                   
+  critic_mini_batch_size: 256                                                   
+  disable_fast_tokenizer: false                                                 
+  dump_data_batch: false                                                        
+  dump_eval_results: true                                                       
+  enable_ray_gpu_monitor: true                                                  
+  epochs: 1                                                                     
+  eval_batch_size: 1024                                                         
+  eval_before_train: true                                                       
+  eval_interval: 5                                                              
+  export_path: /root/exports/                                                   
+  flash_attn: true                                                              
+  fully_async:                                                                  
+    clear_kv_cache_on_weight_sync: false                                        
+    enabled: false                                                              
+    max_staleness_steps: 4                                                      
+    num_parallel_generation_workers: 768                                        
+    sample_full_batch: false                                                    
+    simulate_training: false                                                    
+    simulate_training_step_seconds: 30.0                                        
+    simulate_weight_sync_seconds: 0.0                                           
+  fused_lm_head_logprob: false                                                  
+  fused_lm_head_logprob_backend: torch                                          
+  gradient_checkpointing: true                                                  
+  gradient_checkpointing_use_reentrant: false                                   
+  grafana_annotations:                                                          
+    enabled: false                                                              
+    organization_id: null                                                       
+    tags: []                                                                    
+    token_env_var: GRAFANA_API_TOKEN                                            
+  hf_save_interval: -1                                                          
+  log_example_interval: -1                                                      
+  log_path: /tmp/skyrl-logs                                                     
+  logger: wandb                                                                 
+  logprobs_chunk_size: 1024                                                     
+  max_ckpts_to_keep: -1                                                         
+  max_prompt_length: 512                                                        
+  max_tokens_per_microbatch: -1                                                 
+  max_training_steps: null                                                      
+  micro_forward_batch_size_per_gpu: 1                                           
+  micro_train_batch_size_per_gpu: 1                                             
+  mtp:                                                                          
+    enabled: false                                                              
+    loss_weight: 0.1                                                            
+    num_speculative_tokens: 1                                                   
+  num_logger_eval_samples: -1                                                   
+  num_logger_train_samples: -1                                                  
+  placement:                                                                    
+    colocate_all: true                                                          
+    colocate_policy_ref: true                                                   
+    critic_num_gpus_per_node: 1                                                 
+    critic_num_nodes: 1                                                         
+    policy_num_gpus_per_node: 4                                                 
+    policy_num_nodes: 1                                                         
+    ref_num_gpus_per_node: 4                                                    
+    ref_num_nodes: 1                                                            
+  policy:                                                                       
+    fsdp_config:                                                                
+      cpu_offload: true                                                         
+      fsdp_size: -1                                                             
+      mixed_precision: null                                                     
+      reshard_after_forward: true                                               
+      wrap_policy: {}                                                           
+    inference_only_init: false                                                  
+    language_model_only: false                                                  
+    megatron_config:                                                            
+      async_dist_ckpt_save: false                                               
+      async_save_prestage_to_cpu: false                                         
+      context_parallel_size: 1                                                  
+      ddp_config:                                                               
+        average_in_collective: true                                             
+        fp8_param_gather: false                                                 
+        grad_reduce_in_fp32: true                                               
+        overlap_grad_reduce: false                                              
+        overlap_param_gather: false                                             
+      dist_ckpt_optim_fully_reshardable: false                                  
+      empty_cuda_cache: null                                                    
+      expert_model_parallel_size: 1                                             
+      expert_tensor_parallel_size: null                                         
+      fp8: null                                                                 
+      fp8_amax_compute_algo: null                                               
+      fp8_param: null                                                           
+      fp8_recipe: null                                                          
+      freeze_dsa_indexer: false                                                 
+      freeze_moe_router: false                                                  
+      hf_export_config:                                                         
+        distributed_save: false                                                 
+        save_every_n_ranks: 1                                                   
+      lora_config:                                                              
+        experts_shared_outer_loras: false                                       
+        lora_type: lora                                                         
+        merge_lora: true                                                        
+        normalize_moe_lora: false                                               
+        sequence_parallel_input_regather: true                                  
+      model_config_kwargs: {}                                                   
+      moe_aux_loss_coeff: 0.0                                                   
+      moe_enable_routing_replay: false                                          
+      moe_grouped_gemm: true                                                    
+      moe_per_layer_logging: false                                              
+      moe_router_dtype: fp32                                                    
+      moe_router_enable_expert_bias: null                                       
+      moe_router_load_balancing_type: none                                      
+      moe_router_score_function: null                                           
+      moe_token_dispatcher_type: alltoall                                       
+      mtp_loss_chunk_size: 1024                                                 
+      mtp_loss_topk: null                                                       
+      mtp_loss_weight: 0.1                                                      
+      mtp_num_layers: null                                                      
+      optimizer_config_kwargs:                                                  
+        optimizer_cpu_offload: false                                            
+        optimizer_offload_fraction: 0.0                                         
+        overlap_cpu_optimizer_d2h_h2d: false                                    
+        use_precision_aware_optimizer: false                                    
+      pipeline_model_parallel_size: 1                                           
+      tensor_model_parallel_size: 1                                             
+      transformer_config_kwargs:                                                
+        gradient_accumulation_fusion: false                                     
+        recompute_granularity: full                                             
+        recompute_method: uniform                                               
+        recompute_modules:                                                      
+        - core_attn                                                             
+        recompute_num_layers: 1                                                 
+    model:                                                                      
+      fake_int4_qat:                                                            
+        bf16_base_path: null                                                    
+        enabled: false                                                          
+        group_size: 32                                                          
+        q_min: -8.0                                                             
+        scale_divisor: 7.5                                                      
+        symmetric: true                                                         
+      lora:                                                                     
+        alpha: 32                                                               
+        dropout: 0.0                                                            
+        exclude_modules: null                                                   
+        init_adapter_path: null                                                 
+        init_method: kaiming                                                    
+        lora_sync_path: /tmp/skyrl_lora_sync                                    
+        max_cpu_loras: null                                                     
+        max_lora_rank: null                                                     
+        max_loras: 1                                                            
+        rank: 16                                                                
+        share_expert_adapters: true                                             
+        sync_mode: disk                                                         
+        target_modules: all-linear                                              
+      path: /data/models/cholec-sft-qwen3.5-4b                                  
+    model_config_kwargs: {}                                                     
+    optimizer_config:                                                           
+      adam_betas:                                                               
+      - 0.9                                                                     
+      - 0.999                                                                   
+      lr: 1.0e-06                                                               
+      max_grad_norm: 1.0                                                        
+      num_warmup_steps: 0                                                       
+      offload_after_step: true                                                  
+      scheduler: constant_with_warmup                                           
+      weight_decay: 0.01                                                        
+    record_memory: false                                                        
+    sequence_parallel_size: 1                                                   
+    torch_profiler_config:                                                      
+      active: 1                                                                 
+      activities:                                                               
+      - cpu                                                                     
+      - cuda                                                                    
+      enable: false                                                             
+      export_type: chrome_trace                                                 
+      profile_memory: false                                                     
+      ranks:                                                                    
+      - 0                                                                       
+      record_shapes: true                                                       
+      repeat: 1                                                                 
+      save_path: null                                                           
+      skip_first: 10                                                            
+      use_gzip: false                                                           
+      wait: 0                                                                   
+      warmup: 1                                                                 
+      with_flops: false                                                         
+      with_modules: false                                                       
+      with_stack: true                                                          
+    use_torch_compile: false                                                    
+  policy_mini_batch_size: 256                                                   
+  print_example_interval: 1                                                     
+  project_name: skyrl                                                           
+  recompute_old_logprobs_per_minibatch: true                                    
+  ref:                                                                          
+    fsdp_config:                                                                
+      cpu_offload: false                                                        
+      fsdp_size: -1                                                             
+      mixed_precision: null                                                     
+      reshard_after_forward: true                                               
+      wrap_policy: {}                                                           
+    language_model_only: false                                                  
+    megatron_config:                                                            
+      async_dist_ckpt_save: false                                               
+      async_save_prestage_to_cpu: false                                         
+      context_parallel_size: 1                                                  
+      ddp_config:                                                               
+        average_in_collective: true                                             
+        fp8_param_gather: false                                                 
+        grad_reduce_in_fp32: true                                               
+        overlap_grad_reduce: false                                              
+        overlap_param_gather: false                                             
+      dist_ckpt_optim_fully_reshardable: false                                  
+      empty_cuda_cache: null                                                    
+      expert_model_parallel_size: 1                                             
+      expert_tensor_parallel_size: null                                         
+      fp8: null                                                                 
+      fp8_amax_compute_algo: null                                               
+      fp8_param: null                                                           
+      fp8_recipe: null                                                          
+      freeze_dsa_indexer: false                                                 
+      freeze_moe_router: false                                                  
+      hf_export_config:                                                         
+        distributed_save: false                                                 
+        save_every_n_ranks: 1                                                   
+      lora_config:                                                              
+        experts_shared_outer_loras: false                                       
+        lora_type: lora                                                         
+        merge_lora: true                                                        
+        normalize_moe_lora: false                                               
+        sequence_parallel_input_regather: true                                  
+      model_config_kwargs: {}                                                   
+      moe_aux_loss_coeff: 0.0                                                   
+      moe_enable_routing_replay: false                                          
+      moe_grouped_gemm: true                                                    
+      moe_per_layer_logging: false                                              
+      moe_router_dtype: fp32                                                    
+      moe_router_enable_expert_bias: null                                       
+      moe_router_load_balancing_type: none                                      
+      moe_router_score_function: null                                           
+      moe_token_dispatcher_type: alltoall                                       
+      mtp_loss_chunk_size: 1024                                                 
+      mtp_loss_topk: null                                                       
+      mtp_loss_weight: 0.1                                                      
+      mtp_num_layers: null                                                      
+      optimizer_config_kwargs:                                                  
+        optimizer_cpu_offload: false                                            
+        optimizer_offload_fraction: 0.0                                         
+        overlap_cpu_optimizer_d2h_h2d: false                                    
+        use_precision_aware_optimizer: false                                    
+      pipeline_model_parallel_size: 1                                           
+      tensor_model_parallel_size: 1                                             
+      transformer_config_kwargs:                                                
+        gradient_accumulation_fusion: false                                     
+        recompute_granularity: full                                             
+        recompute_method: uniform                                               
+        recompute_modules:                                                      
+        - core_attn                                                             
+        recompute_num_layers: 1                                                 
+    model:                                                                      
+      fake_int4_qat:                                                            
+        bf16_base_path: null                                                    
+        enabled: false                                                          
+        group_size: 32                                                          
+        q_min: -8.0                                                             
+        scale_divisor: 7.5                                                      
+        symmetric: true                                                         
+      lora:                                                                     
+        alpha: 16                                                               
+        dropout: 0.0                                                            
+        exclude_modules: null                                                   
+        init_adapter_path: null                                                 
+        init_method: kaiming                                                    
+        lora_sync_path: /tmp/skyrl_lora_sync                                    
+        max_cpu_loras: null                                                     
+        max_lora_rank: null                                                     
+        max_loras: 1                                                            
+        rank: 0                                                                 
+        share_expert_adapters: true                                             
+        sync_mode: disk                                                         
+        target_modules: all-linear                                              
+      path: /data/models/cholec-sft-qwen3.5-4b                                  
+    model_config_kwargs: {}                                                     
+    sequence_parallel_size: 1                                                   
+  remove_microbatch_padding: false                                              
+  resume_mode: latest                                                           
+  resume_path: null                                                             
+  run_name: test_run                                                            
+  seed: 42                                                                      
+  sequence_parallel_backend: ulysses                                            
+  step_timeout_s: null                                                          
+  strategy: fsdp                                                                
+  tags: null                                                                    
+  train_batch_size: 1024                                                        
+  update_epochs_per_batch: 1                                                    
+  update_ref_every_epoch: false                                                 
+  use_expandable_segments: true                                                 
+  vocab_entropy_chunk_memory_mb: 512                                            
+  vocab_entropy_chunk_size: 0                                                   
+  weight_sync_timeout_s: null                                                   
+                                                                                
+2026-10-22 11:22:38,174 - INFO - skyrl: Initializing Ray with runtime           
+environment                                                                     
+2026-10-22 11:22:38.174 | INFO     | skyrl.train.utils.utils:prepare_runtime_environment:1051 - `VLLM_USE_V1` is not specified, setting `VLLM_USE_V1` to 1. To override, set `VLLM_USE_V1` explicitly
+2026-10-22 11:22:38.175 | INFO     | skyrl.train.utils.utils:prepare_runtime_environment:1084 - Peer access is not supported on this node type, disabling NCCL P2P and SHM
+2026-10-22 11:22:38.175 | INFO     | skyrl.train.utils.utils:prepare_runtime_environment:1156 - Exporting `UV_PROJECT_ENVIRONMENT` to ray runtime env: /data/SkyRL/.venv
+2026-10-22 11:22:38.175 | INFO     | skyrl.train.utils.utils:prepare_runtime_environment:1156 - Exporting `UV_CACHE_DIR` to ray runtime env: /data/uv-cache
+2026-10-22 11:22:38.175 | INFO     | skyrl.train.utils.utils:prepare_runtime_environment:1156 - Exporting `HF_HOME` to ray runtime env: /data/hf
+2026-10-22 11:22:38.175 | INFO     | skyrl.train.utils.utils:prepare_runtime_environment:1165 - Exporting SKYRL_* overrides to ray runtime env: ['SKYRL_REF']
+2026-10-22 11:22:39,636 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:22:41,692	INFO worker.py:2024 -- Started a local Ray instance.
+2026-10-22 11:22:41,696	WARNING working_dir.py:91 -- Directory '.git' is now ignored by default when packaging the working directory. To disable this behavior, set the `RAY_OVERRIDE_RUNTIME_ENV_DEFAULT_EXCLUDES=''` environment variable.
+2026-10-22 11:22:41,696	WARNING working_dir.py:91 -- Directory '.venv' is now ignored by default when packaging the working directory. To disable this behavior, set the `RAY_OVERRIDE_RUNTIME_ENV_DEFAULT_EXCLUDES=''` environment variable.
+2026-10-22 11:22:41,702	INFO packaging.py:363 -- Ignoring upload to cluster for these files: [PosixPath('/data/SkyRL/.gitignore')]
+2026-10-22 11:22:41,705	INFO packaging.py:363 -- Ignoring upload to cluster for these files: [PosixPath('/data/SkyRL/docs/.gitignore')]
+2026-10-22 11:22:43,213	INFO packaging.py:363 -- Ignoring upload to cluster for these files: [PosixPath('/data/SkyRL/.venv/.gitignore')]
+2026-10-22 11:22:43,571	INFO packaging.py:363 -- Ignoring upload to cluster for these files: [PosixPath('/data/SkyRL/skyrl-agent/.gitignore')]
+2026-10-22 11:22:43,733	INFO packaging.py:734 -- Creating a file package for local module '/data/SkyRL'.
+2026-10-22 11:22:43,739	INFO packaging.py:363 -- Ignoring upload to cluster for these files: [PosixPath('/data/SkyRL/.gitignore')]
+2026-10-22 11:22:43,740	INFO packaging.py:363 -- Ignoring upload to cluster for these files: [PosixPath('/data/SkyRL/docs/.gitignore')]
+2026-10-22 11:22:44,105	INFO packaging.py:363 -- Ignoring upload to cluster for these files: [PosixPath('/data/SkyRL/.venv/.gitignore')]
+2026-10-22 11:22:44,251	INFO packaging.py:363 -- Ignoring upload to cluster for these files: [PosixPath('/data/SkyRL/skyrl-agent/.gitignore')]
+2026-10-22 11:22:44,354	INFO packaging.py:434 -- Pushing file package 'gcs://_ray_pkg_1e719759b86cf374.zip' (37.05MiB) to Ray cluster...
+2026-10-22 11:22:44,473	INFO packaging.py:447 -- Successfully pushed file package 'gcs://_ray_pkg_1e719759b86cf374.zip'.
+[2026-10-22 11:22:44,479 I 3883 3883] logging.cc:303: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 3
+2026-10-22 11:22:45.411 | INFO     | skyrl.train.utils.utils:initialize_ray:1332 - Infrastructure logs will be written to: /tmp/skyrl-logs/infra-261022_112238.log
+[33m(raylet)[0m [2026-10-22 11:22:45,392 I 4923 4923] logging.cc:303: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 3
+2026-10-22 11:22:47.268 | INFO     | skyrl.backends.skyrl_train.utils.ppo_utils:sync_registries:552 - Synced registries to ray actor
+2026-10-22 11:22:47,268 - INFO - skyrl: Creating placement group with 4 GPU     
+slots for colocated training+inference                                          
+2026-10-22 11:22:47,272 - INFO - skyrl: Waiting for placement group to be       
+ready...                                                                        
+2026-10-22 11:22:47,276 - INFO - skyrl: Placement group ready!                  
+2026-10-22 11:22:47,902 - INFO - skyrl: Building models.                        
+2026-10-22 11:22:49,650 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+[36m(pid=10206)[0m Using blocking ray.get inside async actor. This blocks the event loop. Please use `await` on object ref with asyncio.gather if you want to yield execution to the event loop instead.
+[33m(raylet)[0m [2026-10-22 11:22:49,600 I 10206 10206] logging.cc:303: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 3[32m [repeated 7x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)[0m
+2026-10-22 11:22:56.799 | INFO     | skyrl.backends.skyrl_train.workers.worker:_initiate_actors:894 - Initializing process group for RayActorGroup
+2026-10-22 11:22:59,660 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+[36m(pid=10374)[0m Using blocking ray.get inside async actor. This blocks the event loop. Please use `await` on object ref with asyncio.gather if you want to yield execution to the event loop instead.
+[33m(raylet)[0m [2026-10-22 11:22:57,514 I 10374 10374] logging.cc:303: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 3[32m [repeated 3x across cluster][0m
+[36m(pid=10369)[0m Using blocking ray.get inside async actor. This blocks the event loop. Please use `await` on object ref with asyncio.gather if you want to yield execution to the event loop instead.
+2026-10-22 11:23:05.611 | INFO     | skyrl.backends.skyrl_train.workers.worker:_initiate_actors:896 - Initialized process group for RayActorGroup
+2026-10-22 11:23:05.616 | INFO     | skyrl.backends.skyrl_train.workers.worker:_initiate_actors:900 - Mesh Ranks: [MeshRank(dp=0, sp=0, tp=0, pp=0, world_size=4, dp_size=4, pp_size=1), MeshRank(dp=1, sp=0, tp=0, pp=0, world_size=4, dp_size=4, pp_size=1), MeshRank(dp=2, sp=0, tp=0, pp=0, world_size=4, dp_size=4, pp_size=1), MeshRank(dp=3, sp=0, tp=0, pp=0, world_size=4, dp_size=4, pp_size=1)]
+2026-10-22 11:23:09,671 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:23:19,690 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:23:29,703 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:23:39,709 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:23:49,676 - INFO - uvicorn.access: 127.0.0.1:50588 - "POST /api/v1/telemetry HTTP/1.1" 200
+2026-10-22 11:23:49,718 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:23:59,729 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:24:09,736 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:24:19,746 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:24:29,753 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:24:36,486 - INFO - skyrl: init policy model done                  
+2026-10-22 11:24:36,487 - INFO - skyrl: Created policy model model_2042694f     
+using RayPPOTrainer                                                             
+2026-10-22 11:24:36,489 - INFO - skyrl: Created LoRA model model_2042694f       
+2026-10-22 11:24:36,490 - INFO - skyrl: (timing)                                
+process_single_request(create_model) took 118.373s                              
+2026-10-22 11:24:36,500 - INFO - uvicorn.access: 127.0.0.1:50592 - "POST /api/v1/retrieve_future HTTP/1.1" 200
+2026-10-22 11:24:36,505 - INFO - uvicorn.access: 127.0.0.1:38548 - "POST /api/v1/get_info HTTP/1.1" 200
+2026-10-22 11:24:36,608 - INFO - skyrl: Expired stale session session_377fe0f8  
+2026-10-22 11:24:39,764 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:24:52,036 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:24:56,185 - INFO - uvicorn.access: 127.0.0.1:38548 - "POST /api/v1/forward_backward HTTP/1.1" 200
+2026-10-22 11:24:56,246 - INFO - skyrl: Padded batch from 1 to 4 (alignment=4)  
+2026-10-22 11:25:02,356 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:25:12,371 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:25:22,381 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:25:32,392 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:25:42,400 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:25:52,410 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:26:02,421 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:26:12,433 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:26:22,443 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:26:28,515 - INFO - skyrl: (timing)                                
+process_batch_requests(forward_backward, n=1) took 92.270s                      
+2026-10-22 11:26:28,536 - INFO - uvicorn.access: 127.0.0.1:38706 - "POST /api/v1/retrieve_future HTTP/1.1" 200
+2026-10-22 11:26:28,546 - INFO - uvicorn.access: 127.0.0.1:38714 - "POST /api/v1/optim_step HTTP/1.1" 200
+2026-10-22 11:26:30,176 - INFO - skyrl: optim_step: lr=0.0001,                  
+grad_norm=81.64134216308594                                                     
+2026-10-22 11:26:30,177 - INFO - skyrl: (timing)                                
+process_single_request(optim_step) took 1.551s                                  
+2026-10-22 11:26:30,208 - INFO - uvicorn.access: 127.0.0.1:38706 - "POST /api/v1/retrieve_future HTTP/1.1" 200
+2026-10-22 11:26:30,217 - INFO - uvicorn.access: 127.0.0.1:38714 - "POST /api/v1/forward_backward HTTP/1.1" 200
+2026-10-22 11:26:30,286 - INFO - skyrl: Padded batch from 1 to 4 (alignment=4)  
+2026-10-22 11:26:32,089 - INFO - uvicorn.access: 127.0.0.1:38716 - "POST /api/v1/telemetry HTTP/1.1" 200
+2026-10-22 11:26:32,451 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:26:35,038 - INFO - skyrl: (timing)                                
+process_batch_requests(forward_backward, n=1) took 4.753s                       
+2026-10-22 11:26:35,049 - INFO - uvicorn.access: 127.0.0.1:38706 - "POST /api/v1/retrieve_future HTTP/1.1" 200
+2026-10-22 11:26:35,057 - INFO - uvicorn.access: 127.0.0.1:38714 - "POST /api/v1/optim_step HTTP/1.1" 200
+2026-10-22 11:26:35,349 - INFO - skyrl: optim_step: lr=1e-05,                   
+grad_norm=5.7632365226745605                                                    
+2026-10-22 11:26:35,349 - INFO - skyrl: (timing)                                
+process_single_request(optim_step) took 0.202s                                  
+2026-10-22 11:26:35,404 - INFO - uvicorn.access: 127.0.0.1:38706 - "POST /api/v1/retrieve_future HTTP/1.1" 200
+2026-10-22 11:26:35,415 - INFO - uvicorn.access: 127.0.0.1:38714 - "POST /api/v1/save_weights_for_sampler HTTP/1.1" 200
+2026-10-22 11:26:37,062 - INFO -                                                
+skyrl.backends.skyrl_train.inference_servers.server_group: ServerGroup:         
+actor_cls=VLLMServerActor, num_servers=1, gpus_per_server=1, enable_dp=False,   
+enable_pd=False, external_pg=yes                                                
+2026-10-22 11:26:37,063 - INFO -                                                
+skyrl.backends.skyrl_train.inference_servers.server_group: ServerGroup:         
+actor_cls=VLLMServerActor, num_servers=1, gpus_per_server=1, enable_dp=False,   
+enable_pd=False, external_pg=yes                                                
+2026-10-22 11:26:37,064 - INFO -                                                
+skyrl.backends.skyrl_train.inference_servers.server_group: ServerGroup:         
+actor_cls=VLLMServerActor, num_servers=1, gpus_per_server=1, enable_dp=False,   
+enable_pd=False, external_pg=yes                                                
+2026-10-22 11:26:37,065 - INFO -                                                
+skyrl.backends.skyrl_train.inference_servers.server_group: ServerGroup:         
+actor_cls=VLLMServerActor, num_servers=1, gpus_per_server=1, enable_dp=False,   
+enable_pd=False, external_pg=yes                                                
+2026-10-22 11:26:37,066 - INFO -                                                
+skyrl.backends.skyrl_train.inference_servers.server_group: Starting 1           
+server(s)...                                                                    
+2026-10-22 11:26:37,098 - INFO -                                                
+skyrl.backends.skyrl_train.inference_servers.server_group: Starting 1           
+server(s)...                                                                    
+2026-10-22 11:26:37,129 - INFO -                                                
+skyrl.backends.skyrl_train.inference_servers.server_group: Starting 1           
+server(s)...                                                                    
+2026-10-22 11:26:37,160 - INFO -                                                
+skyrl.backends.skyrl_train.inference_servers.server_group: Starting 1           
+server(s)...                                                                    
+[33m(raylet)[0m [2026-10-22 11:26:37,800 I 12306 12306] logging.cc:303: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 3
+[36m(pid=10375)[0m Using blocking ray.get inside async actor. This blocks the event loop. Please use `await` on object ref with asyncio.gather if you want to yield execution to the event loop instead.
+[33m(raylet)[0m [2026-10-22 11:26:37,832 I 12338 12338] logging.cc:303: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 3
+2026-10-22 11:26:42,461 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:26:52,470 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:27:02,480 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:27:12,491 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:27:19,603 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/client/dynamic_config HTTP/1.1" 404
+2026-10-22 11:27:22,502 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+[33m(raylet)[0m [2026-10-22 11:27:25,541 I 13136 13136] logging.cc:303: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 3[32m [repeated 5x across cluster][0m
+2026-10-22 11:27:32,512 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:27:42,521 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:27:52,532 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:28:02,542 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:28:12,162 - INFO - uvicorn.access: 127.0.0.1:46286 - "POST /api/v1/telemetry HTTP/1.1" 200
+2026-10-22 11:28:12,554 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:28:22,563 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:28:32,573 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:28:42,584 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:28:52,593 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:29:02,604 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:29:12,613 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:29:22,622 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:29:32,634 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:29:42,233 - INFO - uvicorn.access: 127.0.0.1:43510 - "POST /api/v1/telemetry HTTP/1.1" 200
+2026-10-22 11:29:42,646 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:29:52,656 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:30:02,668 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:30:12,678 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:30:22,689 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:30:32,699 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:30:41,451 - ERROR - skyrl: Error saving checkpoint for model      
+model_2042694f, checkpoint ss0_seq5: [36mray::VLLMServerActor.start()[39m       
+(pid=12440, ip=172.31.28.54, actor_id=6d86f80a3c063f4e1a989c1d01000000,         
+repr=<skyrl.backends.skyrl_train.inference_servers.vllm_server_actor.VLLMServerA
+ctor object at 0x7dc60c4ac6b0>)                                                 
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 449, in result   
+    return self.__get_result()                                                  
+           ^^^^^^^^^^^^^^^^^^^                                                  
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 401, in          
+__get_result                                                                    
+    raise self._exception                                                       
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 442, in start                                          
+    await self._wait_until_healthy()                                            
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 457, in _wait_until_healthy                            
+    raise exc                                                                   
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 488, in _run_server                                    
+    await _build_and_serve_vllm_server(                                         
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 790, in _build_and_serve_vllm_server                   
+    engine = AsyncLLMEngine.from_engine_args(                                   
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                   
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py",   
+line 276, in from_engine_args                                                   
+    return cls(                                                                 
+           ^^^^                                                                 
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py",   
+line 180, in __init__                                                           
+    self.engine_core = EngineCoreClient.make_async_mp_client(                   
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                   
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/tracing/otel.py",   
+line 175, in sync_wrapper                                                       
+    return func(*args, **kwargs)                                                
+           ^^^^^^^^^^^^^^^^^^^^^                                                
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 167, in make_async_mp_client                                               
+    return AsyncMPClient(                                                       
+           ^^^^^^^^^^^^^^                                                       
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/tracing/otel.py",   
+line 175, in sync_wrapper                                                       
+    return func(*args, **kwargs)                                                
+           ^^^^^^^^^^^^^^^^^^^^^                                                
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 1100, in __init__                                                          
+    super().__init__(                                                           
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 674, in __init__                                                           
+    with launch_core_engines(                                                   
+  File "/usr/lib/python3.12/contextlib.py", line 144, in __exit__               
+    next(self.gen)                                                              
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/utils.py",
+line 1268, in launch_core_engines                                               
+    wait_for_engine_startup(                                                    
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/utils.py",
+line 1348, in wait_for_engine_startup                                           
+    raise RuntimeError(                                                         
+RuntimeError: Engine core initialization failed. See root cause above. Failed   
+core proc(s): {}                                                                
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /data/SkyRL/skyrl/tinker/engine.py:453 in _checkpoint_status_context         │
+│                                                                              │
+│    450 │   │   error_message = "checkpoint operation interrupted"            │
+│    451 │   │   try:                                                          │
+│    452 │   │   │   # Run potentially slow checkpoint I/O without an open DB  │
+│ ❱  453 │   │   │   yield                                                     │
+│    454 │   │   │   status = CheckpointStatus.COMPLETED                       │
+│    455 │   │   │   error_message = None                                      │
+│    456 │   │   except Exception as e:                                        │
+│                                                                              │
+│ /data/SkyRL/skyrl/tinker/engine.py:963 in process_save_weights_for_sampler   │
+│                                                                              │
+│    960 │   │   persist = request_data.sampling_session_seq_id is None        │
+│    961 │   │                                                                 │
+│    962 │   │   with self._checkpoint_status_context(model_id, checkpoint_id, │
+│        types.CheckpointType.SAMPLER):                                        │
+│ ❱  963 │   │   │   self.backend.save_sampler_checkpoint(output_path, model_i │
+│    964 │   │   │   logger.info(f"Saved sampler checkpoint for model {model_i │
+│        {output_path}")                                                       │
+│    965 │   │                                                                 │
+│    966 │   │   # Return path=None when using sampling_session_seq_id and seq │
+│        this)                                                                 │
+│                                                                              │
+│ /data/SkyRL/skyrl/backends/skyrl_train_backend.py:1610 in                    │
+│ save_sampler_checkpoint                                                      │
+│                                                                              │
+│   1607 │   │   │   raise ValueError("save_sampler_checkpoint is only support │
+│        models")                                                              │
+│   1608 │   │                                                                 │
+│   1609 │   │   # Lazily create inference engines on first sampling-related c │
+│ ❱ 1610 │   │   self._ensure_inference_engines()                              │
+│   1611 │   │                                                                 │
+│   1612 │   │   adapter_only_sync = self._adapter_only_sync                   │
+│   1613                                                                       │
+│                                                                              │
+│ /data/SkyRL/skyrl/backends/skyrl_train_backend.py:507 in                     │
+│ _ensure_inference_engines                                                    │
+│                                                                              │
+│    504 │   │   if self._dispatch is not None:                                │
+│    505 │   │   │   self._dispatch.offload_for_sampling()                     │
+│    506 │   │                                                                 │
+│ ❱  507 │   │   self._create_new_inference_client()                           │
+│    508 │   │                                                                 │
+│    509 │   │   if self._dispatch is not None:                                │
+│    510 │   │   │   self._dispatch.set_inference_engine_client(self._inferenc │
+│                                                                              │
+│ /data/SkyRL/skyrl/backends/skyrl_train_backend.py:421 in                     │
+│ _create_new_inference_client                                                 │
+│                                                                              │
+│    418 │   │   )                                                             │
+│    419 │   │                                                                 │
+│    420 │   │   is_colocated = self._cfg.trainer.placement.colocate_all       │
+│ ❱  421 │   │   client, server_setup = build_new_inference_client(            │
+│    422 │   │   │   self._cfg,                                                │
+│    423 │   │   │   self._tokenizer,                                          │
+│    424 │   │   │   placement_group=self._colocate_pg if is_colocated else No │
+│                                                                              │
+│ /data/SkyRL/skyrl/backends/skyrl_train/inference_servers/setup.py:328 in     │
+│ build_new_inference_client                                                   │
+│                                                                              │
+│   325 │   │   │   │   "external_proxy_url or external_server_urls."          │
+│   326 │   │   │   )                                                          │
+│   327 │   │   cli_args = build_vllm_cli_args(cfg)                            │
+│ ❱ 328 │   │   server_setup = create_inference_servers(                       │
+│   329 │   │   │   ie_cfg,                                                    │
+│   330 │   │   │   cli_args,                                                  │
+│   331 │   │   │   log_path=cfg.trainer.log_path,                             │
+│                                                                              │
+│ /data/SkyRL/skyrl/backends/skyrl_train/inference_servers/setup.py:248 in     │
+│ create_inference_servers                                                     │
+│                                                                              │
+│   245 │   │   │   all_refs.extend(g.start(blocking=False))                   │
+│   246 │   │                                                                  │
+│   247 │   │   # Wait for all servers to be ready in one shot                 │
+│ ❱ 248 │   │   ray.get(all_refs)                                              │
+│   249 │   │                                                                  │
+│   250 │   │   # Collect URLs — refs are already resolved so lazy property re │
+│   251 │   │   server_urls = [info.url for g in server_groups for info in g.s │
+│                                                                              │
+│ /data/SkyRL/.venv/lib/python3.12/site-packages/ray/_private/auto_init_hook.p │
+│ y:22 in auto_init_wrapper                                                    │
+│                                                                              │
+│   19 │   @wraps(fn)                                                          │
+│   20 │   def auto_init_wrapper(*args, **kwargs):                             │
+│   21 │   │   auto_init_ray()                                                 │
+│ ❱ 22 │   │   return fn(*args, **kwargs)                                      │
+│   23 │                                                                       │
+│   24 │   return auto_init_wrapper                                            │
+│   25                                                                         │
+│                                                                              │
+│ /data/SkyRL/.venv/lib/python3.12/site-packages/ray/_private/client_mode_hook │
+│ .py:134 in wrapper                                                           │
+│                                                                              │
+│   131 │   │   │   │   │   │   │   if k not in local_only_kwargs              │
+│   132 │   │   │   │   │   │   }                                              │
+│   133 │   │   │   │   │   return getattr(ray, func.__name__)(*args, **kwargs │
+│ ❱ 134 │   │   │   return func(*args, **kwargs)                               │
+│   135 │   │                                                                  │
+│   136 │   │   return cast(F, wrapper)                                        │
+│   137                                                                        │
+│                                                                              │
+│ /data/SkyRL/.venv/lib/python3.12/site-packages/ray/_private/worker.py:2986   │
+│ in get                                                                       │
+│                                                                              │
+│   2983 │   │   │   │   "'object_refs' must either be an ObjectRef or a list  │
+│   2984 │   │   │   )                                                         │
+│   2985 │   │                                                                 │
+│ ❱ 2986 │   │   values, debugger_breakpoint = worker.get_objects(             │
+│   2987 │   │   │   object_refs, timeout, use_object_store=_use_object_store  │
+│   2988 │   │   )                                                             │
+│   2989 │   │   for i, value in enumerate(values):                            │
+│                                                                              │
+│ /data/SkyRL/.venv/lib/python3.12/site-packages/ray/_private/worker.py:1050   │
+│ in get_objects                                                               │
+│                                                                              │
+│   1047 │   │   │   │   │   ) and not isinstance(value, ray.exceptions.OwnerD │
+│   1048 │   │   │   │   │   │   global_worker.core_worker.log_plasma_usage()  │
+│   1049 │   │   │   │   │   if isinstance(value, RayTaskError):               │
+│ ❱ 1050 │   │   │   │   │   │   raise value.as_instanceof_cause()             │
+│   1051 │   │   │   │   │   else:                                             │
+│   1052 │   │   │   │   │   │   raise value                                   │
+│   1053                                                                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+RayTaskError(RuntimeError): [36mray::VLLMServerActor.start()[39m (pid=12440,    
+ip=172.31.28.54, actor_id=6d86f80a3c063f4e1a989c1d01000000,                     
+repr=<skyrl.backends.skyrl_train.inference_servers.vllm_server_actor.VLLMServerA
+ctor object at 0x7dc60c4ac6b0>)                                                 
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 449, in result   
+    return self.__get_result()                                                  
+           ^^^^^^^^^^^^^^^^^^^                                                  
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 401, in          
+__get_result                                                                    
+    raise self._exception                                                       
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 442, in start                                          
+    await self._wait_until_healthy()                                            
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 457, in _wait_until_healthy                            
+    raise exc                                                                   
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 488, in _run_server                                    
+    await _build_and_serve_vllm_server(                                         
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 790, in _build_and_serve_vllm_server                   
+    engine = AsyncLLMEngine.from_engine_args(                                   
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                   
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py",   
+line 276, in from_engine_args                                                   
+    return cls(                                                                 
+           ^^^^                                                                 
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py",   
+line 180, in __init__                                                           
+    self.engine_core = EngineCoreClient.make_async_mp_client(                   
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                   
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/tracing/otel.py",   
+line 175, in sync_wrapper                                                       
+    return func(*args, **kwargs)                                                
+           ^^^^^^^^^^^^^^^^^^^^^                                                
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 167, in make_async_mp_client                                               
+    return AsyncMPClient(                                                       
+           ^^^^^^^^^^^^^^                                                       
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/tracing/otel.py",   
+line 175, in sync_wrapper                                                       
+    return func(*args, **kwargs)                                                
+           ^^^^^^^^^^^^^^^^^^^^^                                                
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 1100, in __init__                                                          
+    super().__init__(                                                           
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 674, in __init__                                                           
+    with launch_core_engines(                                                   
+  File "/usr/lib/python3.12/contextlib.py", line 144, in __exit__               
+    next(self.gen)                                                              
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/utils.py",
+line 1268, in launch_core_engines                                               
+    wait_for_engine_startup(                                                    
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/utils.py",
+line 1348, in wait_for_engine_startup                                           
+    raise RuntimeError(                                                         
+RuntimeError: Engine core initialization failed. See root cause above. Failed   
+core proc(s): {}                                                                
+2026-10-22 11:30:42,709 - INFO - uvicorn.access: 127.0.0.1:54192 - "POST /api/v1/session_heartbeat HTTP/1.1" 200
+2026-10-22 11:30:42,164 - ERROR - skyrl: Error processing request 7:            
+[36mray::VLLMServerActor.start()[39m (pid=12440, ip=172.31.28.54,               
+actor_id=6d86f80a3c063f4e1a989c1d01000000,                                      
+repr=<skyrl.backends.skyrl_train.inference_servers.vllm_server_actor.VLLMServerA
+ctor object at 0x7dc60c4ac6b0>)                                                 
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 449, in result   
+    return self.__get_result()                                                  
+           ^^^^^^^^^^^^^^^^^^^                                                  
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 401, in          
+__get_result                                                                    
+    raise self._exception                                                       
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 442, in start                                          
+    await self._wait_until_healthy()                                            
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 457, in _wait_until_healthy                            
+    raise exc                                                                   
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 488, in _run_server                                    
+    await _build_and_serve_vllm_server(                                         
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 790, in _build_and_serve_vllm_server                   
+    engine = AsyncLLMEngine.from_engine_args(                                   
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                   
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py",   
+line 276, in from_engine_args                                                   
+    return cls(                                                                 
+           ^^^^                                                                 
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py",   
+line 180, in __init__                                                           
+    self.engine_core = EngineCoreClient.make_async_mp_client(                   
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                   
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/tracing/otel.py",   
+line 175, in sync_wrapper                                                       
+    return func(*args, **kwargs)                                                
+           ^^^^^^^^^^^^^^^^^^^^^                                                
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 167, in make_async_mp_client                                               
+    return AsyncMPClient(                                                       
+           ^^^^^^^^^^^^^^                                                       
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/tracing/otel.py",   
+line 175, in sync_wrapper                                                       
+    return func(*args, **kwargs)                                                
+           ^^^^^^^^^^^^^^^^^^^^^                                                
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 1100, in __init__                                                          
+    super().__init__(                                                           
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 674, in __init__                                                           
+    with launch_core_engines(                                                   
+  File "/usr/lib/python3.12/contextlib.py", line 144, in __exit__               
+    next(self.gen)                                                              
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/utils.py",
+line 1268, in launch_core_engines                                               
+    wait_for_engine_startup(                                                    
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/utils.py",
+line 1348, in wait_for_engine_startup                                           
+    raise RuntimeError(                                                         
+RuntimeError: Engine core initialization failed. See root cause above. Failed   
+core proc(s): {}                                                                
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /data/SkyRL/skyrl/tinker/engine.py:1035 in process_single_requests           │
+│                                                                              │
+│   1032 │   │   for request_id, (model_id, request_type, request_data) in req │
+│   1033 │   │   │   with log_timing(f"process_single_request({request_type.va │
+│   1034 │   │   │   │   try:                                                  │
+│ ❱ 1035 │   │   │   │   │   result = self.process_single_request(request_type │
+│        request_data)                                                         │
+│   1036 │   │   │   │   except Exception as e:                                │
+│   1037 │   │   │   │   │   logger.exception(f"Error processing request {requ │
+│   1038 │   │   │   │   │   result = types.ErrorResponse(error=str(e), status │
+│                                                                              │
+│ /data/SkyRL/skyrl/tinker/engine.py:1011 in process_single_request            │
+│                                                                              │
+│   1008 │   │   │   case types.RequestType.OPTIM_STEP:                        │
+│   1009 │   │   │   │   return self.process_optim_step(model_id,              │
+│        types.OptimStepInput.model_validate(request_data))                    │
+│   1010 │   │   │   case types.RequestType.SAVE_WEIGHTS_FOR_SAMPLER:          │
+│ ❱ 1011 │   │   │   │   return self.process_save_weights_for_sampler(         │
+│   1012 │   │   │   │   │   model_id,                                         │
+│        types.SaveWeightsForSamplerInput.model_validate(request_data)         │
+│   1013 │   │   │   │   )                                                     │
+│   1014 │   │   │   case types.RequestType.SAVE_WEIGHTS:                      │
+│                                                                              │
+│ /data/SkyRL/skyrl/tinker/engine.py:963 in process_save_weights_for_sampler   │
+│                                                                              │
+│    960 │   │   persist = request_data.sampling_session_seq_id is None        │
+│    961 │   │                                                                 │
+│    962 │   │   with self._checkpoint_status_context(model_id, checkpoint_id, │
+│        types.CheckpointType.SAMPLER):                                        │
+│ ❱  963 │   │   │   self.backend.save_sampler_checkpoint(output_path, model_i │
+│    964 │   │   │   logger.info(f"Saved sampler checkpoint for model {model_i │
+│        {output_path}")                                                       │
+│    965 │   │                                                                 │
+│    966 │   │   # Return path=None when using sampling_session_seq_id and seq │
+│        this)                                                                 │
+│                                                                              │
+│ /data/SkyRL/skyrl/backends/skyrl_train_backend.py:1610 in                    │
+│ save_sampler_checkpoint                                                      │
+│                                                                              │
+│   1607 │   │   │   raise ValueError("save_sampler_checkpoint is only support │
+│        models")                                                              │
+│   1608 │   │                                                                 │
+│   1609 │   │   # Lazily create inference engines on first sampling-related c │
+│ ❱ 1610 │   │   self._ensure_inference_engines()                              │
+│   1611 │   │                                                                 │
+│   1612 │   │   adapter_only_sync = self._adapter_only_sync                   │
+│   1613                                                                       │
+│                                                                              │
+│ /data/SkyRL/skyrl/backends/skyrl_train_backend.py:507 in                     │
+│ _ensure_inference_engines                                                    │
+│                                                                              │
+│    504 │   │   if self._dispatch is not None:                                │
+│    505 │   │   │   self._dispatch.offload_for_sampling()                     │
+│    506 │   │                                                                 │
+│ ❱  507 │   │   self._create_new_inference_client()                           │
+│    508 │   │                                                                 │
+│    509 │   │   if self._dispatch is not None:                                │
+│    510 │   │   │   self._dispatch.set_inference_engine_client(self._inferenc │
+│                                                                              │
+│ /data/SkyRL/skyrl/backends/skyrl_train_backend.py:421 in                     │
+│ _create_new_inference_client                                                 │
+│                                                                              │
+│    418 │   │   )                                                             │
+│    419 │   │                                                                 │
+│    420 │   │   is_colocated = self._cfg.trainer.placement.colocate_all       │
+│ ❱  421 │   │   client, server_setup = build_new_inference_client(            │
+│    422 │   │   │   self._cfg,                                                │
+│    423 │   │   │   self._tokenizer,                                          │
+│    424 │   │   │   placement_group=self._colocate_pg if is_colocated else No │
+│                                                                              │
+│ /data/SkyRL/skyrl/backends/skyrl_train/inference_servers/setup.py:328 in     │
+│ build_new_inference_client                                                   │
+│                                                                              │
+│   325 │   │   │   │   "external_proxy_url or external_server_urls."          │
+│   326 │   │   │   )                                                          │
+│   327 │   │   cli_args = build_vllm_cli_args(cfg)                            │
+│ ❱ 328 │   │   server_setup = create_inference_servers(                       │
+│   329 │   │   │   ie_cfg,                                                    │
+│   330 │   │   │   cli_args,                                                  │
+│   331 │   │   │   log_path=cfg.trainer.log_path,                             │
+│                                                                              │
+│ /data/SkyRL/skyrl/backends/skyrl_train/inference_servers/setup.py:248 in     │
+│ create_inference_servers                                                     │
+│                                                                              │
+│   245 │   │   │   all_refs.extend(g.start(blocking=False))                   │
+│   246 │   │                                                                  │
+│   247 │   │   # Wait for all servers to be ready in one shot                 │
+│ ❱ 248 │   │   ray.get(all_refs)                                              │
+│   249 │   │                                                                  │
+│   250 │   │   # Collect URLs — refs are already resolved so lazy property re │
+│   251 │   │   server_urls = [info.url for g in server_groups for info in g.s │
+│                                                                              │
+│ /data/SkyRL/.venv/lib/python3.12/site-packages/ray/_private/auto_init_hook.p │
+│ y:22 in auto_init_wrapper                                                    │
+│                                                                              │
+│   19 │   @wraps(fn)                                                          │
+│   20 │   def auto_init_wrapper(*args, **kwargs):                             │
+│   21 │   │   auto_init_ray()                                                 │
+│ ❱ 22 │   │   return fn(*args, **kwargs)                                      │
+│   23 │                                                                       │
+│   24 │   return auto_init_wrapper                                            │
+│   25                                                                         │
+│                                                                              │
+│ /data/SkyRL/.venv/lib/python3.12/site-packages/ray/_private/client_mode_hook │
+│ .py:134 in wrapper                                                           │
+│                                                                              │
+│   131 │   │   │   │   │   │   │   if k not in local_only_kwargs              │
+│   132 │   │   │   │   │   │   }                                              │
+│   133 │   │   │   │   │   return getattr(ray, func.__name__)(*args, **kwargs │
+│ ❱ 134 │   │   │   return func(*args, **kwargs)                               │
+│   135 │   │                                                                  │
+│   136 │   │   return cast(F, wrapper)                                        │
+│   137                                                                        │
+│                                                                              │
+│ /data/SkyRL/.venv/lib/python3.12/site-packages/ray/_private/worker.py:2986   │
+│ in get                                                                       │
+│                                                                              │
+│   2983 │   │   │   │   "'object_refs' must either be an ObjectRef or a list  │
+│   2984 │   │   │   )                                                         │
+│   2985 │   │                                                                 │
+│ ❱ 2986 │   │   values, debugger_breakpoint = worker.get_objects(             │
+│   2987 │   │   │   object_refs, timeout, use_object_store=_use_object_store  │
+│   2988 │   │   )                                                             │
+│   2989 │   │   for i, value in enumerate(values):                            │
+│                                                                              │
+│ /data/SkyRL/.venv/lib/python3.12/site-packages/ray/_private/worker.py:1050   │
+│ in get_objects                                                               │
+│                                                                              │
+│   1047 │   │   │   │   │   ) and not isinstance(value, ray.exceptions.OwnerD │
+│   1048 │   │   │   │   │   │   global_worker.core_worker.log_plasma_usage()  │
+│   1049 │   │   │   │   │   if isinstance(value, RayTaskError):               │
+│ ❱ 1050 │   │   │   │   │   │   raise value.as_instanceof_cause()             │
+│   1051 │   │   │   │   │   else:                                             │
+│   1052 │   │   │   │   │   │   raise value                                   │
+│   1053                                                                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+RayTaskError(RuntimeError): [36mray::VLLMServerActor.start()[39m (pid=12440,    
+ip=172.31.28.54, actor_id=6d86f80a3c063f4e1a989c1d01000000,                     
+repr=<skyrl.backends.skyrl_train.inference_servers.vllm_server_actor.VLLMServerA
+ctor object at 0x7dc60c4ac6b0>)                                                 
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 449, in result   
+    return self.__get_result()                                                  
+           ^^^^^^^^^^^^^^^^^^^                                                  
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 401, in          
+__get_result                                                                    
+    raise self._exception                                                       
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 442, in start                                          
+    await self._wait_until_healthy()                                            
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 457, in _wait_until_healthy                            
+    raise exc                                                                   
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 488, in _run_server                                    
+    await _build_and_serve_vllm_server(                                         
+  File                                                                          
+"/tmp/ray/session_2026-10-22_11-22-38_282373_3883/runtime_resources/working_dir_
+files/_ray_pkg_1e719759b86cf374/skyrl/backends/skyrl_train/inference_servers/vll
+m_server_actor.py", line 790, in _build_and_serve_vllm_server                   
+    engine = AsyncLLMEngine.from_engine_args(                                   
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                                   
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py",   
+line 276, in from_engine_args                                                   
+    return cls(                                                                 
+           ^^^^                                                                 
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py",   
+line 180, in __init__                                                           
+    self.engine_core = EngineCoreClient.make_async_mp_client(                   
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                   
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/tracing/otel.py",   
+line 175, in sync_wrapper                                                       
+    return func(*args, **kwargs)                                                
+           ^^^^^^^^^^^^^^^^^^^^^                                                
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 167, in make_async_mp_client                                               
+    return AsyncMPClient(                                                       
+           ^^^^^^^^^^^^^^                                                       
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/tracing/otel.py",   
+line 175, in sync_wrapper                                                       
+    return func(*args, **kwargs)                                                
+           ^^^^^^^^^^^^^^^^^^^^^                                                
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 1100, in __init__                                                          
+    super().__init__(                                                           
+  File                                                                          
+"/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", 
+line 674, in __init__                                                           
+    with launch_core_engines(                                                   
+  File "/usr/lib/python3.12/contextlib.py", line 144, in __exit__               
+    next(self.gen)                                                              
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/utils.py",
+line 1268, in launch_core_engines                                               
+    wait_for_engine_startup(                                                    
+  File "/data/SkyRL/.venv/lib/python3.12/site-packages/vllm/v1/engine/utils.py",
+line 1348, in wait_for_engine_startup                                           
+    raise RuntimeError(                                                         
+RuntimeError: Engine core initialization failed. See root cause above. Failed   
+core proc(s): {}                                                                
+2026-10-22 11:30:42,953 - INFO - skyrl: (timing)                                
+process_single_request(save_weights_for_sampler) took 247.495s                  
+2026-10-22 11:30:42,973 - INFO - uvicorn.access: 127.0.0.1:43496 - "POST /api/v1/retrieve_future HTTP/1.1" 400
+2026-10-22 11:30:43,022 - INFO - uvicorn.access: 127.0.0.1:43496 - "POST /api/v1/retrieve_future HTTP/1.1" 400
+2026-10-22 11:30:43,072 - INFO - uvicorn.access: 127.0.0.1:43496 - "POST /api/v1/retrieve_future HTTP/1.1" 400
+2026-10-22 11:30:43,123 - INFO - uvicorn.access: 127.0.0.1:43496 - "POST /api/v1/retrieve_future HTTP/1.1" 400
+2026-10-22 11:30:43,126 - INFO - uvicorn.access: 127.0.0.1:43510 - "POST /api/v1/telemetry HTTP/1.1" 200
+*** SIGTERM received at time=1792668644 on cpu 24 ***
+[failure_signal_handler.cc : 345] RAW: Signal 15 raised at PC=0x7c356bf1bd6a while already in AbslFailureSignalHandler()
+*** SIGTERM received at time=1792668644 on cpu 24 ***
+PC: @     0x7c356bf1bd6a  (unknown)  __read
+    @     0x7c356be45330       1488  (unknown)
+2026-10-22 11:30:44,774 - INFO - uvicorn.error: Shutting down                   
+2026-10-22 11:30:44,875 - INFO - uvicorn.error: Waiting for application         
+shutdown.                                                                       
+2026-10-22 11:30:44,876 - INFO - skyrl: Stopping background engine (PID 3875)   
+[failure_signal_handler.cc : 345] RAW: Signal 15 raised at PC=0x7c356bf1bd6a while already in AbslFailureSignalHandler()
+*** SIGTERM received at time=1792668644 on cpu 24 ***
+PC: @     0x7c356bf1bd6a  (unknown)  __read
+    @     0x7c356be45330       1488  (unknown)
+    @     0x7c34c082e4ac         80  absl::lts_20230802::debugging_internal::ReadPersistent()
+    @     0x7c34c082e6a7        144  absl::lts_20230802::debugging_internal::FindSymbol()
+    @     0x7c34c082f9e9       1312  absl::lts_20230802::debugging_internal::(anonymous namespace)::Symbolizer::GetUncachedSymbol()
+    @     0x7c34c082fdbb         80  absl::lts_20230802::Symbolize()
+    @     0x7c34c081a41d       2144  absl::lts_20230802::debugging_internal::(anonymous namespace)::DumpPCAndFrameSizeAndSymbol()
+    @     0x7c34c081a596        192  absl::lts_20230802::debugging_internal::DumpPCAndFrameSizesAndStackTrace()
+    @     0x7c34c0819ed6        496  absl::lts_20230802::WriteStackTrace()
+    @     0x7c34c081a0e1         80  absl::lts_20230802::AbslFailureSignalHandler()
+    @     0x7c356be45330       1488  (unknown)
+    @     0x7c34c082e4ac         80  absl::lts_20230802::debugging_internal::ReadPersistent()
+    @     0x7c34c082f099        208  absl::lts_20230802::debugging_internal::ReadAddrMap()
+    @     0x7c34c082f301         80  absl::lts_20230802::debugging_internal::(anonymous namespace)::Symbolizer::FindObjFile()
+    @     0x7c34c082f34e       1296  absl::lts_20230802::debugging_internal::(anonymous namespace)::Symbolizer::GetUncachedSymbol()
+    @     0x7c34c082fdbb         80  absl::lts_20230802::Symbolize()
+    @     0x7c34c081a41d       2144  absl::lts_20230802::debugging_internal::(anonymous namespace)::DumpPCAndFrameSizeAndSymbol()
+    @     0x7c34c081a551        192  absl::lts_20230802::debugging_internal::DumpPCAndFrameSizesAndStackTrace()
+    @     0x7c34c0819ed6        496  absl::lts_20230802::WriteStackTrace()
+    @     0x7c34c081a0e1         80  absl::lts_20230802::AbslFailureSignalHandler()
+    @     0x7c356be45330  263459264  (unknown)
+    @           0x64dcaa         64  (unknown)
+    @           0x5d7b2d        384  _PyEval_EvalFrameDefault
+    @           0x5d55eb        128  PyEval_EvalCode
+    @           0x5d33dc        112  (unknown)
+    @           0x581fed         64  (unknown)
+    @           0x5499b5         32  PyObject_Vectorcall
+    @           0x5d710f        384  _PyEval_EvalFrameDefault
+    @           0x6bcf22         80  (unknown)
+    @           0x6bcb52        288  Py_RunMain
+    @           0x6bc7bd         48  Py_BytesMain
+    @     0x7c356be2a1ca        160  (unknown)
+    @     0x7c356be2a28b         96  __libc_start_main
+    @ ... and at least 1 more frames
+    @     0x7c34c082e4ac         80  absl::lts_20230802::debugging_internal::ReadPersistent()
+    @     0x7c34c082f099        208  absl::lts_20230802::debugging_internal::ReadAddrMap()
+    @     0x7c34c082f301         80  absl::lts_20230802::debugging_internal::(anonymous namespace)::Symbolizer::FindObjFile()
+    @     0x7c34c082f34e       1296  absl::lts_20230802::debugging_internal::(anonymous namespace)::Symbolizer::GetUncachedSymbol()
+    @     0x7c34c082fdbb         80  absl::lts_20230802::Symbolize()
+    @     0x7c34c081a41d       2144  absl::lts_20230802::debugging_internal::(anonymous namespace)::DumpPCAndFrameSizeAndSymbol()
+    @     0x7c34c081a551        192  absl::lts_20230802::debugging_internal::DumpPCAndFrameSizesAndStackTrace()
+    @     0x7c34c0819ed6        496  absl::lts_20230802::WriteStackTrace()
+    @     0x7c34c081a0e1         80  absl::lts_20230802::AbslFailureSignalHandler()
+    @     0x7c356be45330  263459264  (unknown)
+    @           0x64dcaa         64  (unknown)
+    @           0x5d7b2d        384  _PyEval_EvalFrameDefault
+    @           0x5d55eb        128  PyEval_EvalCode
+    @           0x5d33dc        112  (unknown)
+    @           0x581fed         64  (unknown)
+    @           0x5499b5         32  PyObject_Vectorcall
+    @           0x5d710f        384  _PyEval_EvalFrameDefault
+    @           0x6bcf22         80  (unknown)
+    @           0x6bcb52        288  Py_RunMain
+    @           0x6bc7bd         48  Py_BytesMain
+    @     0x7c356be2a1ca        160  (unknown)
+    @     0x7c356be2a28b         96  __libc_start_main
+    @           0x657a05  (unknown)  _start
+PC: @     0x7c356beecbdf  (unknown)  clock_nanosleep
+    @     0x7c356be45330  263459264  (unknown)
+    @           0x64dcaa         64  (unknown)
+    @           0x5d7b2d        384  _PyEval_EvalFrameDefault
+    @           0x5d55eb        128  PyEval_EvalCode
+    @           0x5d33dc        112  (unknown)
+    @           0x581fed         64  (unknown)
+    @           0x5499b5         32  PyObject_Vectorcall
+    @           0x5d710f        384  _PyEval_EvalFrameDefault
+    @           0x6bcf22         80  (unknown)
+    @           0x6bcb52        288  Py_RunMain
+    @           0x6bc7bd         48  Py_BytesMain
+    @     0x7c356be2a1ca        160  (unknown)
+    @     0x7c356be2a28b         96  __libc_start_main
+    @           0x657a05  (unknown)  _start
+[33m(raylet)[0m [2026-10-22 11:27:25,660 I 13139 13139] logging.cc:303: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 3
+2026-10-22 11:30:48,190 - INFO - skyrl: Background engine stopped               
+2026-10-22 11:30:48,191 - INFO - uvicorn.error: Application shutdown complete.  
+2026-10-22 11:30:48,192 - INFO - uvicorn.error: Finished server process [3790]  

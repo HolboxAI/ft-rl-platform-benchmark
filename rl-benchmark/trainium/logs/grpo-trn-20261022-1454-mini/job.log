@@ -1,0 +1,65 @@
+===== boot 2026-10-22T15:05:05Z on i-026dcce6c6a7a9ca1 =====
+[2026-10-22T15:05:09Z] job grpo-trn-20261022-1454-mini stages: env install data smoke rl1
+[2026-10-22T15:05:09Z] === stage env
+# 2026-10-22T15:05:09Z venv=/opt/aws_neuronx_venv_torch_neuronx_2_14_0
+Python 3.12.3
+instance-type: trn1.2xlarge
+instance-id: i-026dcce6c6a7a9ca1
++--------+--------+----------+--------+--------------+----------+------+
+| NEURON | NEURON |  NEURON  | NEURON |     PCI      |   CPU    | NUMA |
+| DEVICE | CORES  | CORE IDS | MEMORY |     BDF      | AFFINITY | NODE |
++--------+--------+----------+--------+--------------+----------+------+
+| 0      | 2      | 0-1      | 32 GB  | 0000:00:1e.0 | 0-7      | -1   |
++--------+--------+----------+--------+--------------+----------+------+
+neuronx-cc                               2.28.7631.0+8f7b0cf5
+peft                                     0.21.2
+torch                                    2.14.0
+torch-neuronx                            2.14.3.0.1+b1b6c66          /source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx
+torchvision                              0.29.1
+transformers                             5.19.0
+[2026-10-22T15:05:22Z] === stage install
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages (from rich>=13.8.0->typer->transformers==5.19.0) (2.21.0)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages (from sympy>=1.13.3->torch>=1.13.0->peft) (1.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages (from jinja2->torch>=1.13.0->peft) (3.0.4)
+Requirement already satisfied: mdurl~=0.1 in /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages (from markdown-it-py>=2.2.0->rich>=13.8.0->typer->transformers==5.19.0) (0.1.2)
+peft                                     0.21.2
+torch                                    2.14.0
+torch-neuronx                            2.14.3.0.1+b1b6c66          /source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx
+torchvision                              0.29.1
+transformers                             5.19.0
+On-device RNG not available - CPU RNG will be used
+[2026-10-22T15:05:41Z] === stage data
+7463bb11bd6518b469f0cfe248218090fe6896b6e10f70721ee7a0910fb1bd10  data/cholect50/parquet/train.parquet
+5c6f3191fedd088b9dbd2c1c8e3e2089e075259cdc2ed01a19010686ef5c4c8c  data/cholect50/parquet/val.parquet
+[2026-10-22T15:05:44Z] === stage smoke
+On-device RNG not available - CPU RNG will be used
+[neuron_compat] CPU index helpers: get_vision_attention_seqlens, get_vision_bilinear_indices_and_weights, get_vision_cu_seqlens, get_vision_interpolation_indices_and_weights, get_vision_merged_shape, get_vision_nearest_position_ids, get_vision_position_ids, get_vision_window_index, Qwen3_5Model.get_rope_index, Qwen3_5Model.get_vision_position_ids, Qwen3_5Model.get_placeholder_mask
+{
+  "backend": "neuron",
+  "model": "/data/models/cholec-sft-qwen3.5-4b",
+  "stages": {},
+  "ok": false,
+  "describe": {
+    "backend": "neuron",
+    "device": "neuron",
+    "torch": "2.14.0+cu130",
+    "neuron_mode": "native",
+    "torch_neuronx": "2.14.3.0.1+b1b6c66"
+  },
+  "neuron_compat_patched": [
+    "get_vision_attention_seqlens",
+    "get_vision_bilinear_indices_and_weights",
+    "get_vision_cu_seqlens",
+    "get_vision_interpolation_indices_and_weights",
+    "get_vision_merged_shape",
+    "get_vision_nearest_position_ids",
+    "get_vision_position_ids",
+    "get_vision_window_index",
+    "Qwen3_5Model.get_rope_index",
+    "Qwen3_5Model.get_vision_position_ids",
+    "Qwen3_5Model.get_placeholder_mask"
+  ],
+  "failed_stage": "device",
+  "error": "RecursionError: maximum recursion depth exceeded"
+}
+[2026-10-22T15:08:07Z] smoke FAILED: see smoke.json
