@@ -1,4 +1,4 @@
-# DS-1000 — LoRA + GRPO on Trainium (TRL + torch-neuronx)
+# DS-1000 — LoRA + GRPO on Trainium (TRL + TorchNeuron)
 
 Direct RL (RLVR) leg for the platform benchmark: fine-tune a small **Qwen2.5-Coder**
 model to solve **DS-1000** data-science programming problems, scoring reward as
@@ -11,7 +11,7 @@ pass/fail on each problem's hidden test harness.
 | Model | `Qwen/Qwen2.5-Coder-1.5B-Instruct` (LoRA, r=16) |
 | Algorithm | GRPO (RLVR) via TRL `GRPOTrainer` |
 | Reward | 1.0 pass / 0.0 fail / -0.5 empty, sandboxed subprocess |
-| Hardware | AWS Trainium (trn1.2xlarge+, DLAMI) |
+| Hardware | AWS Trainium2/Trn3 — TorchNeuron native backend (`torch-neuronx` ≥ 2.14), DLAMI |
 
 ## Run
 
@@ -26,7 +26,9 @@ FULL_RUN=1 jupyter notebook ds1000_lora_grpo.ipynb
 ## Why TRL, not SkyRL / verl / TitanRL
 
 Those frameworks hardwire a **vLLM** rollout (CUDA-only). TRL rolls out with Transformers
-`model.generate`, which `torch-neuronx` supports — that is the only RL path on Trainium today.
+`model.generate`, which TorchNeuron (`torch-neuronx` ≥ 2.14, the native Trn2/Trn3 backend)
+supports — that is the only RL path on Trainium today. Trn1 uses the older XLA `torch-neuronx`
+stack and is **not** supported by TorchNeuron.
 
 ## Key config (notebook §4)
 
