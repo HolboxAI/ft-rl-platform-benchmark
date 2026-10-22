@@ -1,0 +1,85 @@
+===== boot 2026-10-22T12:27:40Z on i-05b0269abe92b244e =====
+[2026-10-22T12:27:44Z] job trl-trn-20261022-1141-r4 stages: env install data check smoke
+[2026-10-22T12:27:44Z] === stage env
+# 2026-10-22T12:27:44Z venv=/opt/aws_neuronx_venv_torch_neuronx_2_14_0
+Python 3.12.3
+instance-type: trn1.2xlarge
+instance-id: i-05b0269abe92b244e
++--------+--------+----------+--------+--------------+----------+------+
+| NEURON | NEURON |  NEURON  | NEURON |     PCI      |   CPU    | NUMA |
+| DEVICE | CORES  | CORE IDS | MEMORY |     BDF      | AFFINITY | NODE |
++--------+--------+----------+--------+--------------+----------+------+
+| 0      | 2      | 0-1      | 32 GB  | 0000:00:1e.0 | 0-7      | -1   |
++--------+--------+----------+--------+--------------+----------+------+
+accelerate                               1.15.0
+datasets                                 5.1.0
+neuronx-cc                               2.28.7631.0+8f7b0cf5
+peft                                     0.21.2
+torch                                    2.14.0
+torch-neuronx                            2.14.3.0.1+b1b6c66          /source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx
+torchvision                              0.29.1
+transformers                             5.19.0
+trl                                      1.16.0
+[2026-10-22T12:27:54Z] === stage install
+Requirement already satisfied: markdown-it-py>=2.2.0 in /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages (from rich>=13.8.0->typer->transformers==5.19.0) (4.2.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages (from rich>=13.8.0->typer->transformers==5.19.0) (2.21.0)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages (from sympy>=1.13.3->torch>=2.0.0->accelerate==1.15.0) (1.3.0)
+Requirement already satisfied: mdurl~=0.1 in /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages (from markdown-it-py>=2.2.0->rich>=13.8.0->typer->transformers==5.19.0) (0.1.2)
+accelerate                               1.15.0
+datasets                                 5.1.0
+peft                                     0.21.2
+torch                                    2.14.0
+torch-neuronx                            2.14.3.0.1+b1b6c66          /source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx
+torchvision                              0.29.1
+transformers                             5.19.0
+trl                                      1.16.0
+On-device RNG not available - CPU RNG will be used
+[2026-10-22T12:28:13Z] === stage data
+7463bb11bd6518b469f0cfe248218090fe6896b6e10f70721ee7a0910fb1bd10  data/cholect50/parquet/train.parquet
+5c6f3191fedd088b9dbd2c1c8e3e2089e075259cdc2ed01a19010686ef5c4c8c  data/cholect50/parquet/val.parquet
+[2026-10-22T12:28:16Z] === stage check
+On-device RNG not available - CPU RNG will be used
+[check] neuron: ok {'torch': '2.14.0+cu130', 'has_torch_neuron': True, 'device_count': 2, 'is_available': True, 'check': 56.0}
+/source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/nki_kernel.py:85: UserWarning: NKI_ENABLE_TRACE_CACHE=1: the NKI kernel compile cache is persisted across processes. The caching process may not capture all kernel environment dependencies or non-argument values and can yield stale cache hits; see the torch-neuronx environment variables documentation for details. Set NKI_ENABLE_TRACE_CACHE=0 to disable.
+  _warn_trace_cache_once()
+[check] ops: 2 / 20 wrong ['int64_sum', 'int64_cumsum']
+[check] accelerate: ok {'device': 'neuron', 'distributed_type': 'DistributedType.NO'}
+[neuron_compat] CPU index helpers: get_vision_attention_seqlens, get_vision_bilinear_indices_and_weights, get_vision_cu_seqlens, get_vision_interpolation_indices_and_weights, get_vision_merged_shape, get_vision_nearest_position_ids, get_vision_position_ids, get_vision_window_index, Qwen3_5Model.get_rope_index, Qwen3_5Model.get_vision_position_ids, Qwen3_5Model.get_placeholder_mask
+[check] stack: ok {'transformers': '5.19.0', 'trl': '1.16.0', 'peft': '0.21.2', 'accelerate': '1.15.0', 'torch-neuronx': '2.14.3.0.1+b1b6c66'}
+Loading weights:   0%|          | 0/724 [00:00<?, ?it/s]Loading weights:  13%|█▎        | 95/724 [00:00<00:00, 911.74it/s]Loading weights:  26%|██▌       | 187/724 [00:00<00:00, 807.98it/s]Loading weights:  38%|███▊      | 273/724 [00:00<00:00, 814.15it/s]Loading weights:  51%|█████     | 371/724 [00:00<00:00, 872.15it/s]Loading weights:  69%|██████▉   | 500/724 [00:00<00:00, 1015.67it/s]Loading weights: 100%|██████████| 724/724 [00:00<00:00, 1214.59it/s]
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[data] val: 28 rows, dropped 4 over 2048 tokens
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[check] FAILED at model: ValueError: Image features and image tokens do not match, tokens: 0, features: 405
+[2026-10-22T12:30:59Z] check FAILED: see check_env.json

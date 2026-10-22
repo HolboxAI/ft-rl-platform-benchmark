@@ -1,0 +1,32 @@
+{
+  "stages": {
+    "neuron": {
+      "ok": true,
+      "s": 157.96,
+      "torch": "2.14.0+cu130",
+      "has_torch_neuron": true,
+      "device_count": 2,
+      "is_available": true,
+      "check": 56.0
+    },
+    "accelerate": {
+      "ok": true,
+      "s": 0.74,
+      "device": "neuron",
+      "distributed_type": "DistributedType.NO"
+    },
+    "stack": {
+      "ok": true,
+      "s": 55.71,
+      "transformers": "5.19.0",
+      "trl": "1.16.0",
+      "peft": "0.21.2",
+      "accelerate": "1.15.0",
+      "torch-neuronx": "2.14.3.0.1+b1b6c66"
+    }
+  },
+  "ok": false,
+  "failed_stage": "model",
+  "error": "TorchMlirCompilerError: \nFailed Torch-MLIR Lowering Torch Backend IR -> StableHLO IR: error: 'stablehlo.concatenate' op inferred type(s) 'tensor<2xi64>' are incompatible with return type(s) of operation 'tensor<1xi64>'\nerror: 'stablehlo.concatenate' op failed to infer returned types\n\n",
+  "traceback": "nx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py\", line 1483, in get_image_features\n    vision_outputs = self.visual(pixel_values, grid_thw=image_grid_thw, **kwargs)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1783, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1794, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/utils/generic.py\", line 1081, in wrapper\n    output = func(self, *args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/utils/output_capturing.py\", line 287, in wrapper\n    outputs = func(self, *args, **kwargs)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py\", line 1164, in forward\n    interp_indices, interp_weights = get_vision_interpolation_indices_and_weights(\n                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/vision_utils.py\", line 276, in get_vision_interpolation_indices_and_weights\n    heights = torch.repeat_interleave(grid_thw[:, 1], counts)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py\", line 1548, in _fn\n    return fn(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/python_ops/torch_mlir/operation_registry.py\", line 336, in lower\n    lowering_result = kernel.lower(\n                      ^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py\", line 1548, in _fn\n    return fn(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/python_ops/torch_mlir/kernel.py\", line 1788, in lower\n    ) = self._get_or_compile_hlo(\n        ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/python_ops/torch_mlir/kernel.py\", line 1411, in _get_or_compile_hlo\n    entry = self._generate_hlo(\n            ^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/contextlib.py\", line 81, in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/python_ops/torch_mlir/kernel.py\", line 875, in _generate_hlo\n    stablehlo_module, io_spec, cast_spec = convert_fx_to_stablehlo(\n                                           ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/neuron_dynamo_backend/fx/fx_transform.py\", line 241, in convert_fx_to_stablehlo\n    run_pipeline_with_repro_report(\n  File \"/source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/third_party/torch-mlir/python/torch_mlir/compiler_utils.py\", line 145, in run_pipeline_with_repro_report\n    raise TorchMlirCompilerError(trimmed_message) from e\ntorch_mlir.compiler_utils.TorchMlirCompilerError: \nFailed Torch-MLIR Lowering Torch Backend IR -> StableHLO IR: error: 'stablehlo.concatenate' op inferred type(s) 'tensor<2xi64>' are incompatible with return type(s) of operation 'tensor<1xi64>'\nerror: 'stablehlo.concatenate' op failed to infer returned types\n\n\n"
+}

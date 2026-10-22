@@ -1,0 +1,16 @@
+# 2026-10-22T11:27:19Z ip-172-31-70-16 venv=/opt/aws_neuronx_venv_torch_neuronx_2_14_0
+Python 3.12.3
+instance-type: trn1.2xlarge
+instance-id: i-02ab7cbe35b3617a2
++--------+--------+----------+--------+--------------+----------+------+
+| NEURON | NEURON |  NEURON  | NEURON |     PCI      |   CPU    | NUMA |
+| DEVICE | CORES  | CORE IDS | MEMORY |     BDF      | AFFINITY | NODE |
++--------+--------+----------+--------+--------------+----------+------+
+| 0      | 2      | 0-1      | 32 GB  | 0000:00:1e.0 | 0-7      | -1   |
++--------+--------+----------+--------+--------------+----------+------+
+neuronx-cc                               2.28.7631.0+8f7b0cf5
+torch                                    2.14.0
+torch-neuronx                            2.14.3.0.1+b1b6c66          /source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx
+torchdata                                0.11.0
+torchtitan-neuron                        0.2.2+neuron.1              /source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torchtitan-neuron
+miles 8e99947cc9 2026-10-22

@@ -1,0 +1,7 @@
+# Installed on top of each accelerator's own torch build. Never list torch,
+# torch-xla, torch-neuronx or torch_tpu here: each must match its platform.
+transformers>=4.51,<5   # Qwen3 support; logits_to_keep
+peft>=0.13
+pandas
+pyarrow
+pillow

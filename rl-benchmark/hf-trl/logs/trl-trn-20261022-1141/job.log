@@ -1,0 +1,82 @@
+===== boot 2026-10-22T11:43:25Z on i-05b0269abe92b244e =====
+[2026-10-22T11:43:29Z] job trl-trn-20261022-1141 stages: env install data check smoke
+[2026-10-22T11:43:29Z] === stage env
+# 2026-10-22T11:43:29Z venv=/opt/aws_neuronx_venv_torch_neuronx_2_14_0
+Python 3.12.3
+instance-type: trn1.2xlarge
+instance-id: i-05b0269abe92b244e
++--------+--------+----------+--------+--------------+----------+------+
+| NEURON | NEURON |  NEURON  | NEURON |     PCI      |   CPU    | NUMA |
+| DEVICE | CORES  | CORE IDS | MEMORY |     BDF      | AFFINITY | NODE |
++--------+--------+----------+--------+--------------+----------+------+
+| 0      | 2      | 0-1      | 32 GB  | 0000:00:1e.0 | 0-7      | -1   |
++--------+--------+----------+--------+--------------+----------+------+
+datasets                                 5.1.0
+neuronx-cc                               2.28.7631.0+8f7b0cf5
+torch                                    2.14.0
+torch-neuronx                            2.14.3.0.1+b1b6c66          /source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx
+[2026-10-22T11:44:23Z] === stage install
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 123.3/123.3 kB 31.0 MB/s eta 0:00:00
+Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+Installing collected packages: shellingham, regex, typer, transformers, torchvision, accelerate, trl, peft
+Successfully installed accelerate-1.15.0 peft-0.21.2 regex-2026.9.29 shellingham-1.5.4 torchvision-0.29.1 transformers-5.19.0 trl-1.16.0 typer-0.27.3
+accelerate                               1.15.0
+datasets                                 5.1.0
+peft                                     0.21.2
+torch                                    2.14.0
+torch-neuronx                            2.14.3.0.1+b1b6c66          /source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx
+torchvision                              0.29.1
+transformers                             5.19.0
+trl                                      1.16.0
+On-device RNG not available - CPU RNG will be used
+[2026-10-22T11:49:02Z] === stage data
+7463bb11bd6518b469f0cfe248218090fe6896b6e10f70721ee7a0910fb1bd10  data/cholect50/parquet/train.parquet
+5c6f3191fedd088b9dbd2c1c8e3e2089e075259cdc2ed01a19010686ef5c4c8c  data/cholect50/parquet/val.parquet
+[2026-10-22T11:50:02Z] === stage check
+On-device RNG not available - CPU RNG will be used
+[check] neuron: ok {'torch': '2.14.0+cu130', 'has_torch_neuron': True, 'device_count': 2, 'is_available': True, 'check': 56.0}
+[check] accelerate: ok {'device': 'neuron', 'distributed_type': 'DistributedType.NO'}
+[check] stack: ok {'transformers': '5.19.0', 'trl': '1.16.0', 'peft': '0.21.2', 'accelerate': '1.15.0', 'torch-neuronx': '2.14.3.0.1+b1b6c66'}
+Loading weights:   0%|          | 0/724 [00:00<?, ?it/s]Loading weights:  88%|████████▊ | 634/724 [00:00<00:00, 6332.64it/s]Loading weights: 100%|██████████| 724/724 [00:00<00:00, 6739.69it/s]
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+[data] val: 28 rows, dropped 4 over 2048 tokens
+[transformers] Kwargs passed to `processor.__call__` have to be in `processor_kwargs` dict, not in `**kwargs`
+/source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/nki_kernel.py:85: UserWarning: NKI_ENABLE_TRACE_CACHE=1: the NKI kernel compile cache is persisted across processes. The caching process may not capture all kernel environment dependencies or non-argument values and can yield stale cache hits; see the torch-neuronx environment variables documentation for details. Set NKI_ENABLE_TRACE_CACHE=0 to disable.
+  _warn_trace_cache_once()
+[check] FAILED at model: TorchMlirCompilerError: 
+Failed Torch-MLIR Lowering Torch Backend IR -> StableHLO IR: error: 'stablehlo.concatenate' op inferred type(s) 'tensor<2xi64>' are incompatible with return type(s) of operation 'tensor<1xi64>'
+error: 'stablehlo.concatenate' op failed to infer returned types
+
+
+[2026-10-22T11:54:24Z] check FAILED: see check_env.json

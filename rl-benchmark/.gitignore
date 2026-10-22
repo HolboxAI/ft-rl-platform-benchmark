@@ -1,0 +1,29 @@
+# Secrets — never commit
+.env
+*.env
+.env.*
+*.pem
+*.key
+
+# Python
+.venv*/
+venv/
+__pycache__/
+*.pyc
+
+# Large derived data (regenerate: data/README.md)
+data/cholect50/parquet/
+data/cholect50/frames/
+
+# Per-run output folders (keep console.log; the copied metrics/ files are the record)
+trainium/logs/*/model/
+torchtpu/logs/*/model/
+
+# Compile caches
+neuron-compile-cache/
+xla_cache/
+
+.DS_Store
+
+# The repo-root .gitignore excludes *.env; these hold launcher settings only (no credentials).
+!ec2.env

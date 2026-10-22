@@ -1,0 +1,226 @@
+{
+  "stages": {
+    "neuron": {
+      "ok": true,
+      "s": 12.82,
+      "torch": "2.14.0+cu130",
+      "has_torch_neuron": true,
+      "device_count": 2,
+      "is_available": true,
+      "check": 56.0
+    },
+    "ops": {
+      "ok": false,
+      "n": 16,
+      "n_wrong": 2,
+      "results": {
+        "eq_int64_sum": {
+          "match": true,
+          "cpu": [
+            405
+          ],
+          "neuron": [
+            405
+          ]
+        },
+        "eq_int32_sum": {
+          "match": true,
+          "cpu": [
+            405
+          ],
+          "neuron": [
+            405
+          ]
+        },
+        "bool_sum": {
+          "match": true,
+          "cpu": [
+            405
+          ],
+          "neuron": [
+            405
+          ]
+        },
+        "bool_to_long_sum": {
+          "match": true,
+          "cpu": [
+            405
+          ],
+          "neuron": [
+            405
+          ]
+        },
+        "bool_to_int_sum": {
+          "match": true,
+          "cpu": [
+            405
+          ],
+          "neuron": [
+            405
+          ]
+        },
+        "bool_sum_dim": {
+          "match": true,
+          "cpu": [
+            56,
+            33,
+            40,
+            41,
+            41,
+            54
+          ],
+          "neuron": [
+            56,
+            33,
+            40,
+            41,
+            41,
+            54
+          ]
+        },
+        "int64_sum": {
+          "match": false,
+          "cpu": [
+            330901475
+          ],
+          "neuron": [
+            330901472
+          ]
+        },
+        "int64_cumsum": {
+          "match": false,
+          "cpu": [
+            330407798,
+            330465317,
+            330607593,
+            330810703,
+            330901475
+          ],
+          "neuron": [
+            586250,
+            586505,
+            586760,
+            587015,
+            587270
+          ]
+        },
+        "bool_cumsum": {
+          "match": true,
+          "cpu": [
+            405
+          ],
+          "neuron": [
+            405
+          ]
+        },
+        "eq_argmax_int": {
+          "match": true,
+          "cpu": [
+            0,
+            9,
+            13,
+            4,
+            1,
+            3
+          ],
+          "neuron": [
+            0,
+            9,
+            13,
+            4,
+            1,
+            3
+          ]
+        },
+        "nonzero_count": {
+          "match": true,
+          "cpu": [
+            405
+          ],
+          "neuron": [
+            405
+          ]
+        },
+        "masked_select_count": {
+          "match": true,
+          "cpu": [
+            405
+          ],
+          "neuron": [
+            405
+          ]
+        },
+        "any_all": {
+          "match": true,
+          "cpu": [
+            true,
+            false
+          ],
+          "neuron": [
+            true,
+            false
+          ]
+        },
+        "gather_logprob": {
+          "match": true,
+          "cpu": [
+            -16.239604949951172
+          ],
+          "neuron": [
+            -16.23958969116211
+          ]
+        },
+        "masked_mean": {
+          "match": true,
+          "cpu": [
+            0.004222768358886242
+          ],
+          "neuron": [
+            0.004222767893224955
+          ]
+        },
+        "float_sum": {
+          "match": true,
+          "cpu": [
+            -16.239604949951172
+          ],
+          "neuron": [
+            -16.23958969116211
+          ]
+        }
+      },
+      "s": 25.65
+    },
+    "accelerate": {
+      "ok": true,
+      "s": 0.3,
+      "device": "neuron",
+      "distributed_type": "DistributedType.NO"
+    },
+    "stack": {
+      "ok": true,
+      "s": 2.38,
+      "transformers": "5.19.0",
+      "trl": "1.16.0",
+      "peft": "0.21.2",
+      "accelerate": "1.15.0",
+      "torch-neuronx": "2.14.3.0.1+b1b6c66"
+    }
+  },
+  "ok": false,
+  "compat_patched": [
+    "get_vision_attention_seqlens",
+    "get_vision_bilinear_indices_and_weights",
+    "get_vision_cu_seqlens",
+    "get_vision_interpolation_indices_and_weights",
+    "get_vision_merged_shape",
+    "get_vision_nearest_position_ids",
+    "get_vision_position_ids",
+    "get_vision_window_index",
+    "Qwen3_5Model.get_rope_index",
+    "Qwen3_5Model.get_vision_position_ids"
+  ],
+  "failed_stage": "model",
+  "error": "ValueError: Image features and image tokens do not match, tokens: 203, features: 405",
+  "traceback": "Traceback (most recent call last):\n  File \"/data/code/accelerator-rl-benchmark/hf-trl/scripts/check_env.py\", line 156, in main\n    out = model.generate(**enc, max_new_tokens=16, do_sample=False)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/utils/_contextlib.py\", line 124, in decorate_context\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/generation/utils.py\", line 2982, in generate\n    result = decoding_method(\n             ^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/generation/utils.py\", line 3182, in _sample\n    outputs = self._prefill(\n              ^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/generation/utils.py\", line 4293, in _prefill\n    return self(**model_inputs, return_dict=True)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1783, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1794, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/utils/generic.py\", line 943, in wrapper\n    output = func(self, *args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py\", line 1851, in forward\n    outputs = self.model(\n              ^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1783, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1794, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/utils/generic.py\", line 943, in wrapper\n    output = func(self, *args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py\", line 1620, in forward\n    image_mask, _ = self.get_placeholder_mask(\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py\", line 1516, in get_placeholder_mask\n    torch_compilable_check(\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/transformers/utils/import_utils.py\", line 1892, in torch_compilable_check\n    torch._check_tensor_all_with(error_type, cond, msg_callable)\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/__init__.py\", line 2283, in _check_tensor_all_with\n    _check_with(error_type, cond._is_all_true().item(), message)  # type: ignore[arg-type]\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/torch/__init__.py\", line 2118, in _check_with\n    raise error_type(message_evaluated)\nValueError: Image features and image tokens do not match, tokens: 203, features: 405\n"
+}

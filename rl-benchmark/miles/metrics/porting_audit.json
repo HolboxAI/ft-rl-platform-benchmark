@@ -1,0 +1,288 @@
+{
+  "name": "miles",
+  "root": "/private/tmp/claude-501/-Users-dev-Documents-RL-benchmark/dba023e7-4c19-43be-af4c-a8b7eebb09b2/scratchpad/ext/miles",
+  "commit": "8e99947 2026-10-22",
+  "scope": "production code (tests/docs/examples/benchmarks/ci excluded)",
+  "py_files": 979,
+  "py_lines": 150246,
+  "totals": {
+    "cuda_runtime": {
+      "call_sites": 141,
+      "files": 56
+    },
+    "nccl": {
+      "call_sites": 26,
+      "files": 13
+    },
+    "gpu_kernels": {
+      "call_sites": 62,
+      "files": 33
+    },
+    "nvidia_stack": {
+      "call_sites": 323,
+      "files": 84
+    },
+    "sglang": {
+      "call_sites": 67,
+      "files": 31
+    },
+    "vllm": {
+      "call_sites": 0,
+      "files": 0
+    },
+    "jax": {
+      "call_sites": 0,
+      "files": 0
+    },
+    "xla_or_neuron": {
+      "call_sites": 1,
+      "files": 1
+    }
+  },
+  "top_files": {
+    "sglang": [
+      [
+        "miles/backends/training_utils/weight_update/protocols/utils/model_replica.py",
+        12
+      ],
+      [
+        "miles/backends/megatron_utils/sglang.py",
+        9
+      ],
+      [
+        "miles_plugins/models/deepseek_v4_1/ops/kvnorm.py",
+        4
+      ],
+      [
+        "miles/rollout/session/sessions.py",
+        4
+      ],
+      [
+        "miles/backends/training_utils/weight_update/protocols/cuda_ipc.py",
+        3
+      ],
+      [
+        "miles/rollout/generate_utils/tool_call_utils.py",
+        3
+      ],
+      [
+        "miles/kernels/attention/dsa/topk.py",
+        2
+      ],
+      [
+        "miles/backends/fsdp_utils/actor.py",
+        2
+      ]
+    ],
+    "cuda_runtime": [
+      [
+        "tools/convert_hf_to_nvfp4.py",
+        7
+      ],
+      [
+        "tools/convert_hf_to_mxfp8.py",
+        7
+      ],
+      [
+        "tools/convert_hf_to_int4_direct.py",
+        6
+      ],
+      [
+        "miles_plugins/models/linear_attn.py",
+        6
+      ],
+      [
+        "miles/kernels/quant/nvfp4_qdq.py",
+        6
+      ],
+      [
+        "miles/backends/megatron_utils/update_weight/hf_weight_iterator_direct.py",
+        6
+      ],
+      [
+        "miles/backends/fsdp_utils/actor.py",
+        6
+      ],
+      [
+        "miles/backends/fsdp_utils/checkpoint.py",
+        5
+      ]
+    ],
+    "nccl": [
+      [
+        "miles/backends/training_utils/weight_update/protocols/broadcast.py",
+        9
+      ],
+      [
+        "miles/utils/test_utils/det_process_group.py",
+        3
+      ],
+      [
+        "miles/backends/megatron_utils/ft/checkpoint_transfer.py",
+        2
+      ],
+      [
+        "miles/backends/training_utils/weight_update/protocols/cuda_ipc.py",
+        2
+      ],
+      [
+        "miles/ray/specs/inference.py",
+        2
+      ],
+      [
+        "tools/convert_hf_to_torch_dist.py",
+        1
+      ],
+      [
+        "miles/backends/megatron_utils/update_weight/hf_weight_iterator_direct.py",
+        1
+      ],
+      [
+        "miles/backends/megatron_utils/ft/indep_dp.py",
+        1
+      ]
+    ],
+    "nvidia_stack": [
+      [
+        "miles/backends/megatron_utils/model.py",
+        17
+      ],
+      [
+        "miles_plugins/models/glm5/glm5.py",
+        16
+      ],
+      [
+        "miles_plugins/models/inkling/layers.py",
+        16
+      ],
+      [
+        "miles_plugins/models/deepseek_v4_1/deepseek_v4_1.py",
+        15
+      ],
+      [
+        "miles_plugins/models/deepseek_v4/deepseek_v4.py",
+        12
+      ],
+      [
+        "miles_plugins/optimizers/nvme_stream.py",
+        11
+      ],
+      [
+        "miles_plugins/megatron_bridge/mimo_v2.py",
+        10
+      ],
+      [
+        "miles_plugins/models/glm5_next/glm5_next.py",
+        9
+      ]
+    ],
+    "gpu_kernels": [
+      [
+        "miles_plugins/models/linear_attn.py",
+        6
+      ],
+      [
+        "miles_plugins/models/inkling/ops.py",
+        3
+      ],
+      [
+        "miles_plugins/models/glm5_next/kda.py",
+        3
+      ],
+      [
+        "miles/kernels/quant/fake_quant.py",
+        3
+      ],
+      [
+        "miles/kernels/attention/dsa/kpool.py",
+        3
+      ],
+      [
+        "tools/fp8_cast_bf16.py",
+        2
+      ],
+      [
+        "miles/kernels/quant/fp8_blockwise.py",
+        2
+      ],
+      [
+        "miles/kernels/attention/qsa/block_sparse_attention.py",
+        2
+      ]
+    ],
+    "xla_or_neuron": [
+      [
+        "miles/platforms/tpu.py",
+        1
+      ]
+    ]
+  },
+  "by_area": {
+    "miles_plugins/models": {
+      "nvidia_stack": 162,
+      "cuda_runtime": 14,
+      "gpu_kernels": 17,
+      "sglang": 5
+    },
+    "miles/backends": {
+      "cuda_runtime": 38,
+      "nvidia_stack": 103,
+      "gpu_kernels": 4,
+      "sglang": 33,
+      "nccl": 17
+    },
+    "miles/utils": {
+      "sglang": 11,
+      "cuda_runtime": 20,
+      "nvidia_stack": 13,
+      "gpu_kernels": 3,
+      "nccl": 6
+    },
+    "miles/kernels": {
+      "cuda_runtime": 11,
+      "gpu_kernels": 36,
+      "sglang": 4
+    },
+    "tools": {
+      "cuda_runtime": 35,
+      "nccl": 1,
+      "nvidia_stack": 5,
+      "sglang": 1,
+      "gpu_kernels": 2
+    },
+    "miles_plugins/megatron_bridge": {
+      "nvidia_stack": 18
+    },
+    "miles_plugins/mbridge": {
+      "cuda_runtime": 6,
+      "nvidia_stack": 9
+    },
+    "miles_plugins/optimizers": {
+      "cuda_runtime": 1,
+      "nvidia_stack": 11
+    },
+    "miles/rollout": {
+      "sglang": 10
+    },
+    "miles/ray": {
+      "cuda_runtime": 5,
+      "nvidia_stack": 1,
+      "nccl": 2,
+      "sglang": 2
+    },
+    "scripts": {
+      "cuda_runtime": 4,
+      "nvidia_stack": 1
+    },
+    "miles/platforms": {
+      "cuda_runtime": 3,
+      "xla_or_neuron": 1
+    },
+    "scripts/amd": {
+      "cuda_runtime": 4
+    },
+    "train.py": {
+      "sglang": 1
+    }
+  }
+}

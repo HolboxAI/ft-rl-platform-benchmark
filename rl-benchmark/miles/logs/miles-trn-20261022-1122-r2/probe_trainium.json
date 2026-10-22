@@ -1,0 +1,60 @@
+{
+  "backend": "neuron",
+  "MILES_ACCELERATOR": "neuron",
+  "stages": {
+    "accelerator": {
+      "ok": false,
+      "error": "ModuleNotFoundError: No module named 'torch_xla'",
+      "traceback": "Traceback (most recent call last):\n  File \"/data/code/accelerator-rl-benchmark/miles/scripts/probe_miles.py\", line 35, in try_stage\n    extra = fn() or {}\n            ^^^^\n  File \"/data/code/accelerator-rl-benchmark/miles/scripts/probe_miles.py\", line 67, in accelerator\n    import torch_xla.core.xla_model as xm\nModuleNotFoundError: No module named 'torch_xla'\n"
+    },
+    "miles_import": {
+      "ok": true,
+      "s": 0.0,
+      "miles_path": "/data/miles/miles"
+    },
+    "platform": {
+      "ok": false,
+      "error": "ValueError: MILES_ACCELERATOR='neuron'; expected cuda or tpu",
+      "traceback": "Traceback (most recent call last):\n  File \"/data/code/accelerator-rl-benchmark/miles/scripts/probe_miles.py\", line 35, in try_stage\n    extra = fn() or {}\n            ^^^^\n  File \"/data/code/accelerator-rl-benchmark/miles/scripts/probe_miles.py\", line 80, in platform\n    from miles.platforms import current_platform\n  File \"/data/miles/miles/platforms/__init__.py\", line 48, in <module>\n    current_platform = _select_platform()\n                       ^^^^^^^^^^^^^^^^^^\n  File \"/data/miles/miles/platforms/__init__.py\", line 45, in _select_platform\n    raise ValueError(f\"MILES_ACCELERATOR={device_type!r}; expected cuda or tpu\")\nValueError: MILES_ACCELERATOR='neuron'; expected cuda or tpu\n"
+    },
+    "train_backends": {
+      "ok": true,
+      "s": 2.37,
+      "backends": {
+        "miles.backends.fsdp_utils": "ValueError: MILES_ACCELERATOR='neuron'; expected cuda or tpu",
+        "miles.backends.torchtitan_utils": "ok",
+        "miles.backends.megatron_utils": "ok"
+      }
+    },
+    "rollout": {
+      "ok": false,
+      "error": "ModuleNotFoundError: No module named 'sglang'",
+      "traceback": "Traceback (most recent call last):\n  File \"/data/code/accelerator-rl-benchmark/miles/scripts/probe_miles.py\", line 35, in try_stage\n    extra = fn() or {}\n            ^^^^\n  File \"/data/code/accelerator-rl-benchmark/miles/scripts/probe_miles.py\", line 98, in rollout\n    import sglang  # noqa: F401\n    ^^^^^^^^^^^^^\nModuleNotFoundError: No module named 'sglang'\n"
+    },
+    "import_surface": {
+      "ok": true,
+      "s": 88.42,
+      "modules_ok": 480,
+      "modules_failed": 165,
+      "failures_by_cause": {
+        "sglang": 51,
+        "ValueError": 27,
+        "megatron": 24,
+        "sglang_router": 23,
+        "polars": 13,
+        "uvicorn": 7,
+        "tilelang": 5,
+        "tinker": 4,
+        "openai": 2,
+        "pylatexenc": 2,
+        "setproctitle": 2,
+        "kubernetes_asyncio": 2,
+        "zstandard": 1,
+        "cutlass": 1,
+        "ImportError": 1
+      }
+    }
+  },
+  "ok": false,
+  "first_failure": "accelerator"
+}

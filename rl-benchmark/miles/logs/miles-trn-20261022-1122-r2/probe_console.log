@@ -1,0 +1,25 @@
+On-device RNG not available - CPU RNG will be used
+[probe] accelerator: FAILED ModuleNotFoundError: No module named 'torch_xla'
+[probe] miles_import: ok {'miles_path': '/data/miles/miles'}
+[probe] platform: FAILED ValueError: MILES_ACCELERATOR='neuron'; expected cuda or tpu
+WARNING:root:deep_ep is not installed, some functionalities may be limited.
+WARNING:miles_plugins.megatron_bridge:miles bridge shim _install_bridge_pp_group_unwrap not applied: No module named 'megatron'
+WARNING:miles_plugins.megatron_bridge.nemotron_h:miles nemotron_h shim _build_bridge_subclass not applied: No module named 'megatron'
+WARNING:miles_plugins.megatron_bridge:miles mimo_v2 plugin failed to load: No module named 'megatron'
+[probe] train_backends: ok {'backends': {'miles.backends.fsdp_utils': "ValueError: MILES_ACCELERATOR='neuron'; expected cuda or tpu", 'miles.backends.torchtitan_utils': 'ok', 'miles.backends.megatron_utils': 'ok'}}
+[probe] rollout: FAILED ModuleNotFoundError: No module named 'sglang'
+[probe] import_surface: ok {'modules_ok': 480, 'modules_failed': 165, 'failures_by_cause': {'sglang': 51, 'ValueError': 27, 'megatron': 24, 'sglang_router': 23, 'polars': 13, 'uvicorn': 7, 'tilelang': 5, 'tinker': 4, 'openai': 2, 'pylatexenc': 2, 'setproctitle': 2, 'kubernetes_asyncio': 2, 'zstandard': 1, 'cutlass': 1, 'ImportError': 1}}
+{
+  "backend": "neuron",
+  "MILES_ACCELERATOR": "neuron",
+  "stages": {
+    "accelerator": false,
+    "miles_import": true,
+    "platform": false,
+    "train_backends": true,
+    "rollout": false,
+    "import_surface": true
+  },
+  "ok": false,
+  "first_failure": "accelerator"
+}
