@@ -1,0 +1,14 @@
+=== python / torch ===
+Python 3.14.4
+torch 2.14.0+cu130
+torch_neuronx 2.14.3.0.1+b1b6c66
+neuron device: neuron
+=== install trl / transformers / accelerate / pillow ===
+=== verify ===
+transformers 5.18.0
+trl 1.16.0
+accelerate 1.15.0
+qwen3_5 has Qwen3_5ForConditionalGeneration: True
+qwen3_5 has Qwen3_5Config: True
+core imports OK
+DONE setup2

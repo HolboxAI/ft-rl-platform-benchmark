@@ -1,0 +1,59 @@
+{
+  "updated": "2026-10-23",
+  "platform": "trainium2",
+  "framework": "TorchNeuron (torch-neuronx) native PyTorch backend + TRL GRPO",
+  "sdk": "AWS DLAMI torch-neuronx 2.14.0 venv (/opt/aws_neuronx_venv_torch_neuronx_2_14_0)",
+  "compute": "AWS EC2 trn2.48xlarge spot, ap-south-2b (single NeuronCore, NEURON_RT_VISIBLE_CORES=0)",
+  "instance": "i-0100ad220252068d3",
+  "host": "ubuntu@16.113.78.135",
+  "ssh_key": "~/.ssh/trainium-ap-south-2",
+  "repo": "ft-rl-platform-benchmark (this repo, trainium2/)",
+  "scope": "RL / GRPO stage only. SFT stays on Tinker; this loads the merged cholec-sft-qwen3.5-4b checkpoint.",
+  "stack_pins": {
+    "torch": "2.14.0+cu130",
+    "torch_neuronx": "2.14.3.0.282 (pinned --no-deps; the AMI-bundled 2.14.3.0.1 crashes on torch.repeat_interleave)",
+    "torchvision": "0.29.1",
+    "transformers": "5.18.0",
+    "trl": "1.16.0",
+    "accelerate": "1.15.0",
+    "peft": ">=0.15",
+    "datasets": ">=3",
+    "pillow": ">=11",
+    "python": "3.14"
+  },
+  "experiments": [
+    {
+      "name": "cholect50_grpo_smoke",
+      "method": "grpo",
+      "base_model": "cholec-sft-qwen3.5-4b (Qwen3.5-4B VLM, Tinker SFT output)",
+      "sft_checkpoint": "Tinker output, LoRA merged (same checkpoint as verl, Miles, SkyRL)",
+      "job_id": "trainium2-cholec-grpo-smoke-4step",
+      "state": "succeeded",
+      "dataset_size": 256,
+      "smoke_train_size": 32,
+      "smoke_val_size": 8,
+      "steps": 4,
+      "learning_rate": 1e-5,
+      "lora_rank": 16,
+      "lora_alpha": 32,
+      "kl_beta": 0.0,
+      "temperature": 0.7,
+      "rollout_n": 8,
+      "max_tokens": 256,
+      "train_reward": 0.4,
+      "train_reward_std": 3.186e-08,
+      "final_score": 0.2958,
+      "sft_baseline": 0.31875,
+      "note": "Go/no-go smoke only. Platform works; no learning (flat reward). See final_results.json and TRAINIUM_ISSUES_LOG.md."
+    }
+  ],
+  "findings": [
+    "TorchNeuron runs the Qwen3.5-4B VLM (8 full-attention + 24 Gated DeltaNet layers) on the neuron device in eager mode. A full GRPO training step and eval both complete.",
+    "The Qwen3.5 vision tower uses torch.repeat_interleave with a dynamic repeats tensor. The AMI-bundled torch-neuronx 2.14.3.0.1 crashes the StableHLO lowering; 2.14.3.0.282 compiles it under torch.compile but crashes neuronx-cc. Fix = monkeypatch the vision interpolation precompute onto CPU (scripts/grpo_train.py:_patch_vision_interp).",
+    "transformers Trainer forces torch.compile whenever torch_compile_backend is non-None (accelerate >= 1.2.0), even with torch_compile=False. Fix = pass the neuron backend only when compilation is wanted.",
+    "Single NeuronCore HBM = 25.8 GB. GRPO with beta!=0 loads a second full model copy (~10 GB) as the reference model, and full fine-tune AdamW keeps ~41 GB of fp32 states. Neither fits one core. verl fits by FSDP(size 4) + param_offload + optimizer_offload, which TRL-on-Neuron has no equivalent for.",
+    "TRL 1.16 passes conversational completions to the reward as message lists ([{\"role\":\"assistant\",\"content\":...}]), not strings, and passes the label through the 'label' column. scripts/reward_tr.py unwraps both.",
+    "The Gated DeltaNet / linear-attention layers fall back to reference PyTorch because causal_conv1d and flash-linear-attention are not on the Neuron AMI. Correct but much slower.",
+    "torch_neuronx empty_cache() is required between training and eval, or the eval's fused-LM-head logits (~288 MB) fail to allocate because the training-time buffers stay cached in the Neuron allocator."
+  ]
+}

@@ -1,0 +1,13 @@
+torch 2.14.0+cu130
+stage 0: neuron device -> neuron
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/724 [00:00<?, ?it/s]Loading weights: 100%|██████████| 724/724 [00:00<00:00, 15788.64it/s]
+stage 1: model loaded -> Qwen3_5ForConditionalGeneration
+stage 2: model moved to neuron OK
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+/source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/nki_kernel.py:85: UserWarning: NKI_ENABLE_TRACE_CACHE=1: the NKI kernel compile cache is persisted across processes. The caching process may not capture all kernel environment dependencies or non-argument values and can yield stale cache hits; see the torch-neuronx environment variables documentation for details. Set NKI_ENABLE_TRACE_CACHE=0 to disable.
+  _warn_trace_cache_once()
+stage 3: text-only forward OK, loss = 0.804292619228363
+stage 4: backward OK
+=== LLM STAGES OK ===

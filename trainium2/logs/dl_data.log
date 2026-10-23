@@ -1,0 +1,5 @@
+total 187552
+drwxrwxr-x 2 ubuntu ubuntu      4096 Oct 23 09:42 .
+drwxr-x--- 8 ubuntu ubuntu      4096 Oct 23 09:42 ..
+-rw-rw-r-- 1 ubuntu ubuntu 170302885 Oct 23 09:42 cholect50_train.jsonl
+-rw-rw-r-- 1 ubuntu ubuntu  21738718 Oct 23 09:42 cholect50_val.jsonl

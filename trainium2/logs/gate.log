@@ -1,0 +1,385 @@
+torch 2.14.0+cu130
+stage 0: neuron device -> neuron
+stage 1: processor loaded: Qwen3VLProcessor
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/724 [00:00<?, ?it/s]Loading weights: 100%|██████████| 724/724 [00:00<00:00, 15461.93it/s]
+stage 1: model loaded -> Qwen3_5ForConditionalGeneration
+stage 2: model moved to neuron OK
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/nki_kernel.py:85: UserWarning: NKI_ENABLE_TRACE_CACHE=1: the NKI kernel compile cache is persisted across processes. The caching process may not capture all kernel environment dependencies or non-argument values and can yield stale cache hits; see the torch-neuronx environment variables documentation for details. Set NKI_ENABLE_TRACE_CACHE=0 to disable.
+  _warn_trace_cache_once()
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py:276: UserWarning: [Neuron] [WARNING] [torch_neuronx/csrc/core/dispatch/NeuronDispatcher.cpp:2987] [GetOrLowerOperation] Python lower_func failed:  TorchMlirCompilerError: 
+Failed Torch-MLIR Lowering Torch Backend IR -> StableHLO IR: error: 'stablehlo.concatenate' op inferred type(s) 'tensor<2xi64>' are incompatible with return type(s) of operation 'tensor<1xi64>'
+error: 'stablehlo.concatenate' op failed to infer returned types
+
+
+
+At:
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_mlir/compiler_utils.py(150): run_pipeline_with_repro_report
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/neuron_dynamo_backend/fx/fx_transform.py(241): convert_fx_to_stablehlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(875): _generate_hlo
+  /usr/lib/python3.14/contextlib.py(85): inner
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1411): _get_or_compile_hlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1866): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/operation_registry.py(336): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py(276): get_vision_interpolation_indices_and_weights
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1173): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/output_capturing.py(287): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(1068): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1492): get_image_features
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(993): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1616): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1860): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /home/ubuntu/gate_test.py(103): main
+  /home/ubuntu/gate_test.py(140): <module>
+  cache_key= repeat_interleave.Tensor--n64--_[1]:Long:S(C)_kw:output_size=None  — falling back to CPU  (Triggered internally at ./torch_neuronx/csrc/core/NeuronLogging.h:103.)
+  heights = torch.repeat_interleave(grid_thw[:, 1], counts)
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py:277: UserWarning: [Neuron] [WARNING] [torch_neuronx/csrc/core/dispatch/NeuronDispatcher.cpp:2987] [GetOrLowerOperation] Python lower_func failed:  TorchMlirCompilerError: 
+Failed Torch-MLIR Lowering Torch Backend IR -> StableHLO IR: error: 'stablehlo.concatenate' op inferred type(s) 'tensor<2xi64>' are incompatible with return type(s) of operation 'tensor<1xi64>'
+error: 'stablehlo.concatenate' op failed to infer returned types
+
+
+
+At:
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_mlir/compiler_utils.py(150): run_pipeline_with_repro_report
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/neuron_dynamo_backend/fx/fx_transform.py(241): convert_fx_to_stablehlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(875): _generate_hlo
+  /usr/lib/python3.14/contextlib.py(85): inner
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1411): _get_or_compile_hlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1866): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/operation_registry.py(336): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py(277): get_vision_interpolation_indices_and_weights
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1173): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/output_capturing.py(287): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(1068): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1492): get_image_features
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(993): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1616): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1860): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /home/ubuntu/gate_test.py(103): main
+  /home/ubuntu/gate_test.py(140): <module>
+  cache_key= repeat_interleave.Tensor--n64--_[1]:Long:S(C)_kw:output_size=None  — falling back to CPU  (Triggered internally at ./torch_neuronx/csrc/core/NeuronLogging.h:103.)
+  widths = torch.repeat_interleave(grid_thw[:, 2], counts)
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py:278: UserWarning: [Neuron] [WARNING] [torch_neuronx/csrc/core/dispatch/NeuronDispatcher.cpp:2987] [GetOrLowerOperation] Python lower_func failed:  TorchMlirCompilerError: 
+Failed Torch-MLIR Lowering Torch Backend IR -> StableHLO IR: error: 'stablehlo.concatenate' op inferred type(s) 'tensor<2xi64>' are incompatible with return type(s) of operation 'tensor<1xi64>'
+error: 'stablehlo.concatenate' op failed to infer returned types
+
+
+
+At:
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_mlir/compiler_utils.py(150): run_pipeline_with_repro_report
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/neuron_dynamo_backend/fx/fx_transform.py(241): convert_fx_to_stablehlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(875): _generate_hlo
+  /usr/lib/python3.14/contextlib.py(85): inner
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1411): _get_or_compile_hlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1866): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/operation_registry.py(336): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py(278): get_vision_interpolation_indices_and_weights
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1173): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/output_capturing.py(287): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(1068): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1492): get_image_features
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(993): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1616): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1860): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /home/ubuntu/gate_test.py(103): main
+  /home/ubuntu/gate_test.py(140): <module>
+  cache_key= repeat_interleave.Tensor--n64--_[1]:Long:S(C)_kw:output_size=None  — falling back to CPU  (Triggered internally at ./torch_neuronx/csrc/core/NeuronLogging.h:103.)
+  starts = torch.repeat_interleave(F.pad(counts.cumsum(0)[:-1], (1, 0)), counts)
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+stage 3: eager forward OK, loss = 21.197256088256836
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py:276: UserWarning: [Neuron] [WARNING] [torch_neuronx/csrc/core/dispatch/NeuronDispatcher.cpp:2987] [GetOrLowerOperation] Python lower_func failed:  TorchMlirCompilerError: 
+Failed Torch-MLIR Lowering Torch Backend IR -> StableHLO IR: error: 'stablehlo.concatenate' op inferred type(s) 'tensor<2xi64>' are incompatible with return type(s) of operation 'tensor<1xi64>'
+error: 'stablehlo.concatenate' op failed to infer returned types
+
+
+
+At:
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_mlir/compiler_utils.py(150): run_pipeline_with_repro_report
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/neuron_dynamo_backend/fx/fx_transform.py(241): convert_fx_to_stablehlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(875): _generate_hlo
+  /usr/lib/python3.14/contextlib.py(85): inner
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1411): _get_or_compile_hlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1866): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/operation_registry.py(336): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py(276): get_vision_interpolation_indices_and_weights
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1173): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/output_capturing.py(287): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(1068): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1492): get_image_features
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(993): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1616): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1860): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /home/ubuntu/gate_test.py(113): main
+  /home/ubuntu/gate_test.py(140): <module>
+  cache_key= repeat_interleave.Tensor--n64--_[1]:Long:S(C)_kw:output_size=None  — falling back to CPU  (Triggered internally at ./torch_neuronx/csrc/core/NeuronLogging.h:103.)
+  heights = torch.repeat_interleave(grid_thw[:, 1], counts)
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py:277: UserWarning: [Neuron] [WARNING] [torch_neuronx/csrc/core/dispatch/NeuronDispatcher.cpp:2987] [GetOrLowerOperation] Python lower_func failed:  TorchMlirCompilerError: 
+Failed Torch-MLIR Lowering Torch Backend IR -> StableHLO IR: error: 'stablehlo.concatenate' op inferred type(s) 'tensor<2xi64>' are incompatible with return type(s) of operation 'tensor<1xi64>'
+error: 'stablehlo.concatenate' op failed to infer returned types
+
+
+
+At:
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_mlir/compiler_utils.py(150): run_pipeline_with_repro_report
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/neuron_dynamo_backend/fx/fx_transform.py(241): convert_fx_to_stablehlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(875): _generate_hlo
+  /usr/lib/python3.14/contextlib.py(85): inner
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1411): _get_or_compile_hlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1866): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/operation_registry.py(336): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py(277): get_vision_interpolation_indices_and_weights
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1173): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/output_capturing.py(287): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(1068): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1492): get_image_features
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(993): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1616): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1860): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /home/ubuntu/gate_test.py(113): main
+  /home/ubuntu/gate_test.py(140): <module>
+  cache_key= repeat_interleave.Tensor--n64--_[1]:Long:S(C)_kw:output_size=None  — falling back to CPU  (Triggered internally at ./torch_neuronx/csrc/core/NeuronLogging.h:103.)
+  widths = torch.repeat_interleave(grid_thw[:, 2], counts)
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py:278: UserWarning: [Neuron] [WARNING] [torch_neuronx/csrc/core/dispatch/NeuronDispatcher.cpp:2987] [GetOrLowerOperation] Python lower_func failed:  TorchMlirCompilerError: 
+Failed Torch-MLIR Lowering Torch Backend IR -> StableHLO IR: error: 'stablehlo.concatenate' op inferred type(s) 'tensor<2xi64>' are incompatible with return type(s) of operation 'tensor<1xi64>'
+error: 'stablehlo.concatenate' op failed to infer returned types
+
+
+
+At:
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_mlir/compiler_utils.py(150): run_pipeline_with_repro_report
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/neuron_dynamo_backend/fx/fx_transform.py(241): convert_fx_to_stablehlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(875): _generate_hlo
+  /usr/lib/python3.14/contextlib.py(85): inner
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1411): _get_or_compile_hlo
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/kernel.py(1866): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch_neuronx/python_ops/torch_mlir/operation_registry.py(336): lower
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/_dynamo/eval_frame.py(1555): _fn
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/vision_utils.py(278): get_vision_interpolation_indices_and_weights
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1173): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/output_capturing.py(287): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(1068): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1492): get_image_features
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(993): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1616): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py(1860): forward
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/transformers/utils/generic.py(939): wrapper
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1794): _call_impl
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.14/site-packages/torch/nn/modules/module.py(1783): _wrapped_call_impl
+  /home/ubuntu/gate_test.py(113): main
+  /home/ubuntu/gate_test.py(140): <module>
+  cache_key= repeat_interleave.Tensor--n64--_[1]:Long:S(C)_kw:output_size=None  — falling back to CPU  (Triggered internally at ./torch_neuronx/csrc/core/NeuronLogging.h:103.)
+  starts = torch.repeat_interleave(F.pad(counts.cumsum(0)[:-1], (1, 0)), counts)
+stage 4: eager backward OK
+=== ALL STAGES OK ===
+2026-Oct-23 10:49:51.069522 131393:131841 ERROR  TDRV:dmem_alloc_internal                     Failed to allocate DEVICE memory (1272971264 bytes): memory allocation failed (ret=-12)
+2026-Oct-23 10:49:51.069635 131393:131841 ERROR  TDRV:tensor_allocate                         Failed to allocate 1272971264 bytes on DEVICE for tensor UNKNOWN.
+2026-Oct-23 10:49:51.069664 131393:131841 ERROR   NRT:nrt_infodump                            Neuron runtime information - please include in any support request:
+2026-Oct-23 10:49:51.069686 131393:131841 ERROR   NRT:nrt_infodump                            ------------->8------------[ cut here ]------------>8-------------
+2026-Oct-23 10:49:51.069709 131393:131841 ERROR   NRT:nrt_infodump                            NRT version: 2.35.30.0 (d2725ccb85ec45a12a6cda21994562156f6e1c23)
+2026-Oct-23 10:49:51.069730 131393:131841 ERROR   NRT:nrt_infodump                            Embedded FW version: 1.25.36.0 (862ff86bbfacf42a954a4d280d1508fbbaf2c561) loaded from "libnrtucode_extisa.so"
+2026-Oct-23 10:49:51.069760 131393:131841 ERROR   NRT:nrt_infodump                            CCOM version: 0.35.43.0-"354ad3064" (compat 93)
+2026-Oct-23 10:49:51.069780 131393:131841 ERROR   NRT:nrt_infodump                            NCFW version: 2.35.12.0 (0cd410fb83c08e6964e981b2fdc1f50713297caa)
+2026-Oct-23 10:49:51.069802 131393:131841 ERROR   NRT:nrt_infodump                            Instance ID: i-0100ad220252068d3
+2026-Oct-23 10:49:51.069820 131393:131841 ERROR   NRT:nrt_infodump                            Cluster ID: 0
+2026-Oct-23 10:49:51.069834 131393:131841 ERROR   NRT:nrt_infodump                            Kernel: Linux 7.0.0-1014-aws #14-Ubuntu SMP PREEMPT Thu Sep 17 19:08:36 UTC 2026
+2026-Oct-23 10:49:51.069855 131393:131841 ERROR   NRT:nrt_infodump                            Nodename: ip-172-31-46-188
+2026-Oct-23 10:49:51.069896 131393:131841 ERROR   NRT:nrt_infodump                            Driver version: 2.31.7.0
+
+2026-Oct-23 10:49:51.069921 131393:131841 ERROR   NRT:nrt_infodump                            Failure: NRT_RESOURCE in nrt_tensor_allocate
+2026-Oct-23 10:49:51.069941 131393:131841 ERROR   NRT:nrt_infodump                            LNC: 0
+2026-Oct-23 10:49:51.069955 131393:131841 ERROR   NRT:nrt_infodump                            Visible cores: 0
+2026-Oct-23 10:49:51.069994 131393:131841 ERROR   NRT:nrt_infodump                            Environment:
+2026-Oct-23 10:49:51.070032 131393:131841 ERROR   NRT:nrt_infodump                                NEURON_LAUNCH_BLOCKING=0
+2026-Oct-23 10:49:51.070049 131393:131841 ERROR   NRT:nrt_infodump                                NEURON_RT_ALLOW_LEGACY_NEFF=1
+2026-Oct-23 10:49:51.070337 131393:131841 ERROR   NRT:nrt_infodump                                NEURON_RT_DBG_ZEROCOPY=1
+2026-Oct-23 10:49:51.070521 131393:131841 ERROR   NRT:nrt_infodump                                NEURON_RT_MAP_HBM=1
+2026-Oct-23 10:49:51.070691 131393:131841 ERROR   NRT:nrt_infodump                                NEURON_LOGICAL_NC_CONFIG=2
+2026-Oct-23 10:49:51.070859 131393:131841 ERROR   NRT:nrt_infodump                                NEURON_RT_ENABLE_DEVICE_MEMORY_OOM_LOG=0
+2026-Oct-23 10:49:51.071055 131393:131841 ERROR   NRT:nrt_infodump                            -------------8<-----------[ cut to here ]-----------8<------------
+2026-Oct-23 10:49:55.527688 131393:131841 ERROR   NRT:nrt_tensor_allocate                     Failed to allocate nrt tensor UNNAMED
+2026-Oct-23 10:49:55.529091 131393:131841 ERROR  TDRV:dmem_alloc_internal                     Failed to allocate DEVICE memory (1272971264 bytes): memory allocation failed (ret=-12)
+2026-Oct-23 10:49:55.529419 131393:131841 ERROR  TDRV:tensor_allocate                         Failed to allocate 1272971264 bytes on DEVICE for tensor UNKNOWN.
+2026-Oct-23 10:49:56.663643 131393:131841 ERROR   NRT:nrt_tensor_allocate                     Failed to allocate nrt tensor UNNAMED
+2026-Oct-23 10:49:56.666054 131393:131841 ERROR  TDRV:dmem_alloc_internal                     Failed to allocate DEVICE memory (1272971264 bytes): memory allocation failed (ret=-12)
+2026-Oct-23 10:49:56.666787 131393:131841 ERROR  TDRV:tensor_allocate                         Failed to allocate 1272971264 bytes on DEVICE for tensor UNKNOWN.
+2026-Oct-23 10:49:57.790434 131393:131841 ERROR   NRT:nrt_tensor_allocate                     Failed to allocate nrt tensor UNNAMED
+[W1023 10:49:57.824478809 NeuronLogging.h:103] Warning: [Neuron] [WARNING] [torch_neuronx/csrc/core/utils/ErrorRecovery.cpp:110] OOM recovery failed after shelves cleanup + cache drain op= neuron::alloc::lazy nrt_status=NRT_RESOURCE  (function log)
+[W1023 10:49:57.824499600 NeuronMetrics.cpp:625] Warning: Neuron OOM: requested_size=1271398400 | Peak memory stats (at allocated_bytes peak): allocated_bytes.current=21801161472 allocated_bytes.peak=21801161472 reserved_bytes.current=22106079232 reserved_bytes.peak=22106079232 active_bytes.current=21141989886 active_bytes.peak=21141989886 internal_fragmentation=659171586 num_alloc_retries=0 num_ooms=0 num_alloc_deferred=0 num_alloc_drain_retry_ok=0 num_alloc_drain_retry_fail=0 (function RecordOOMFailure)
+[W1023 10:49:57.825317257 NeuronMetrics.cpp:668] Warning: Neuron OOM: Segment pool state: segments=358 free_chunks=349 total_free=5715116032 largest_cached_free=65536000 nrt_free=3361734656 cached_free=2353381376 allocated=20054687744 reserved=22408069120 active=20044312632 total_hbm=25769803776 (function RecordOOMFailure)
+2026-Oct-23 10:49:57.793379 131393:131841 ERROR  TDRV:print_lnc_hbm_details                   LNC size is 2. Neuron Cores using this HBM: NC 4 and NC 5
+2026-Oct-23 10:49:57.794064 131393:131841 ERROR  TDRV:log_dev_mem_utilization                 ND 0:NC 4, current utilization:
+2026-Oct-23 10:49:57.805288 131393:131841 ERROR  TDRV:log_dev_mem_usage_table                 Displaying Current Memory Utilization:
+(NOTE: the lines are LONG, and NEFF id to name mapping is printed after)
+
+              |          |  Model   |  Model   |          |  Shared  |          |          |DMA Rings |DMA Rings | DMA Rings |DMA Rings |           | Profiler |
+              |  TOTAL   |   Code   |Constants | Tensors  |Scratchpad|Scratchpad| Runtime  |    IO    |  Spill   |Collectives| Runtime  |Collectives| Buffers  |
+ND 0 HBM 2    | 21.651GB | 97.431MB | 15.414MB | 20.869GB |512.000MB |  0.000B  | 68.623MB | 23.054MB | 81.479MB |  0.000B   | 3.125MB  |  0.000B   |  0.000B  |
+\_NC 4        | 21.519GB | 57.385MB | 7.754MB  | 20.869GB |512.000MB |  0.000B  | 34.712MB | 11.582MB | 40.868MB |  0.000B   | 1.572MB  |  0.000B   |  0.000B  |
+  \_NEFF 1280 |204.820KB | 28.812KB | 32.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB | 32.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1024 | 50.820KB | 22.812KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1281 |413.758KB | 34.750KB |  0.000B  |   n/a    |11.000MB* |  0.000B  |108.008KB | 82.500KB |184.500KB |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1025 |234.383KB | 26.375KB | 64.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB | 32.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1282 |222.258KB | 38.250KB |  0.000B  |   n/a    | 2.324MB* |  0.000B  |108.008KB | 32.000KB | 40.000KB |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1026 |136.258KB | 24.250KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1283 | 50.570KB | 22.562KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1027 |135.820KB | 23.812KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1284 |178.633KB | 34.625KB |  0.000B  |   n/a    |940.000KB*|  0.000B  |108.008KB | 32.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1028 |135.758KB | 23.750KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1285 |397.072KB |117.062KB | 96.002KB |   n/a    | 0.000B*  |  0.000B  |108.008KB | 72.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1029 | 51.133KB | 23.125KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1286 |216.320KB | 60.312KB |  0.000B  |   n/a    | 3.672MB* |  0.000B  |108.008KB | 44.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1030 | 51.445KB | 23.438KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1287 |169.820KB | 25.812KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB | 32.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1031 | 51.133KB | 23.125KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1288 | 85.258KB | 25.250KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB | 32.000KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1032 | 51.633KB | 23.625KB |  0.000B  |   n/a    |240.000B* |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1289 | 6.775MB  | 6.011MB  | 32.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB |638.500KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1033 | 51.633KB | 23.625KB |  0.000B  |   n/a    |432.000B* |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1290 | 50.945KB | 22.938KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1034 |135.320KB | 23.312KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1291 |235.695KB | 27.688KB | 64.000KB |   n/a    | 7.672KB* |  0.000B  |108.008KB |  0.000B  | 32.000KB |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1035 | 50.445KB | 22.438KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1292 | 2.758MB  |705.188KB | 64.000KB |   n/a    |485.016MB*|  0.000B  |108.008KB |486.500KB | 1.423MB  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1036 |135.508KB | 23.500KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1293 | 50.449KB | 22.438KB |  4.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1037 | 50.695KB | 22.688KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1294 | 4.139MB  | 1.335MB  | 64.000KB |   n/a    |504.507MB*|  0.000B  |108.008KB | 2.149MB  |495.250KB |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1038 |137.820KB | 25.812KB |  0.000B  |   n/a    |41.312KB* |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1295 | 50.945KB | 22.938KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1039 | 50.445KB | 22.438KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1296 | 8.611MB  | 7.230MB  | 32.000KB |   n/a    |222.607MB*|  0.000B  |108.016KB |638.500KB |632.000KB |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1040 | 50.453KB | 22.438KB |  8.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1297 | 90.695KB | 25.688KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB | 37.000KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1041 | 52.695KB | 24.688KB |  0.000B  |   n/a    | 8.008KB* |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1298 |239.508KB | 31.500KB | 64.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB | 32.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1042 | 51.883KB | 23.875KB |  0.000B  |   n/a    | 4.008KB* |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1299 | 50.570KB | 22.562KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1043 | 50.945KB | 22.938KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1300 |235.070KB | 27.062KB | 64.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB | 32.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1044 |225.695KB | 81.688KB | 32.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1301 |234.008KB | 26.000KB | 64.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB | 32.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1045 | 54.320KB | 26.312KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1302 | 50.758KB | 22.750KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1046 | 57.070KB | 29.062KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1303 | 50.758KB | 22.750KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1047 |142.195KB | 30.188KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1304 |170.570KB | 26.562KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB | 32.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1048 | 50.445KB | 22.438KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1305 | 50.570KB | 22.562KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1049 | 53.570KB | 25.562KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1306 | 85.195KB | 25.688KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB | 31.500KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1050 | 51.508KB | 23.500KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1307 | 90.695KB | 25.688KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB | 37.000KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1051 |137.695KB | 25.688KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1308 |558.453KB |289.438KB | 64.000KB |   n/a    | 2.295MB* |  0.000B  |108.016KB | 61.000KB | 32.000KB |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1052 | 51.508KB | 23.500KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1309 |596.578KB |327.562KB | 64.000KB |   n/a    | 8.262MB* |  0.000B  |108.016KB | 57.000KB | 36.000KB |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1053 |137.570KB | 25.562KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1310 |204.008KB | 44.000KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB | 48.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1054 | 50.570KB | 22.562KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1311 | 84.883KB | 24.875KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB | 32.000KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1055 | 51.008KB | 23.000KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1312 |329.633KB |145.625KB | 32.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB | 40.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1056 |243.945KB | 35.938KB | 64.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB | 32.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1313 | 87.195KB | 27.188KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB | 32.000KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1057 |268.195KB |124.188KB | 32.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1314 |605.635KB |247.625KB | 96.002KB |   n/a    | 4.000MB* |  0.000B  |108.008KB |150.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1058 | 51.445KB | 23.438KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1315 | 95.383KB | 24.375KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB | 43.000KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1059 | 51.445KB | 23.438KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1316 |179.258KB | 24.750KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB | 42.500KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1060 | 52.633KB | 24.625KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1317 |181.008KB | 26.000KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB | 43.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1061 |138.695KB | 26.688KB |  0.000B  |   n/a    | 6.328MB* |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1318 | 95.633KB | 24.625KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB | 43.000KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1062 |141.883KB | 29.875KB |  0.000B  |   n/a    |12.656MB* |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1319 | 88.820KB | 24.812KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB | 36.000KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1063 | 53.570KB | 25.562KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1320 |187.945KB | 28.938KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |131.000KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1064 | 50.445KB | 22.438KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1321 |137.945KB | 25.938KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1065 | 50.695KB | 22.688KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1322 |261.258KB | 26.250KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB |123.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1066 |824.760KB |616.750KB | 96.002KB |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1323 |175.883KB | 24.875KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |123.000KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1067 | 50.570KB | 22.562KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |  0.000B  |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1324 |241.758KB | 29.250KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB |184.500KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1068 |208.883KB | 64.875KB | 32.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1325 |170.883KB | 26.875KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB | 32.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1069 |299.320KB |155.312KB | 32.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1326 |170.133KB | 26.125KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB | 32.000KB |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1070 |166.633KB | 54.625KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1327 | 88.945KB | 24.938KB |  0.000B  |   n/a    | 0.000B*  |  0.000B  | 26.008KB | 36.000KB |  0.000B  |  0.000B   | 2.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1071 |307.570KB |163.562KB | 32.000KB |   n/a    | 0.000B*  |  0.000B  |108.008KB |  0.000B  |  0.000B  |  0.000B   | 4.000KB  |  0.000B   |   n/a    |
+  \_NEFF 1328 |116.383KB | 27.375KB |  0.000B  |   n/a    | 0.<<TRUNCATED>>
+2026-Oct-23 10:49:57.805436 131393:131841 ERROR  TDRV:log_dev_mem_usage_table                 Also logged memory breakdown to /tmp/neuron_mem_table_device_0_nc_4.log
+2026-Oct-23 10:49:57.983877 131393:131841 ERROR  TDRV:dml_dump                                Wrote nrt memory alloc debug info to /tmp/nrt_mem_log_device_0_6adb3bd5.csv
+2026-Oct-23 10:49:57.993288 131393:131841 ERROR  TDRV:dml_driver_dump                         Wrote driver memory alloc debug info to /tmp/neuron_mem_log_device_0_hbm_2_6adb3bd5.csv
+Warning: stream drain failed (module_cleanup:pre): NRT Execution error occurred on Neuron for operation=neuron::alloc::lazy
+error message="NRT EXECUTION FAILED: lazy::AllocBind: NRT_RESOURCE on retry after drain, Failed to allocate resource"
+Note: Neuron errors are reported asynchronously. The Python traceback shows where the
+error was detected (synchronization point), not necessarily where the failing operation
+was dispatched. For synchronous error reporting, set NEURON_LAUNCH_BLOCKING=1.

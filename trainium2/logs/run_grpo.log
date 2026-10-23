@@ -1,0 +1,58 @@
+Loading weights:   0%|          | 0/724 [00:00<?, ?it/s]Loading weights: 100%|██████████| 724/724 [00:00<00:00, 16390.90it/s]
+MODEL_DEVICE neuron:0
+BETA 0.0 USE_LORA True LORA_R 16
+[RANK 0] You passed `model_init_kwargs` to the `GRPOConfig`, but your model is already instantiated. The `model_init_kwargs` will be ignored.
+TRAINABLE_PARAMS 32464896 TOTAL_PARAMS 5207429632 FRAC 0.00623
+ACCEL_DEVICE neuron
+ACCEL_STATE_NEURON None
+[transformers] The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 248046}.
+  0%|          | 0/4 [00:00<?, ?it/s]INTERP_PATCH dev= neuron:0 compiling= False
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+ 25%|██▌       | 1/4 [01:42<05:07, 102.58s/it]                                               25%|██▌       | 1/4 [01:42<05:07, 102.58s/it]{'loss': '0.0002648', 'grad_norm': '0.0007166', 'learning_rate': '1e-05', 'num_tokens': '3832', 'completions/mean_length': '9', 'completions/min_length': '8', 'completions/max_length': '10', 'completions/clipped_ratio': '0', 'completions/mean_terminated_length': '9', 'completions/min_terminated_length': '8', 'completions/max_terminated_length': '10', 'rewards/reward_func/mean': '0.4', 'rewards/reward_func/std': '3.186e-08', 'reward': '0.4', 'reward_std': '3.186e-08', 'frac_reward_zero_std': '0', 'entropy': '0.1433', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'step_time': '92.2', 'epoch': '0.003906'}
+INTERP_PATCH dev= neuron:0 compiling= False
+ 50%|█████     | 2/4 [01:55<01:39, 49.85s/it]                                               50%|█████     | 2/4 [01:55<01:39, 49.85s/it]{'loss': '0.0002981', 'grad_norm': '0.0001332', 'learning_rate': '7.5e-06', 'entropy': '0.1269', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'step_time': '4.822', 'epoch': '0.007812'}
+INTERP_PATCH dev= neuron:0 compiling= False
+ 75%|███████▌  | 3/4 [02:08<00:32, 32.92s/it]                                              75%|███████▌  | 3/4 [02:08<00:32, 32.92s/it]{'loss': '0.0002988', 'grad_norm': '0.0001283', 'learning_rate': '5e-06', 'entropy': '0.1239', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'step_time': '4.815', 'epoch': '0.01172'}
+INTERP_PATCH dev= neuron:0 compiling= False
+100%|██████████| 4/4 [02:21<00:00, 24.97s/it]                                             100%|██████████| 4/4 [02:21<00:00, 24.97s/it]                                             100%|██████████| 4/4 [02:21<00:00, 24.97s/it]100%|██████████| 4/4 [02:21<00:00, 35.27s/it]
+{'loss': '0.0003288', 'grad_norm': '0.0004113', 'learning_rate': '2.5e-06', 'entropy': '0.1128', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'step_time': '4.819', 'epoch': '0.01562'}
+{'train_runtime': '141.1', 'train_samples_per_second': '0.028', 'train_steps_per_second': '0.028', 'train_loss': '0.0002976', 'epoch': '0.01562'}
+POST_TRAIN_MEM_ALLOCATED 10843060352
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+  0%|          | 0/8 [00:00<?, ?it/s]INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+ 25%|██▌       | 2/8 [00:17<00:52,  8.82s/it]INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+ 38%|███▊      | 3/8 [01:12<02:20, 28.04s/it]INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+ 50%|█████     | 4/8 [01:26<01:31, 22.82s/it]INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+ 62%|██████▎   | 5/8 [01:40<00:58, 19.56s/it]INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+ 75%|███████▌  | 6/8 [01:53<00:34, 17.50s/it]INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+ 88%|████████▊ | 7/8 [02:44<00:28, 28.23s/it]INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+100%|██████████| 8/8 [02:57<00:00, 23.64s/it]100%|██████████| 8/8 [02:57<00:00, 22.24s/it]
+EVAL_RESULT {"eval_loss": 0.0, "eval_runtime": 194.7302, "eval_samples_per_second": 0.041, "eval_steps_per_second": 0.041, "eval_num_tokens": 3832.0, "eval_completions/mean_length": 9.125, "eval_completions/min_length": 9.125, "eval_completions/max_length": 9.125, "eval_completions/clipped_ratio": 0.0, "eval_completions/mean_terminated_length": 9.125, "eval_completions/min_terminated_length": 9.125, "eval_completions/max_terminated_length": 9.125, "eval_rewards/reward_func/mean": 0.2958333417773247, "eval_rewards/reward_func/std": null, "eval_reward": 0.2958333417773247, "eval_reward_std": null, "eval_frac_reward_zero_std": 1.0, "eval_entropy": 0.18641907069832087, "eval_clip_ratio/low_mean": 0.0, "eval_clip_ratio/high_mean": 0.0, "eval_clip_ratio/region_mean": 0.0, "eval_clip_ratio/low_min": 0.0, "eval_clip_ratio/high_max": 0.0, "epoch": 0.015625}
