@@ -7,10 +7,33 @@ verl, and SkyRL legs, on AWS Trainium2 hardware through the TorchNeuron
 
 ## Status
 
-**The platform go/no-go passed — including a full 1-epoch run.** A full GRPO step
-and the final eval both complete on a single Trainium2 NeuronCore. The full-epoch
-run (64 steps, all 256 train rows) also completes and shows a real RLVR gain over
-the SFT baseline.
+Two experiments live here, kept as separate result records:
+
+### Smoke run (go/no-go, 4 steps)
+
+**The platform go/no-go passed.** A full GRPO step and the final eval both
+complete on a single Trainium2 NeuronCore. This is a smoke run, not a comparable
+RL result.
+
+| Metric | Value |
+|---|---|
+| State | succeeded (4-step smoke) |
+| Val reward (eval) | **0.2958** |
+| Train reward (step 1) | 0.4 (std 3.186e-08) |
+| Train loss | 0.0002976 |
+| SFT baseline (Miles/verl reference) | 0.31875 |
+| Miles final (full run) | 0.65125 |
+| verl final (full run) | 0.715 |
+
+The reward is flat (std ~3e-08): the SFT checkpoint emits near-identical
+completions at temperature 0.7, so GRPO advantages are ~0 and the model does not
+move. That is an RL exploration issue, not a Trainium2 issue. See
+`metrics/final_results_smoke.json`.
+
+### Full 1-epoch run (64 steps)
+
+The full-epoch run (64 steps, all 256 train rows) completes and shows a real RLVR
+gain over the SFT baseline.
 
 | Metric | Value |
 |---|---|
@@ -24,10 +47,9 @@ the SFT baseline.
 
 The full-epoch run improves on the SFT baseline (+0.0385, ~12%) and shows real
 reward variance (train `reward_std` 0.05–0.28, vs the smoke's 3e-08), so GRPO is
-genuinely learning — unlike the 4-step smoke, whose reward was flat. It is still
-not comparable to verl/Miles: those are full-fine-tune runs, while this is
-LoRA r=16 + beta=0.0 on one core. See `metrics/final_results.json` for the full
-record.
+genuinely learning. It is still not comparable to verl/Miles: those are
+full-fine-tune runs, while this is LoRA r=16 + beta=0.0 on one core. See
+`metrics/final_results_full_epoch.json`.
 
 ## What works
 
@@ -46,7 +68,8 @@ trainium2/
 ├── config/
 │   └── TRAINIUM_CONFIG.md   exact stack pins and hyperparameters
 ├── metrics/
-│   ├── final_results.json   the run's results and findings
+│   ├── final_results_smoke.json        the 4-step smoke (go/no-go) results
+│   ├── final_results_full_epoch.json   the full 1-epoch run results
 │   └── run_manifest.json    platform, compute, and experiment manifest
 ├── scripts/
 │   ├── grpo_train.py        main TRL GRPO training script
@@ -110,8 +133,9 @@ optimizer. Both are open items in the issues log.
    `SMOKE=0 MAX_STEPS=64 BATCH=4 NUM_GEN=8 GEN_BATCH=8` (64 steps = one pass over 256 rows).
 6. Healthcheck: install `scripts/healthcheck.sh` in cron (`*/5 * * * *`) so a crash/stall/success pulls the
    log home and terminates the spot instance (stops billing).
-7. Collect: the run prints `EVAL_RESULT` as the last log line; record it in `metrics/final_results.json`
-   and this README's status table.
+7. Collect: the run prints `EVAL_RESULT` as the last log line; record it in
+   `metrics/final_results_smoke.json` (smoke) or `metrics/final_results_full_epoch.json` (full run) — one
+   file per run — and the matching status table above.
 
 The 4-step smoke is the same but with `SMOKE=1 MAX_STEPS=4 BATCH=1` (see the script's own comment).
 

@@ -44,7 +44,7 @@
       "train_reward_std": 3.186e-08,
       "final_score": 0.2958,
       "sft_baseline": 0.31875,
-      "note": "Go/no-go smoke only. Platform works; no learning (flat reward). See final_results.json and TRAINIUM_ISSUES_LOG.md."
+      "note": "Go/no-go smoke only. Platform works; no learning (flat reward). See final_results_smoke.json and TRAINIUM_ISSUES_LOG.md."
     }
   ],
   "findings": [

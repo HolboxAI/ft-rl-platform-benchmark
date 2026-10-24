@@ -110,4 +110,4 @@ Distributed) or a CPU-offload optimizer. Both are open; see
 | Val split | 8 frames (smoke) |
 | Decoding | `num_generations_eval=1` (one completion per prompt) |
 | Metric | blended reward (same formula as training) |
-| Result | 0.2958 smoke / **0.3573 full 1-epoch** (SFT baseline 0.31875; see `metrics/final_results.json`) |
+| Result | smoke 0.2958 (`metrics/final_results_smoke.json`) / full 1-epoch 0.3573 (`metrics/final_results_full_epoch.json`) |
