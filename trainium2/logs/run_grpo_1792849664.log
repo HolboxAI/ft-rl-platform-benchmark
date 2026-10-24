@@ -1,0 +1,25 @@
+Loading weights:   0%|          | 0/724 [00:00<?, ?it/s]Loading weights: 100%|██████████| 724/724 [00:00<00:00, 15319.42it/s]
+MODEL_DEVICE neuron:0
+BETA 0.0 USE_LORA True LORA_R 16
+[RANK 0] You passed `model_init_kwargs` to the `GRPOConfig`, but your model is already instantiated. The `model_init_kwargs` will be ignored.
+TRAINABLE_PARAMS 32464896 TOTAL_PARAMS 5207429632 FRAC 0.00623
+ACCEL_DEVICE neuron
+ACCEL_STATE_NEURON None
+[transformers] The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'eos_token_id': 248046}.
+  0%|          | 0/64 [00:00<?, ?it/s]INTERP_PATCH dev= neuron:0 compiling= False
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+  2%|▏         | 1/64 [02:28<2:36:03, 148.63s/it]                                                   2%|▏         | 1/64 [02:28<2:36:03, 148.63s/it]{'loss': '0.3622', 'grad_norm': '0.3893', 'learning_rate': '1e-05', 'num_tokens': '3865', 'completions/mean_length': '13.12', 'completions/min_length': '8', 'completions/max_length': '17', 'completions/clipped_ratio': '0', 'completions/mean_terminated_length': '13.12', 'completions/min_terminated_length': '8', 'completions/max_terminated_length': '17', 'rewards/reward_func/mean': '0.25', 'rewards/reward_func/std': '0.1902', 'reward': '0.25', 'reward_std': '0.1902', 'frac_reward_zero_std': '0', 'entropy': '0.1681', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'step_time': '110.9', 'epoch': '0.001953'}
+INTERP_PATCH dev= neuron:0 compiling= False
+  3%|▎         | 2/64 [03:22<1:35:43, 92.64s/it]                                                   3%|▎         | 2/64 [03:22<1:35:43, 92.64s/it]{'loss': '-0.6454', 'grad_norm': '0.8253', 'learning_rate': '9.844e-06', 'entropy': '0.1672', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'step_time': '18.19', 'epoch': '0.003906'}
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+INTERP_PATCH dev= neuron:0 compiling= False
+  5%|▍         | 3/64 [05:18<1:45:11, 103.46s/it]                                                   5%|▍         | 3/64 [05:18<1:45:11, 103.46s/it]{'loss': '0.01451', 'grad_norm': '0.8118', 'learning_rate': '9.687e-06', 'num_tokens': '7696', 'completions/mean_length': '8.875', 'completions/min_length': '8', 'completions/max_length': '15', 'completions/clipped_ratio': '0', 'completions/mean_terminated_length': '8.875', 'completions/min_terminated_length': '8', 'completions/max_terminated_length': '15', 'rewards/reward_func/mean': '0.2417', 'rewards/reward_func/std': '0.0496', 'reward': '0.2417', 'reward_std': '0.0496', 'frac_reward_zero_std': '0', 'entropy': '0.2442', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'step_time': '81.29', 'epoch': '0.005859'}
+INTERP_PATCH dev= neuron:0 compiling= False

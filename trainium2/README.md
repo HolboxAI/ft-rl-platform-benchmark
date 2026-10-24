@@ -7,24 +7,27 @@ verl, and SkyRL legs, on AWS Trainium2 hardware through the TorchNeuron
 
 ## Status
 
-**The platform go/no-go passed.** A full GRPO step and the final eval both
-complete on a single Trainium2 NeuronCore. This is a smoke run, not a comparable
-RL result.
+**The platform go/no-go passed — including a full 1-epoch run.** A full GRPO step
+and the final eval both complete on a single Trainium2 NeuronCore. The full-epoch
+run (64 steps, all 256 train rows) also completes and shows a real RLVR gain over
+the SFT baseline.
 
 | Metric | Value |
 |---|---|
-| State | succeeded (4-step smoke) |
-| Val reward (eval) | **0.2958** |
-| Train reward (step 1) | 0.4 (std 3.186e-08) |
-| Train loss | 0.0002976 |
+| State | succeeded (full 1-epoch, 64 steps) |
+| Val reward (eval) | **0.3573** |
+| Train reward (final step 64) | 0.3083 (std 0.0988) |
+| Train loss (final step) | -0.7667 |
 | SFT baseline (Miles/verl reference) | 0.31875 |
 | Miles final (full run) | 0.65125 |
 | verl final (full run) | 0.715 |
 
-The reward is flat (std ~3e-08): the SFT checkpoint emits near-identical
-completions at temperature 0.7, so GRPO advantages are ~0 and the model does not
-move. That is an RL exploration issue, not a Trainium2 issue. See
-`metrics/final_results.json` for the full record.
+The full-epoch run improves on the SFT baseline (+0.0385, ~12%) and shows real
+reward variance (train `reward_std` 0.05–0.28, vs the smoke's 3e-08), so GRPO is
+genuinely learning — unlike the 4-step smoke, whose reward was flat. It is still
+not comparable to verl/Miles: those are full-fine-tune runs, while this is
+LoRA r=16 + beta=0.0 on one core. See `metrics/final_results.json` for the full
+record.
 
 ## What works
 
@@ -39,7 +42,7 @@ move. That is an RL exploration issue, not a Trainium2 issue. See
 ```
 trainium2/
 ├── README.md                this file
-├── TRAINIUM_ISSUES_LOG.md   the bugfix / native-fix doc (16 issues, with asks for torch_neuronx)
+├── TRAINIUM_ISSUES_LOG.md   the bugfix / native-fix doc (23 issues, with asks for torch_neuronx)
 ├── config/
 │   └── TRAINIUM_CONFIG.md   exact stack pins and hyperparameters
 ├── metrics/
@@ -95,14 +98,22 @@ So the smoke uses **LoRA** (32.5M trainable) and **beta = 0.0**. A comparable
 run needs multi-core tensor parallelism (NeuronX Distributed) or a CPU-offload
 optimizer. Both are open items in the issues log.
 
-## Reproduce
+## Reproduce (full 1-epoch run)
 
-1. Launch a `trn2.48xlarge` spot instance (ap-south-2b works).
-2. Run `scripts/setup2.sh` to install the pinned transformers/trl/accelerate on
-   top of the DLAMI venv.
-3. Run `scripts/download_model.sh` and `scripts/download_data.sh` (needs the
-   presigned S3 URLs in `/home/ubuntu/urls.sh`).
-4. Gate checks: `push_run.sh gate_test.py` and `push_run.sh llm_gate_test.py`.
-5. Full loop: `scripts/launch_grpo.sh`, then `scripts/poll_grpo.sh`.
+1. Launch a `trn2.48xlarge` **spot** instance in `ap-south-2b` (keypair
+   `trainium-ap-south-2`, DLAMI `aws_neuronx_venv_torch_neuronx_2_14_0`).
+2. `scripts/setup2.sh` — install the pinned transformers/trl/accelerate/peft on top of the DLAMI venv.
+3. `scripts/download_model.sh` + `scripts/download_data.sh` — pull the SFT checkpoint and
+   `cholect50_{train,val}.jsonl` from the presigned S3 URLs in `/home/ubuntu/urls.sh`.
+4. Gate checks: `push_run.sh gate_test.py` and `push_run.sh llm_gate_test.py` (both exit 0).
+5. Full epoch: `scripts/launch_grpo.sh` — pushes `grpo_train.py` + `reward_tr.py` and runs detached with
+   `SMOKE=0 MAX_STEPS=64 BATCH=4 NUM_GEN=8 GEN_BATCH=8` (64 steps = one pass over 256 rows).
+6. Healthcheck: install `scripts/healthcheck.sh` in cron (`*/5 * * * *`) so a crash/stall/success pulls the
+   log home and terminates the spot instance (stops billing).
+7. Collect: the run prints `EVAL_RESULT` as the last log line; record it in `metrics/final_results.json`
+   and this README's status table.
 
-See `config/TRAINIUM_CONFIG.md` for the exact environment and hyperparameters.
+The 4-step smoke is the same but with `SMOKE=1 MAX_STEPS=4 BATCH=1` (see the script's own comment).
+
+See `config/TRAINIUM_CONFIG.md` for the exact environment and hyperparameters, and
+`TRAINIUM_ISSUES_LOG.md` for the full error + native-fix record.

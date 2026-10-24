@@ -50,11 +50,25 @@ GEN_BATCH = int(os.environ.get("GEN_BATCH", "2" if SMOKE else "8"))
 torch._dynamo.config.automatic_dynamic_shapes = False
 
 
+# CholecT50 frames arrive in two resolutions (854x480 and 1920x1080). The
+# vision tower emits a different token count per resolution, so a mixed batch
+# produces a new attention/SDPA shape. In eager Neuron JIT each unique shape
+# compiles a new NEFF, and each resident NEFF pins on-core TDRAM; a few dozen
+# distinct shapes exhaust it ("Failed to load model / Failed to allocate
+# resource", err 4 = NERR_RESOURCE). Normalizing every frame to the majority
+# resolution keeps the prompt length (and hence the whole forward shape)
+# constant across the epoch.
+IMAGE_SIZE = (854, 480)
+
+
 def _decode_image(item) -> Image.Image:
     raw = item["image_url"]
     if isinstance(raw, str) and raw.startswith("data:"):
         raw = raw.split(",", 1)[1]
-    return Image.open(io.BytesIO(base64.b64decode(raw))).convert("RGB")
+    img = Image.open(io.BytesIO(base64.b64decode(raw))).convert("RGB")
+    if img.size != IMAGE_SIZE:
+        img = img.resize(IMAGE_SIZE)
+    return img
 
 
 def load_dataset(path: str) -> Dataset:
@@ -150,13 +164,19 @@ def main():
         num_generations_eval=1,  # greedy-ish eval: 1 completion/prompt (matches verl n=1 eval)
         generation_batch_size=GEN_BATCH,
         max_completion_length=256,
+        # TRL right-pads the completion to the *batch* max (variable 1..256),
+        # so the scoring forward's sequence length changes every batch. That is
+        # the other half of the shape explosion above: pad to a fixed multiple
+        # so every completion is exactly 256 tokens and the forward shape is
+        # constant (with IMAGE_SIZE normalizing the prompt half).
+        pad_to_multiple_of=256,
         temperature=0.7,
         top_p=1.0,
         # --- optimizer / algorithm (verl/Miles match) ---
         learning_rate=1e-5,
         beta=BETA,               # KL coefficient (verl kl_loss_coef 0.04)
         num_train_epochs=1,
-        max_steps=MAX_STEPS if MAX_STEPS > 0 else None,
+        max_steps=MAX_STEPS if MAX_STEPS > 0 else -1,  # -1 = no step cap, use num_train_epochs
         # --- Trainium ---
         torch_compile=TORCH_COMPILE,
         torch_compile_backend="neuron" if TORCH_COMPILE else None,
@@ -180,6 +200,26 @@ def main():
 
     print("BETA", BETA, "USE_LORA", USE_LORA, "LORA_R", LORA_R, flush=True)
 
+    from transformers import TrainerCallback
+
+    class _NeuronCacheCallback(TrainerCallback):
+        """Release cached-but-unreferenced HBM every few steps.
+
+        The Neuron allocator keeps freed buffers cached for reuse. This reclaims
+        HBM only; it does NOT touch on-core TDRAM, which is the resource behind
+        the step-40 "Failed to allocate resource" (that is fixed separately by
+        IMAGE_SIZE + pad_to_multiple_of, which keep the forward shape constant).
+        """
+        def __init__(self, every_n_steps=4):
+            self.every_n_steps = every_n_steps
+
+        def on_step_end(self, args, state, control, **kwargs):
+            gs = state.global_step
+            if gs and gs % self.every_n_steps == 0:
+                torch_neuronx.synchronize()
+                torch_neuronx.empty_cache()
+                print("EMPTY_CACHE step", gs, "alloc", torch_neuronx.memory_allocated(), flush=True)
+
     trainer = GRPOTrainer(
         model=model,
         processing_class=processor,
@@ -188,6 +228,7 @@ def main():
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         peft_config=lora_config,
+        callbacks=[_NeuronCacheCallback()],
     )
 
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)

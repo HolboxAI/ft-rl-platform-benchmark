@@ -3,7 +3,7 @@
 # completed step / eval), then print the relevant tail. Bounded by MAX_ITER.
 set -u
 KEY="$HOME/.ssh/trainium-ap-south-2"
-HOST="ubuntu@16.113.78.135"
+HOST="ubuntu@18.60.144.22"
 SSH="ssh -i $KEY -o ConnectTimeout=15 -o StrictHostKeyChecking=no"
 LOG="~/run_grpo.log"
 MAX_ITER="${1:-40}"   # ~40 * 15s = 10 min max

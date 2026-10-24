@@ -1,0 +1,42 @@
+2026-10-24T19:23:55 log fetched -> /home/susmitkulkarni/Documents/stanford_testing/ft-rl-platform-benchmark/trainium2/logs/run_grpo_1792849664.log
+2026-10-24T19:23:55 FAILED 3/64 err=4280 (/home/ubuntu/run_grpo_1792849664.log) — killing process + terminating instance
+2026-10-24T19:23:57 terminate skipped (--no-terminate)
+2026-10-24T19:42:09 OK 10/64 19188B (alive, progressing)
+2026-10-24T19:45:03 OK 12/64 27398B (alive, progressing)
+2026-10-24T19:50:03 OK 15/64 40035B (alive, progressing)
+2026-10-24T19:55:03 OK 18/64 45573B (alive, progressing)
+2026-10-24T20:00:03 OK 22/64 48603B (alive, progressing)
+2026-10-24T20:05:03 OK 25/64 51195B (alive, progressing)
+2026-10-24T20:10:03 OK 29/64 54321B (alive, progressing)
+2026-10-24T20:15:03 OK 32/64 56517B (alive, progressing)
+2026-10-24T20:20:03 OK 36/64 59615B (alive, progressing)
+2026-10-24T20:25:03 OK 40/64 62670B (alive, progressing)
+2026-10-24T20:30:03 OK 43/64 65307B (alive, progressing)
+2026-10-24T20:35:03 OK 46/64 67542B (alive, progressing)
+2026-10-24T20:40:03 OK 50/64 70737B (alive, progressing)
+2026-10-24T20:45:03 OK 54/64 73816B (alive, progressing)
+2026-10-24T20:50:03 OK 57/64 76469B (alive, progressing)
+2026-10-24T20:55:03 OK 61/64 79692B (alive, progressing)
+2026-10-24T21:00:03 OK 64/64 83014B (alive, progressing)
+2026-10-24T21:05:03 OK 64/64 86719B (alive, progressing)
+2026-10-24T21:09:16 log fetched -> /home/susmitkulkarni/Documents/stanford_testing/ft-rl-platform-benchmark/trainium2/logs/run_grpo_1792850149.log
+2026-10-24T21:09:16 SUCCESS 64/64 (/home/ubuntu/run_grpo_1792850149.log) — eval complete, terminating instance
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-0d3797ee48e3d9664",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}
+2026-10-24T21:09:19 TERMINATE sent for i-0d3797ee48e3d9664
+2026-10-24T21:10:15 NO_LOG: no run_grpo_*.log on instance (instance gone or run never started)
+2026-10-24T21:15:15 NO_LOG: no run_grpo_*.log on instance (instance gone or run never started)
+2026-10-24T21:20:15 NO_LOG: no run_grpo_*.log on instance (instance gone or run never started)

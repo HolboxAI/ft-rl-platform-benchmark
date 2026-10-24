@@ -40,7 +40,7 @@ TRL GRPO against the triplet-F1 reward.
 | `learning_rate` | `1e-5` |
 | `beta` (KL) | `0.0` (see note) |
 | `num_train_epochs` | `1` |
-| `max_steps` | `4` (smoke; set `-1` for a full epoch) |
+| `max_steps` | `4` (smoke) / `64` (full 1-epoch = 256 rows ÷ batch 4) |
 | `gradient_checkpointing` | `True` |
 | `torch_compile` | `False` (eager) |
 | `cache_implementation` | `static` |
@@ -59,12 +59,14 @@ TRL GRPO against the triplet-F1 reward.
 
 | Parameter | Value |
 |---|---|
-| `per_device_train_batch_size` | `1` (smoke) |
+| `per_device_train_batch_size` | `1` (smoke) / `4` (full 1-epoch) |
 | `per_device_eval_batch_size` | `1` |
 | `num_generations` | `8` (smoke) |
 | `num_generations_eval` | `1` (greedy mean@1, matches verl n=1 eval) |
 | `generation_batch_size` | `8` (must be divisible by `num_generations`) |
 | `max_completion_length` | `256` |
+| `pad_to_multiple_of` | `256` (full run; keeps the scoring-forward shape constant — issues #22/#23) |
+| image size | `854×480` normalized (full run; frames arrive in 854×480 and 1920×1080) |
 | smoke train/val rows | 32 / 8 |
 
 ### Rollout
@@ -84,7 +86,8 @@ TRL GRPO against the triplet-F1 reward.
 | HBM per core | 25.8 GB |
 | Env | `NKI_ENABLE_TRACE_CACHE=0` |
 | Smoke train time | ~141 s (4 steps) |
-| Smoke eval time | ~195 s (8 frames) |
+| Full-epoch train time | ~90 min (64 steps) |
+| Full-epoch eval time | ~511 s (32 frames) |
 
 ## Notes on the two hard memory constraints
 
@@ -107,4 +110,4 @@ Distributed) or a CPU-offload optimizer. Both are open; see
 | Val split | 8 frames (smoke) |
 | Decoding | `num_generations_eval=1` (one completion per prompt) |
 | Metric | blended reward (same formula as training) |
-| Result | 0.2958 (SFT baseline 0.31875 — no learning, see `metrics/final_results.json`) |
+| Result | 0.2958 smoke / **0.3573 full 1-epoch** (SFT baseline 0.31875; see `metrics/final_results.json`) |

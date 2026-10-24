@@ -26,3 +26,7 @@ data/goemotions/data/full_dataset/*.csv
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Trainium2 healthcheck runtime state (transient, written every cron tick)
+trainium2/logs/healthcheck.state
+trainium2/logs/healthcheck.cron.out

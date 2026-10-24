@@ -4,7 +4,7 @@
 # timeouts: each ssh/scp is retried.
 set -u
 KEY="$HOME/.ssh/trainium-ap-south-2"
-HOST="ubuntu@16.113.78.135"
+HOST="ubuntu@18.60.144.22"
 LOCAL="$1"
 REMOTE="~/$(basename "$1")"
 LOG="~/run_$(basename "$1").log"
