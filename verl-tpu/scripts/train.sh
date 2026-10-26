@@ -78,6 +78,7 @@ REF=(
 
 ROLLOUT=(
   actor_rollout_ref.rollout.name=hf           # [TPU] vLLM does not run on TPU; use HF generate
+  actor_rollout_ref.rollout.tensor_model_parallel_size=1
   actor_rollout_ref.rollout.n=8
   actor_rollout_ref.rollout.temperature=0.7
   actor_rollout_ref.rollout.top_p=1.0

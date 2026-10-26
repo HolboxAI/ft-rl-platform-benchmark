@@ -45,9 +45,39 @@ def _load_torch_tpu() -> None:
     load()
 
 
+def _patch_accelerator_api() -> None:
+    """Add torch.cuda-style helpers verl expects (mem_get_info).
+
+    TorchTPU's ``torch.accelerator`` exposes ``get_memory_info``, not the
+    ``mem_get_info`` name verl calls via ``get_torch_device().mem_get_info()``.
+    """
+    acc = torch.accelerator
+    if hasattr(acc, "mem_get_info"):
+        return
+
+    def mem_get_info(device=None):
+        fn = getattr(acc, "get_memory_info", None)
+        if fn is None:
+            return (0, 0)
+        try:
+            info = fn()
+            if isinstance(info, (tuple, list)) and len(info) == 2:
+                return int(info[0]), int(info[1])
+            if isinstance(info, dict):
+                total = int(info.get("bytes_limit") or info.get("total") or 0)
+                used = int(info.get("bytes_in_use") or info.get("used") or 0)
+                return max(total - used, 0), total
+        except Exception:
+            pass
+        return (0, 0)
+
+    acc.mem_get_info = mem_get_info
+
+
 def _resolve_device_module() -> ModuleType:
     """Return the module exposing the standard device API (is_available, etc.)."""
     _load_torch_tpu()
+    _patch_accelerator_api()
     return torch.accelerator
 
 
