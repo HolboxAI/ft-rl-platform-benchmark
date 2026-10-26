@@ -12,6 +12,7 @@ export TORCH_DEVICE_BACKEND_AUTOLOAD=0     # [TPU] one process per chip; no auto
 export USE_HUB_KERNELS=NO                  # [TPU] pure-PyTorch Gated DeltaNet
 export TOKENIZERS_PARALLELISM=false
 PY=~/.venv-verl-tpu/bin/python
+export PATH="$HOME/.venv-verl-tpu/bin:$PATH"   # ray CLI + venv tools
 
 MODEL_PATH=~/models/cholec-sft-qwen3.5-4b
 TRAIN_FILE=~/cholec/verl_parquet/train.parquet
