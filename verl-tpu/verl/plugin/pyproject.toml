@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "verl-tpu-plugin"
+version = "0.1.0"
+description = "verl PlatformBase backend for Google Cloud TPU (TorchTPU)"
+requires-python = ">=3.10"
+
+# verl auto-loads every entry point in this group at import time, so installing
+# this package is enough for verl to discover the `tpu` platform.
+[project.entry-points."verl.plugins"]
+tpu = "verl_tpu_plugin"
+
+[tool.setuptools.packages.find]
+include = ["verl_tpu_plugin*"]
