@@ -61,6 +61,9 @@ uv pip install --python "$PY" -r "$REQS" -c "$CONSTRAINTS" --extra-index-url htt
 # 3. verl itself, no deps.
 uv pip install --python "$PY" --no-deps -e "$VERL_DIR"
 
+# 3b. The TPU platform plugin (registers PlatformTPU via the verl.plugins entry-point).
+uv pip install --python "$PY" -e "$ROOT/verl/plugin"
+
 # 4. torchvision (CPU build matching torch) + runtime helpers.
 uv pip install --python "$PY" -c "$CONSTRAINTS" torchvision pyarrow requests --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match
 
