@@ -8,6 +8,8 @@
 set -euo pipefail
 
 export VERL_PLATFORM=tpu
+export VERL_ENGINE_DEVICE=cuda              # [TPU] select the CUDA-registered FSDP2 engine; it still uses `tpu` internally
+export VERL_ENGINE_VENDOR=nvidia
 export TORCH_DEVICE_BACKEND_AUTOLOAD=0     # [TPU] one process per chip; no autoload
 export USE_HUB_KERNELS=NO                  # [TPU] pure-PyTorch Gated DeltaNet
 export TOKENIZERS_PARALLELISM=false
@@ -82,11 +84,14 @@ ROLLOUT=(
   actor_rollout_ref.rollout.prompt_length=2048
   actor_rollout_ref.rollout.response_length=256
   actor_rollout_ref.rollout.ignore_eos=False
+  actor_rollout_ref.rollout.log_prob_use_dynamic_bsz=False
+  actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1
   actor_rollout_ref.rollout.free_cache_engine=True
 )
 
 TRAINER=(
   trainer.critic_warmup=0
+  trainer.use_v1=False                       # [TPU] V1 hard-requires transfer_queue (Ascend); use V0
   trainer.logger='["console"]'
   trainer.project_name=verl_cholec_tpu
   trainer.experiment_name=cholec_rl_qwen3_5_4b_loratpu
