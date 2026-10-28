@@ -13,7 +13,7 @@
 #   5. import checks of everything the trainer process loads.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERL_DIR=${VERL_DIR:-$HOME/verl}                 # verl @ v0.9.1
+VERL_DIR=${VERL_DIR:-$HOME/verl}                 # verl from the HolboxAI fork (HF-async-rollout fix)
 VENV=${VERL_VENV:-$HOME/.venv-verl-tpu}
 TORCH_TPU_SPEC=${TORCH_TPU_SPEC:-torch_tpu==0.2.0}
 # verl-core deps that are CUDA-only or otherwise unsupported on TPU.
@@ -25,9 +25,9 @@ exec > >(tee -a "$LOG") 2>&1
 command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH="$HOME/.local/bin:$PATH"
 
-# verl checkout at v0.9.1 (shallow).
+# verl checkout from the HolboxAI fork (has the HF-async-rollout fix) (shallow).
 if [ ! -f "$VERL_DIR/pyproject.toml" ]; then
-  git clone --depth 1 --branch v0.9.1 https://github.com/volcengine/verl.git "$VERL_DIR"
+  git clone --depth 1 https://github.com/HolboxAI/verl.git "$VERL_DIR"
 fi
 
 uv venv --clear --python 3.12 "$VENV"
