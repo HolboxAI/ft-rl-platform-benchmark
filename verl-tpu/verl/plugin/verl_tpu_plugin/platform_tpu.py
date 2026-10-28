@@ -269,5 +269,30 @@ class PlatformTPU(PlatformBase):
         """
         return accelerator_type
 
+    def get_worker_env_vars(self, **kwargs) -> dict:
+        """Return the TorchTPU topology env for one worker.
+
+        verl's Ray base sets RANK/WORLD_SIZE/MASTER_* for each worker, but TPU
+        additionally needs the slice/mesh env (``TORCH_TPU_TOPOLOGY``,
+        slice-builder addresses, per-chip visibility) before the ``tpu_dist``
+        backend initialises. One process per chip; ``local_rank`` selects the chip.
+        """
+        world_size = int(kwargs.get("world_size", 1))
+        local_rank = int(kwargs.get("local_rank", 0))
+        topo = {1: "1,1,1", 2: "2,1,1", 4: "2,2,1", 8: "2,4,1"}
+        n = world_size if world_size in topo else 1
+        chip = local_rank if local_rank < n else 0
+        return {
+            "TORCH_TPU_TOPOLOGY": topo[n],
+            "TORCH_TPU_SLICEBUILDER_ADDRESSES": ",".join(f"localhost:{9470 + i}" for i in range(n)),
+            "TPU_VISIBLE_DEVICES": str(chip),
+            "TPU_CHIPS_PER_PROCESS_BOUNDS": "1,1,1",
+            "TPU_PROCESS_BOUNDS": topo[n],
+            "TPU_PROCESS_ADDRESSES": ",".join(f"localhost:{9478 + i}" for i in range(n)),
+            "TPU_VISIBLE_CHIPS": str(chip),
+            "TPU_PROCESS_PORT": str(9478 + chip),
+            "CLOUD_TPU_TASK_ID": str(chip),
+        }
+
     def apply_model_patches(self, model_type: str) -> None:
         _patch_qwen35_models()
