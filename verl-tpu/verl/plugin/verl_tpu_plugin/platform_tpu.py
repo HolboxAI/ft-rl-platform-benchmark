@@ -260,25 +260,14 @@ class PlatformTPU(PlatformBase):
         return None
 
     def auto_assign_accelerator_type(self, name_prefix: str, accelerator_type: Optional[str] = None) -> Optional[str]:
-        """Return the TPU accelerator type for Ray placement.
+        """Skip the TPU-slice pin.
 
-        verl pins a multi-host pool to a single TPU slice by adding a
-        ``bundle[accelerator_type]`` resource. Read the type from the GCP
-        metadata; for a single-slice host the pin is not strictly needed, so
-        ``None`` is an acceptable fallback.
+        verl pins a *multi-host* pool to one TPU slice by adding a
+        ``bundle[accelerator_type]`` resource. We run a single v6e-8 and start
+        Ray with ``--num-gpus`` (TPU chips mapped to GPU slots), so there is no
+        ``v6e-8`` Ray resource to pin against — return ``None`` to skip the pin.
         """
-        if accelerator_type is not None:
-            return accelerator_type
-        try:
-            import urllib.request
-
-            req = urllib.request.Request(
-                "http://metadata.google.internal/computeMetadata/v1/instance/attributes/accelerator-type",
-                headers={"Metadata-Flavor": "Google"},
-            )
-            return urllib.request.urlopen(req, timeout=5).read().decode().strip()
-        except Exception:
-            return None
+        return accelerator_type
 
     def apply_model_patches(self, model_type: str) -> None:
         _patch_qwen35_models()
