@@ -259,5 +259,26 @@ class PlatformTPU(PlatformBase):
     def cudart(self) -> Any:
         return None
 
+    def auto_assign_accelerator_type(self, name_prefix: str, accelerator_type: Optional[str] = None) -> Optional[str]:
+        """Return the TPU accelerator type for Ray placement.
+
+        verl pins a multi-host pool to a single TPU slice by adding a
+        ``bundle[accelerator_type]`` resource. Read the type from the GCP
+        metadata; for a single-slice host the pin is not strictly needed, so
+        ``None`` is an acceptable fallback.
+        """
+        if accelerator_type is not None:
+            return accelerator_type
+        try:
+            import urllib.request
+
+            req = urllib.request.Request(
+                "http://metadata.google.internal/computeMetadata/v1/instance/attributes/accelerator-type",
+                headers={"Metadata-Flavor": "Google"},
+            )
+            return urllib.request.urlopen(req, timeout=5).read().decode().strip()
+        except Exception:
+            return None
+
     def apply_model_patches(self, model_type: str) -> None:
         _patch_qwen35_models()
