@@ -1,0 +1,20 @@
+diff --git a/verl_hardware_plugin/accelerators/tpu/rollout/tpu_vllm_patches.py b/verl_hardware_plugin/accelerators/tpu/rollout/tpu_vllm_patches.py
+index 7260700..b7b140e 100644
+--- a/verl_hardware_plugin/accelerators/tpu/rollout/tpu_vllm_patches.py
++++ b/verl_hardware_plugin/accelerators/tpu/rollout/tpu_vllm_patches.py
+@@ -378,10 +378,14 @@ def _tpu_worker_envs(worker_ips: list[str], base_port: int, pod_type: str = "")
+     addresses = ",".join(
+         f"{ip}:{base_port + local_rank}" for ip, local_rank in zip(worker_ips, local_ranks, strict=True)
+     )
++    chip_offset = int(os.environ.get("TPU_ROLLOUT_CHIP_OFFSET", "0"))
++    logger.info("TPU rollout chip offset = %s", chip_offset)
+     envs = []
+     for rank, (ip, local_rank) in enumerate(zip(worker_ips, local_ranks, strict=True)):
++        chip = local_rank + chip_offset
+         env = {
+-            "TPU_VISIBLE_CHIPS": str(local_rank),
++            "TPU_VISIBLE_CHIPS": str(chip),
++            "TPU_VISIBLE_DEVICES": str(chip),
+             "TPU_PROCESS_PORT": str(base_port + local_rank),
+             "TPU_PROCESS_ADDRESSES": addresses,
+             "TORCH_TPU_SLICEBUILDER_ADDRESSES": addresses,
