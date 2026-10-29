@@ -28,7 +28,7 @@ def build(args):
     for r in raw:
         rows.append({
             "data_source": "ds1000",
-            "prompt": r["prompt"],  # the code-completion context + problem
+            "prompt": [{"role": "user", "content": r["prompt"]}],  # list of messages, as verl expects
             "ability": "code",
             "reward_model": {"ground_truth": r.get("reference_code", "")},
         })
