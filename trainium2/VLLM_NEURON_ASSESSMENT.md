@@ -5,6 +5,16 @@ CholecT50 GRPO/RLVR loop natively on Trainium2.
 
 > **Source-verified 2026-10-26** against the vllm-neuron repo, AWS Neuron
 > release notes, and the three frameworks' source. No instance was launched.
+>
+> **Update 2026-11-04.** A deeper source analysis against newer commits
+> (`vllm@5225a1f`, `vllm-neuron@a080ebf`, v0.29.0.1.2.0) refines the conclusion
+> below. Upstream vLLM **already has** a first-class RL weight-sync API
+> (`sleep`/`wake_up`/`update_weights`/`update_weight_version`), a weight-transfer
+> framework with pluggable backends, and full Qwen3.5 + GatedDeltaNet. The
+> "no weight reload" and "re-implements dynamic `update_weights`" claims below
+> were against the older vLLM. The real gap is now three bounded contributions
+> to vLLM-neuron: Qwen3.5 hybrid-GDN, a neuron weight-transfer backend, and
+> neuron `sleep`/`wake_up`. See `vllm-neuron/IMPLEMENTATION_PLAN.md`.
 
 ## What vllm-neuron is
 

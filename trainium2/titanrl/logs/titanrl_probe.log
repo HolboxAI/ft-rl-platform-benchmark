@@ -1,0 +1,239 @@
+=== [0] start Tue Nov  3 07:17:53 UTC 2026 ===
+hostname: ip-172-31-43-15
+--- neuron devices ---
+crw-rw-rw- 1 root root 238,  0 Nov  3 07:17 /dev/neuron0
+crw-rw-rw- 1 root root 238,  1 Nov  3 07:17 /dev/neuron1
+crw-rw-rw- 1 root root 238, 10 Nov  3 07:17 /dev/neuron10
+crw-rw-rw- 1 root root 238, 11 Nov  3 07:17 /dev/neuron11
+crw-rw-rw- 1 root root 238, 12 Nov  3 07:17 /dev/neuron12
+crw-rw-rw- 1 root root 238, 13 Nov  3 07:17 /dev/neuron13
+crw-rw-rw- 1 root root 238, 14 Nov  3 07:17 /dev/neuron14
+crw-rw-rw- 1 root root 238, 15 Nov  3 07:17 /dev/neuron15
+crw-rw-rw- 1 root root 238,  2 Nov  3 07:17 /dev/neuron2
+crw-rw-rw- 1 root root 238,  3 Nov  3 07:17 /dev/neuron3
+instance-type: trn2.48xlarge
+instance-id: i-0b37b5d508e6bbd9c
+logical-neuroncore-config: 2
++--------+--------+----------+--------+---------------+--------------+---------------+------+
+| NEURON | NEURON |  NEURON  | NEURON |   CONNECTED   |     PCI      |      CPU      | NUMA |
+| DEVICE | CORES  | CORE IDS | MEMORY |    DEVICES    |     BDF      |   AFFINITY    | NODE |
++--------+--------+----------+--------+---------------+--------------+---------------+------+
+| 0      | 4      | 0-3      | 96 GB  | 12, 3, 4, 1   | 0000:cc:00.0 | 48-95,144-191 | 1    |
+| 1      | 4      | 4-7      | 96 GB  | 13, 0, 5, 2   | 0000:b5:00.0 | 48-95,144-191 | 1    |
+| 2      | 4      | 8-11     | 96 GB  | 14, 1, 6, 3   | 0000:b6:00.0 | 48-95,144-191 | 1    |
+| 3      | 4      | 12-15    | 96 GB  | 15, 2, 7, 0   | 0000:cb:00.0 | 48-95,144-191 | 1    |
+| 4      | 4      | 16-19    | 96 GB  | 0, 7, 8, 5    | 0000:6f:00.0 | 0-47,96-143   | 0    |
+| 5      | 4      | 20-23    | 96 GB  | 1, 4, 9, 6    | 0000:58:00.0 | 0-47,96-143   | 0    |
+| 6      | 4      | 24-27    | 96 GB  | 2, 5, 10, 7   | 0000:59:00.0 | 0-47,96-143   | 0    |
+| 7      | 4      | 28-31    | 96 GB  | 3, 6, 11, 4   | 0000:6e:00.0 | 0-47,96-143   | 0    |
+| 8      | 4      | 32-35    | 96 GB  | 4, 11, 12, 9  | 0000:9b:00.0 | 0-47,96-143   | 0    |
+| 9      | 4      | 36-39    | 96 GB  | 5, 8, 13, 10  | 0000:84:00.0 | 0-47,96-143   | 0    |
+| 10     | 4      | 40-43    | 96 GB  | 6, 9, 14, 11  | 0000:85:00.0 | 0-47,96-143   | 0    |
+| 11     | 4      | 44-47    | 96 GB  | 7, 10, 15, 8  | 0000:9a:00.0 | 0-47,96-143   | 0    |
+| 12     | 4      | 48-51    | 96 GB  | 8, 15, 0, 13  | 0000:f8:00.0 | 48-95,144-191 | 1    |
+
+=== [1] neuron environment reality (DLAMI torch-neuronx venv) ===
+Python 3.14.4
+torch: 2.14.0+cu130
+torch.cuda.is_available(): False
+torch.version.hip: None
+torch.device('neuron'): OK -> neuron
+torch_neuronx: 2.14.3.0.1+b1b6c66
+
+=== [2] clone torchtitan ===
+Cloning into '/home/ubuntu/torchtitan'...
+torchtitan rev: 6a2292d00272cc6b91f600db4c14143afeb26c35
+
+=== [3] has_cuda_capability gate (vllm/engine.py:283 / tools/utils.py:25) ===
+torch.cuda.is_available(): False
+has_cuda_capability(9, 0): False
+has_cuda_capability(8, 0): False
+
+=== [4] isolated venv for TitanRL deps (do NOT clobber DLAMI torch) ===
+venv python: Python 3.14.4
+
+=== [5] install probes (each is a CUDA dependency named in rl/README.md) ===
+
+########## pip install torchstore ##########
+Looking in indexes: https://pypi.org/simple, https://pip.repos.neuron.amazonaws.com
+Collecting torchstore
+  Downloading torchstore-0.1.2-py3-none-any.whl.metadata (7.0 kB)
+Collecting pygtrie (from torchstore)
+  Downloading pygtrie-2.6.2-py3-none-any.whl.metadata (12 kB)
+Collecting torch==2.9.0 (from torchstore)
+  Downloading torch-2.9.0-cp314-cp314-manylinux_2_28_x86_64.whl.metadata (30 kB)
+Collecting torchstore
+  Downloading torchstore-0.1.1-py3-none-any.whl.metadata (7.0 kB)
+INFO: pip is looking at multiple versions of torchstore to determine which version is compatible with other requirements. This could take a while.
+ERROR: Cannot install torchstore==0.1.1 and torchstore==0.1.2 because these package versions have conflicting dependencies.
+
+The conflict is caused by:
+    torchstore 0.1.2 depends on torchmonarch==0.1.2
+    torchstore 0.1.1 depends on torchmonarch==0.1.1
+
+Additionally, some packages in these conflicts have no matching distributions available for your environment:
+    torchmonarch
+
+To fix this you could try to:
+1. loosen the range of package versions you've specified
+2. remove package versions to allow pip to attempt to solve the dependency conflict
+
+ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
+########## pip install torchstore -> exit 1 ##########
+
+########## pip install torchmonarch ##########
+Looking in indexes: https://pypi.org/simple, https://pip.repos.neuron.amazonaws.com
+ERROR: Could not find a version that satisfies the requirement torchmonarch (from versions: none)
+ERROR: No matching distribution found for torchmonarch
+########## pip install torchmonarch -> exit 1 ##########
+
+########## pip install vllm ##########
+Using cached blake3-1.0.11-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (382 kB)
+Downloading cachetools-7.2.8-py3-none-any.whl (19 kB)
+Downloading cbor2-6.2.0.post2-cp314-cp314-manylinux_2_28_x86_64.whl (467 kB)
+Using cached cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+Using cached dill-0.4.1-py3-none-any.whl (120 kB)
+Using cached einops-0.8.2-py3-none-any.whl (65 kB)
+Using cached ijson-3.6.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (149 kB)
+Using cached jmespath-1.1.0-py3-none-any.whl (20 kB)
+Using cached loguru-0.7.3-py3-none-any.whl (61 kB)
+Using cached ml_dtypes-0.6.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (409 kB)
+Using cached msgspec-0.22.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (230 kB)
+Using cached ninja-1.13.2-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (183 kB)
+Using cached nvidia_cuda_cccl-13.3.4.3.1-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (3.9 MB)
+Using cached nvidia_cuda_nvcc-13.4.92-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (47.7 MB)
+Using cached nvidia_cuda_crt-13.4.92-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (160 kB)
+Using cached nvidia_ml_py-13.615.71-py3-none-any.whl (58 kB)
+Using cached nvidia_nvvm-13.4.92-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl (72.6 MB)
+Using cached partial_json_parser-0.2.1.1.post7-py3-none-any.whl (10 kB)
+Using cached psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl (155 kB)
+Using cached py_cpuinfo-9.0.0-py3-none-any.whl (22 kB)
+Using cached pybase64-1.5.1-cp314-cp314-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl (95 kB)
+Downloading pycparser-3.12-py3-none-any.whl (62 kB)
+Using cached python_json_logger-4.2.0-py3-none-any.whl (14 kB)
+Using cached sentencepiece-0.2.2-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (1.4 MB)
+Using cached setproctitle-1.3.8-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (33 kB)
+Using cached tabulate-0.10.0-py3-none-any.whl (39 kB)
+Using cached torch_c_dlpack_ext-0.1.5-cp314-cp314-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (171 kB)
+Installing collected packages: z3-solver, torchaudio, supervisor, py-cpuinfo, nvtx, nvidia-ml-py, nvidia-cusparselt-cu13, mpmath, cuda-toolkit, websockets, uvloop, urllib3, typing_extensions, truststore, triton, tqdm, torchcodec, tokenspeed-triton, tabulate, sympy, sniffio, six, shellingham, setuptools, setproctitle, sentencepiece, safetensors, rpds-py, rignore, regex, pyzmq, pyyaml, python-multipart, python-json-logger, python-dotenv, PyNvVideoCodec, pyjwt, pygments, pycparser, pycountry, pybase64, psutil, protobuf, propcache, prometheus_client, pillow, partial-json-parser, packaging, outlines_core, orjson, nvidia-nvvm, nvidia-nvtx, nvidia-nvshmem-cu13, nvidia-nvjitlink, nvidia-nccl-cu13, nvidia-curand, nvidia-cufile, nvidia-cuda-runtime, nvidia-cuda-nvrtc, nvidia-cuda-cupti, nvidia-cuda-crt, nvidia-cuda-cccl, numpy, ninja, networkx, multidict, msgspec, mdurl, MarkupSafe, loguru, llvmlite, llguidance, lark, jmespath, jiter, interegular, ijson, idna, httptools, hf-xet, h11, fsspec, frozenlist, filelock, fastar, einops, docstring-parser, dnspython, dill, detect-installer, cuda-pathfinder, cloudpickle, click, charset_normalizer, certifi, cbor2, cachetools, blake3, attrs, astor, annotated-types, annotated-doc, aiohappyeyeballs, agent-detector, yarl, uvicorn, typing-inspection, sentry-sdk, requests, referencing, pydantic-core, opentelemetry-proto, opentelemetry-api, opencv-python-headless, nvidia-cusparse, nvidia-cufft, nvidia-cuda-nvcc, nvidia-cublas, numba, ml-dtypes, markdown-it-py, jinja2, httpcore2, httpcore, grpcio, googleapis-common-protos, email-validator, depyf, cuda-tile, cuda-core, cuda-bindings, cffi, apache-tvm-ffi, anyio, aiosignal, watchfiles, tiktoken, starlette, rich, pydantic, opentelemetry-semantic-conventions, opentelemetry-exporter-otlp-proto-common, opentelemetry-exporter-http-transport, nvidia-cutlass-dsl-libs-core, nvidia-cusolver, nvidia-cudnn-cu13, nccl4py, jsonschema-specifications, httpx2, httpx, cuda-python, cryptography, aiohttp, typer, sse-starlette, rich-toolkit, pydantic-settings, pydantic-extra-types, prometheus-fastapi-instrumentator, oss-harmony, opentelemetry-sdk, openai, nvidia-cutlass-dsl-libs-base, nccl-extensions, mcp-types, lm-format-enforcer, jsonschema, huggingface_hub, fastapi, anthropic, torch, tokenizers, opentelemetry-semantic-conventions-ai, opentelemetry-exporter-otlp-common, nvidia-cutlass-dsl-libs-cu13, nvidia-cutlass-dsl-libs-cu12, model-hosting-container-standards, mcp, fastsafetensors, fastapi-cloud-cli, fastapi-cli, transformers, torchvision, torch-c-dlpack-ext, tilelang, opentelemetry-exporter-otlp-proto-http, opentelemetry-exporter-otlp-proto-grpc, nvidia-cutlass-dsl, mistral_common, instanttensor, humming-kernels, xgrammar, tokenspeed-mla, quack-kernels, opentelemetry-exporter-otlp, compressed-tensors, nvidia-cudnn-frontend, flashinfer-python, vllm
+
+Successfully installed MarkupSafe-3.0.4 PyNvVideoCodec-2.0.4 agent-detector-2.0.0 aiohappyeyeballs-2.7.1 aiohttp-3.14.5 aiosignal-1.4.0 annotated-doc-0.0.5 annotated-types-0.8.0 anthropic-2.4.0 anyio-4.16.0 apache-tvm-ffi-0.1.11 astor-0.8.1 attrs-26.1.0 blake3-1.0.11 cachetools-7.2.8 cbor2-6.2.0.post2 certifi-2026.10.23 cffi-2.1.1 charset_normalizer-3.5.2 click-8.5.0 cloudpickle-3.1.2 compressed-tensors-0.17.0 cryptography-50.0.2 cuda-bindings-13.4.4 cuda-core-1.2.2 cuda-pathfinder-1.8.5 cuda-python-13.4.4 cuda-tile-1.7.0 cuda-toolkit-13.0.3.0 depyf-0.20.0 detect-installer-0.2.1 dill-0.4.1 dnspython-2.9.1 docstring-parser-0.18.0 einops-0.8.2 email-validator-2.3.0 fastapi-0.136.3 fastapi-cli-0.0.32 fastapi-cloud-cli-0.26.0 fastar-0.12.0 fastsafetensors-0.5.0 filelock-4.2.7 flashinfer-python-0.7.2.post1 frozenlist-1.8.0 fsspec-2026.9.0 googleapis-common-protos-1.76.0 grpcio-1.85.1 h11-0.16.0 hf-xet-1.8.0 httpcore-1.0.9 httpcore2-2.16.0 httptools-0.9.0 httpx-0.28.1 httpx2-2.16.0 huggingface_hub-2.4.0 humming-kernels-0.1.19 idna-3.20 ijson-3.6.0 instanttensor-0.2.2 interegular-0.3.3 jinja2-3.1.6 jiter-0.18.0 jmespath-1.1.0 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 lark-1.2.2 llguidance-1.7.6 llvmlite-0.47.0 lm-format-enforcer-0.11.3 loguru-0.7.3 markdown-it-py-4.2.0 mcp-2.3.0 mcp-types-2.3.0 mdurl-0.1.2 mistral_common-1.13.1 ml-dtypes-0.6.0 model-hosting-container-standards-0.1.16 mpmath-1.3.0 msgspec-0.22.0 multidict-7.2.1 nccl-extensions-0.1.0 nccl4py-0.6.0 networkx-3.7 ninja-1.13.2 numba-0.65.0 numpy-2.4.6 nvidia-cublas-13.1.1.3 nvidia-cuda-cccl-13.3.4.3.1 nvidia-cuda-crt-13.4.92 nvidia-cuda-cupti-13.0.85 nvidia-cuda-nvcc-13.4.92 nvidia-cuda-nvrtc-13.0.88 nvidia-cuda-runtime-13.0.96 nvidia-cudnn-cu13-9.24.0.43 nvidia-cudnn-frontend-1.32.1 nvidia-cufft-12.0.0.61 nvidia-cufile-1.15.1.6 nvidia-curand-10.4.0.35 nvidia-cusolver-12.0.4.66 nvidia-cusparse-12.6.3.3 nvidia-cusparselt-cu13-0.8.1 nvidia-cutlass-dsl-4.8.0 nvidia-cutlass-dsl-libs-base-4.8.0 nvidia-cutlass-dsl-libs-core-4.8.0 nvidia-cutlass-dsl-libs-cu12-4.8.0 nvidia-cutlass-dsl-libs-cu13-4.8.0 nvidia-ml-py-13.615.71 nvidia-nccl-cu13-2.30.7 nvidia-nvjitlink-13.4.92 nvidia-nvshmem-cu13-3.4.5 nvidia-nvtx-13.0.85 nvidia-nvvm-13.4.92 nvtx-0.2.15 openai-3.42.1 opencv-python-headless-5.0.0.93 opentelemetry-api-1.45.2 opentelemetry-exporter-http-transport-0.66b2 opentelemetry-exporter-otlp-1.45.2 opentelemetry-exporter-otlp-common-0.66b2 opentelemetry-exporter-otlp-proto-common-1.45.2 opentelemetry-exporter-otlp-proto-grpc-1.45.2 opentelemetry-exporter-otlp-proto-http-1.45.2 opentelemetry-proto-1.45.2 opentelemetry-sdk-1.45.2 opentelemetry-semantic-conventions-0.66b2 opentelemetry-semantic-conventions-ai-0.5.1 orjson-3.13.0 oss-harmony-0.0.12 outlines_core-0.2.14 packaging-26.3 partial-json-parser-0.2.1.1.post7 pillow-13.0.0 prometheus-fastapi-instrumentator-8.1.0 prometheus_client-0.26.0 propcache-0.5.4 protobuf-7.36.2 psutil-7.2.2 py-cpuinfo-9.0.0 pybase64-1.5.1 pycountry-26.2.16 pycparser-3.12 pydantic-2.14.2 pydantic-core-2.50.2 pydantic-extra-types-2.11.1 pydantic-settings-2.16.2 pygments-2.21.0 pyjwt-2.15.1 python-dotenv-1.2.4 python-json-logger-4.2.0 python-multipart-0.0.33 pyyaml-6.0.3 pyzmq-27.2.0 quack-kernels-0.6.5 referencing-0.37.0 regex-2026.9.29 requests-2.34.2 rich-15.0.0 rich-toolkit-0.20.6 rignore-0.8.1 rpds-py-2026.9.1 safetensors-0.8.0 sentencepiece-0.2.2 sentry-sdk-2.73.0 setproctitle-1.3.8 setuptools-80.10.2 shellingham-1.5.4 six-1.17.0 sniffio-1.3.1 sse-starlette-3.6.0 starlette-1.10.0 supervisor-4.3.0 sympy-1.14.0 tabulate-0.10.0 tiktoken-0.14.0 tilelang-0.1.12 tokenizers-0.23.3 tokenspeed-mla-2.0.3 tokenspeed-triton-3.9.10.post20261028 torch-2.14.0 torch-c-dlpack-ext-0.1.5 torchaudio-2.11.0 torchcodec-0.17.0 torchvision-0.29.0 tqdm-4.70.1 transformers-5.20.2 triton-3.8.0 truststore-0.10.5 typer-0.27.3 typing-inspection-0.4.4 typing_extensions-4.16.0 urllib3-2.8.0 uvicorn-0.54.0 uvloop-0.23.0 vllm-0.33.0 watchfiles-1.3.0 websockets-17.4 xgrammar-0.2.8 yarl-1.25.1 z3-solver-4.15.4.0
+########## pip install vllm -> exit 0 ##########
+
+########## pip install flash-attn ##########
+  × Getting requirements to build wheel did not run successfully.
+  │ exit code: 1
+  ╰─> [23 lines of output]
+      Traceback (most recent call last):
+        File "/home/ubuntu/titanrl-venv/lib/python3.14/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 406, in <module>
+          main()
+          ~~~~^^
+        File "/home/ubuntu/titanrl-venv/lib/python3.14/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 381, in main
+          json_out["return_val"] = hook(**hook_input["kwargs"])
+                                   ~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/home/ubuntu/titanrl-venv/lib/python3.14/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 149, in get_requires_for_build_wheel
+          return hook(config_settings)
+        File "/tmp/pip-build-env-_lx9tc18/overlay/lib/python3.14/site-packages/setuptools/build_meta.py", line 333, in get_requires_for_build_wheel
+          return self._get_build_requires(config_settings, requirements=[])
+                 ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/tmp/pip-build-env-_lx9tc18/overlay/lib/python3.14/site-packages/setuptools/build_meta.py", line 301, in _get_build_requires
+          self.run_setup()
+          ~~~~~~~~~~~~~~^^
+        File "/tmp/pip-build-env-_lx9tc18/overlay/lib/python3.14/site-packages/setuptools/build_meta.py", line 520, in run_setup
+          super().run_setup(setup_script=setup_script)
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/tmp/pip-build-env-_lx9tc18/overlay/lib/python3.14/site-packages/setuptools/build_meta.py", line 317, in run_setup
+          exec(code, locals())  # noqa: S102 # exec is intentional here
+          ~~~~^^^^^^^^^^^^^^^^
+        File "<string>", line 22, in <module>
+      ModuleNotFoundError: No module named 'torch'
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+ERROR: Failed to build 'flash-attn' when getting requirements to build wheel
+########## pip install flash-attn -> exit 1 ##########
+
+########## pip install attn-gym[linear,cudnn] ##########
+Requirement already satisfied: nvidia-cutlass-dsl-libs-cu13==4.8.0 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from nvidia-cutlass-dsl[cu13]>=4.7.0; sys_platform == "linux" and extra == "cudnn"->attn-gym[cudnn,linear]) (4.8.0)
+Requirement already satisfied: filelock in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from torch->attn-gym[cudnn,linear]) (4.2.7)
+Requirement already satisfied: setuptools>=77.0.3 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from torch->attn-gym[cudnn,linear]) (80.10.2)
+Requirement already satisfied: sympy>=1.13.3 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from torch->attn-gym[cudnn,linear]) (1.14.0)
+Requirement already satisfied: networkx>=2.5.1 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from torch->attn-gym[cudnn,linear]) (3.7)
+Requirement already satisfied: jinja2 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from torch->attn-gym[cudnn,linear]) (3.1.6)
+Requirement already satisfied: fsspec>=0.8.5 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from torch->attn-gym[cudnn,linear]) (2026.9.0)
+Requirement already satisfied: cuda-toolkit==13.0.3 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (13.0.3.0)
+Requirement already satisfied: nvidia-cudnn-cu13==9.24.0.43 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from torch->attn-gym[cudnn,linear]) (9.24.0.43)
+Requirement already satisfied: nvidia-cusparselt-cu13==0.8.1 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from torch->attn-gym[cudnn,linear]) (0.8.1)
+Requirement already satisfied: nvidia-nccl-cu13==2.30.7 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from torch->attn-gym[cudnn,linear]) (2.30.7)
+Requirement already satisfied: nvidia-nvshmem-cu13==3.4.5 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from torch->attn-gym[cudnn,linear]) (3.4.5)
+Requirement already satisfied: triton~=3.8.0 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from torch->attn-gym[cudnn,linear]) (3.8.0)
+Requirement already satisfied: nvidia-cublas==13.1.1.3.* in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (13.1.1.3)
+Requirement already satisfied: nvidia-cuda-nvrtc==13.0.88.* in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (13.0.88)
+Requirement already satisfied: nvidia-cuda-runtime==13.0.96.* in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (13.0.96)
+Requirement already satisfied: nvidia-cufft==12.0.0.61.* in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (12.0.0.61)
+Requirement already satisfied: nvidia-nvjitlink<14,>=13.0.88 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (13.4.92)
+Requirement already satisfied: nvidia-cufile==1.15.1.6.* in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (1.15.1.6)
+Requirement already satisfied: nvidia-cuda-cupti==13.0.85.* in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (13.0.85)
+Requirement already satisfied: nvidia-curand==10.4.0.35.* in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (10.4.0.35)
+Requirement already satisfied: nvidia-cusolver==12.0.4.66.* in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (12.0.4.66)
+Requirement already satisfied: nvidia-cusparse==12.6.3.3.* in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (12.6.3.3)
+Requirement already satisfied: nvidia-nvtx==13.0.85.* in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch->attn-gym[cudnn,linear]) (13.0.85)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from sympy>=1.13.3->torch->attn-gym[cudnn,linear]) (1.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /home/ubuntu/titanrl-venv/lib/python3.14/site-packages (from jinja2->torch->attn-gym[cudnn,linear]) (3.0.4)
+Downloading attn_gym-0.0.17-py3-none-any.whl (1.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.0/1.0 MB 12.2 MB/s  0:00:00
+Installing collected packages: attn-gym
+Successfully installed attn-gym-0.0.17
+########## pip install attn-gym[linear,cudnn] -> exit 0 ##########
+
+=== [6] import / init probes ===
+Traceback (most recent call last):
+  File "<stdin>", line 6, in attempt
+  File "<stdin>", line 17, in <lambda>
+ModuleNotFoundError: No module named 'torchstore'
+Traceback (most recent call last):
+  File "<stdin>", line 6, in attempt
+  File "<stdin>", line 19, in <lambda>
+ModuleNotFoundError: No module named 'torchmonarch'
+W1103 07:31:29.204000 13488 torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W1103 07:31:29.204000 13488 torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W1103 07:31:29.205000 13488 torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+Traceback (most recent call last):
+  File "<stdin>", line 6, in attempt
+  File "<stdin>", line 31, in vllm_device_probe
+  File "/home/ubuntu/titanrl-venv/lib/python3.14/site-packages/pydantic/_internal/_dataclasses.py", line 121, in __init__
+    s.__pydantic_validator__.validate_python(ArgsKwargs(args, kwargs), self_instance=s)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/titanrl-venv/lib/python3.14/site-packages/vllm/config/device.py", line 55, in __post_init__
+    raise RuntimeError(
+    ...<3 lines>...
+    )
+RuntimeError: Failed to infer device type, please set the environment variable `VLLM_LOGGING_LEVEL=DEBUG` to turn on verbose logging to help debug the issue.
+Traceback (most recent call last):
+  File "<stdin>", line 6, in attempt
+  File "<stdin>", line 39, in vllm_engineargs_probe
+AttributeError: 'EngineArgs' object has no attribute 'device'
+
+--- torch version + cuda.is_available ---
+OK: ('2.14.0+cu130', False)
+
+--- import vllm ---
+OK: 0.33.0
+
+--- import torchstore ---
+FAILED: ModuleNotFoundError No module named 'torchstore'
+
+--- import torchmonarch ---
+FAILED: ModuleNotFoundError No module named 'torchmonarch'
+
+--- vllm current_platform ---
+OK: current_platform = <vllm.platforms.interface.UnspecifiedPlatform object at 0x7116a51c4050>
+
+--- vllm DeviceConfig device ---
+FAILED: RuntimeError Failed to infer device type, please set the environment variable `VLLM_LOGGING_LEVEL=DEBUG` to turn on verbose logging to help debug the issue.
+
+--- vllm EngineArgs (no build) ---
+FAILED: AttributeError 'EngineArgs' object has no attribute 'device'
+
+=== [7] DONE Tue Nov  3 07:31:33 UTC 2026 ===
+TITANRL_PROBE_COMPLETE
