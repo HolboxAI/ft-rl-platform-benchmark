@@ -14,7 +14,7 @@ CholecT50 GRPO/RLVR loop natively on Trainium2.
 > "no weight reload" and "re-implements dynamic `update_weights`" claims below
 > were against the older vLLM. The real gap is now three bounded contributions
 > to vLLM-neuron: Qwen3.5 hybrid-GDN, a neuron weight-transfer backend, and
-> neuron `sleep`/`wake_up`. See `vllm-neuron/IMPLEMENTATION_PLAN.md`.
+> neuron `sleep`/`wake_up`. See `verl/IMPLEMENTATION_PLAN.md`.
 
 ## What vllm-neuron is
 

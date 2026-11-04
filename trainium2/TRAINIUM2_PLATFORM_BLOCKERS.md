@@ -23,7 +23,7 @@ Source of truth, per leg:
 > weight-transfer framework. vLLM-neuron is missing only: Qwen3.5 hybrid-GDN,
 > a neuron weight-transfer backend, and neuron `sleep`/`wake_up`. The whole
 > rollout+weight-sync wall collapses to that bounded contribution — see
-> `vllm-neuron/IMPLEMENTATION_PLAN.md`. Miles still needs SGLang, not vLLM.
+> `verl/IMPLEMENTATION_PLAN.md`. Miles still needs SGLang, not vLLM.
 
 ## Evidence legend
 
