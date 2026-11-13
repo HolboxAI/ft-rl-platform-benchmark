@@ -1,0 +1,1289 @@
+diff --git a/skyrl/backends/renderer.py b/skyrl/backends/renderer.py
+index 3269ba32..ad0fb9cd 100644
+--- a/skyrl/backends/renderer.py
++++ b/skyrl/backends/renderer.py
+@@ -51,6 +51,9 @@ def decode_mm_kwargs(mm_kwargs: dict[str, list[str]] | None) -> MultiModalKwargs
+     if not mm_kwargs or "image" not in mm_kwargs:
+         return MultiModalKwargs(pixel_values=None, image_grid_thw=None)
+ 
++    if all(isinstance(s, str) and s.startswith(SAFETENSORS_MM_PREFIX) for s in mm_kwargs["image"]):
++        return _decode_safetensors_mm_kwargs(mm_kwargs["image"])
++
+     from vllm.entrypoints.scale_out.token_in_token_out.mm_serde import (
+         decode_mm_kwargs_item as _vllm_decode,
+     )
+@@ -71,6 +74,30 @@ def decode_mm_kwargs(mm_kwargs: dict[str, list[str]] | None) -> MultiModalKwargs
+     return MultiModalKwargs(pixel_values=pixel_values, image_grid_thw=image_grid_thw)
+ 
+ 
++#: kwargs_data items written by a non-vLLM render server (see tpu_rl_benchmark's
++#: rollout server): ``"st:" + base64(safetensors{pixel_values, image_grid_thw})``.
++#: Decoding them needs no vLLM, so a trainer host without the vLLM wheel can read them.
++SAFETENSORS_MM_PREFIX = "st:"
++
++
++def _decode_safetensors_mm_kwargs(items: list[str]) -> MultiModalKwargs:
++    from safetensors.torch import load as st_load
++
++    pv_parts: list[torch.Tensor] = []
++    thw_parts: list[torch.Tensor] = []
++    for item in items:
++        tensors = st_load(base64.b64decode(item[len(SAFETENSORS_MM_PREFIX) :]))
++        if "pixel_values" in tensors:
++            pv_parts.append(tensors["pixel_values"])
++        if "image_grid_thw" in tensors:
++            thw = tensors["image_grid_thw"]
++            thw_parts.append(thw.reshape(1, -1) if thw.dim() == 1 else thw)
++    return MultiModalKwargs(
++        pixel_values=torch.cat(pv_parts, dim=0) if pv_parts else None,
++        image_grid_thw=torch.cat(thw_parts, dim=0) if thw_parts else None,
++    )
++
++
+ class RenderedImage(NamedTuple):
+     """Per-image result from _render_images."""
+ 
+diff --git a/skyrl/backends/skyrl_train/distributed/fsdp_strategy.py b/skyrl/backends/skyrl_train/distributed/fsdp_strategy.py
+index 4220aaaf..16ac00bd 100644
+--- a/skyrl/backends/skyrl_train/distributed/fsdp_strategy.py
++++ b/skyrl/backends/skyrl_train/distributed/fsdp_strategy.py
+@@ -35,6 +35,7 @@ from skyrl.backends.skyrl_train.distributed.fsdp_utils import (
+ )
+ from skyrl.backends.skyrl_train.distributed.strategy import DistributedStrategy
+ from skyrl.backends.skyrl_train.distributed.utils import ModelOrModelOptimPair
++from skyrl.backends.skyrl_train.utils import device as accel
+ from skyrl.backends.skyrl_train.utils.io import io
+ from skyrl.backends.skyrl_train.workers.model_wrapper import HFModelWrapper
+ from skyrl.train.config import FSDPConfig, ModelConfig, OptimizerConfig
+@@ -99,14 +100,14 @@ class FSDPStrategy(DistributedStrategy):
+         random.seed(seed)
+         np.random.seed(seed)
+         torch.manual_seed(seed)
+-        torch.cuda.manual_seed_all(seed)
++        accel.manual_seed_all(seed)
+ 
+     def setup_distributed(self) -> None:
+         self.set_seed(self.seed)
+ 
+         local_rank = int(os.environ.get("LOCAL_RANK", "-1"))
+         if local_rank != -1:
+-            torch.cuda.set_device(local_rank)
++            accel.set_device(local_rank)
+ 
+         # Initializes the distributed backend which will take care of synchronizing nodes/GPUs
+         self.world_size = dist.get_world_size()
+@@ -129,8 +130,8 @@ class FSDPStrategy(DistributedStrategy):
+             if optimizer is not None and self.manual_offload_optimizer and offload_optimizer:
+                 offload_fsdp_optimizer(optimizer)
+ 
+-        torch.cuda.synchronize()
+-        torch.cuda.empty_cache()
++        accel.synchronize()
++        accel.empty_cache()
+ 
+     def backload_to_gpu(self, model, optimizer, backload_optimizer=True, backload_model=True):
+         """Reload model weights back to GPU."""
+@@ -141,9 +142,9 @@ class FSDPStrategy(DistributedStrategy):
+             if backload_model:
+                 load_fsdp2_model_to_gpu(model)
+             if optimizer is not None and self.manual_offload_optimizer and backload_optimizer:
+-                load_fsdp_optimizer(optimizer, torch.cuda.current_device())
++                load_fsdp_optimizer(optimizer, accel.current_device())
+ 
+-        torch.cuda.synchronize()
++        accel.synchronize()
+ 
+     def backward(self, loss: torch.Tensor, model, optimizer: optim.Optimizer, **kwargs) -> None:
+         """Perform backward pass"""
+@@ -449,7 +450,7 @@ class FSDPStrategy(DistributedStrategy):
+ 
+         # Final barrier to ensure all operations complete
+         dist.barrier()
+-        torch.cuda.synchronize()
++        accel.synchronize()
+         self.print(f"[rank-{rank}]: Checkpoint saved to {ckpt_dir}")
+ 
+     def load_checkpoint(
+diff --git a/skyrl/backends/skyrl_train/distributed/fsdp_utils.py b/skyrl/backends/skyrl_train/distributed/fsdp_utils.py
+index e23d36fa..7a65cbf9 100644
+--- a/skyrl/backends/skyrl_train/distributed/fsdp_utils.py
++++ b/skyrl/backends/skyrl_train/distributed/fsdp_utils.py
+@@ -27,6 +27,7 @@ from peft.utils.save_and_load import get_peft_model_state_dict
+ from torch.distributed import DeviceMesh
+ from torch.distributed.device_mesh import init_device_mesh
+ 
++from skyrl.backends.skyrl_train.utils import device as accel
+ from skyrl.train.config import FSDPConfig
+ 
+ if version.parse(torch.__version__) >= version.parse("2.6"):
+@@ -49,8 +50,8 @@ else:
+ 
+ def init_fn(x: torch.nn.Module):
+     if torch.distributed.get_rank() != 0:
+-        x = x.to_empty(device=torch.cuda.current_device(), recurse=False)
+-        torch.cuda.empty_cache()
++        x = x.to_empty(device=accel.current_device(), recurse=False)
++        accel.empty_cache()
+     return x
+ 
+ 
+@@ -75,12 +76,12 @@ def offload_fsdp2_model_to_cpu(model, empty_cache: bool = True):
+                 module._buffers[key] = torch.empty(buf.shape, dtype=buf.dtype, device="cpu")
+     model.to("cpu", non_blocking=True)
+     if empty_cache:
+-        torch.cuda.empty_cache()
++        accel.empty_cache()
+ 
+ 
+ @torch.no_grad()
+ def load_fsdp2_model_to_gpu(model):
+-    device = torch.cuda.current_device()
++    device = accel.current_device()
+     model.to(device, non_blocking=True)
+ 
+ 
+@@ -122,9 +123,9 @@ def _sync_non_persistent_buffers(model: torch.nn.Module, loaded_sd: dict):
+             if buf is None:
+                 continue
+             if dist.get_rank() == 0:
+-                src = buf.detach().cuda()
++                src = buf.detach().to(accel.current_device())
+             else:
+-                src = torch.empty(buf.shape, dtype=buf.dtype, device="cuda")
++                src = torch.empty(buf.shape, dtype=buf.dtype, device=accel.current_device())
+             dist.broadcast(src, src=0)
+             module._buffers[key] = src.cpu()
+ 
+@@ -246,17 +247,17 @@ def fsdp2_clip_grad_norm_(parameters, max_norm, norm_type=2.0, error_if_nonfinit
+         parameters = list(parameters)
+     grads = [p.grad for p in parameters if p.grad is not None]
+     total_norm = _get_total_norm(grads, norm_type, error_if_nonfinite, foreach)
+-    total_norm = total_norm.to(torch.cuda.current_device(), non_blocking=True)
++    total_norm = total_norm.to(accel.current_device(), non_blocking=True)
+     _clip_grads_with_norm_(parameters, max_norm, total_norm, foreach)
+     return total_norm
+ 
+ 
+ def create_device_mesh(world_size, fsdp_size):
+     if fsdp_size < 0 or fsdp_size >= world_size:
+-        device_mesh = init_device_mesh("cuda", mesh_shape=(world_size,), mesh_dim_names=["fsdp"])
++        device_mesh = init_device_mesh(accel.device_type(), mesh_shape=(world_size,), mesh_dim_names=["fsdp"])
+     else:
+         device_mesh = init_device_mesh(
+-            "cuda", mesh_shape=(world_size // fsdp_size, fsdp_size), mesh_dim_names=["ddp", "fsdp"]
++            accel.device_type(), mesh_shape=(world_size // fsdp_size, fsdp_size), mesh_dim_names=["ddp", "fsdp"]
+         )
+     return device_mesh
+ 
+@@ -355,7 +356,7 @@ def layered_summon_lora_params(fsdp_module) -> OrderedDict:
+                 for param_name, param in sub_lora_params.items()
+             }
+             lora_params.update(sub_lora_params)
+-            torch.cuda.empty_cache()
++            accel.empty_cache()
+     return lora_params
+ 
+ 
+@@ -369,5 +370,5 @@ def collect_lora_params(module) -> OrderedDict:
+         name: param.full_tensor().detach().cpu() if hasattr(param, "full_tensor") else param.detach().cpu()
+         for name, param in lora_params.items()
+     }
+-    torch.cuda.empty_cache()
++    accel.empty_cache()
+     return lora_params
+diff --git a/skyrl/backends/skyrl_train/distributed/strategy.py b/skyrl/backends/skyrl_train/distributed/strategy.py
+index a6b1bb71..b1928e07 100644
+--- a/skyrl/backends/skyrl_train/distributed/strategy.py
++++ b/skyrl/backends/skyrl_train/distributed/strategy.py
+@@ -10,6 +10,7 @@ from loguru import logger
+ from torch import distributed as dist
+ from transformers import GenerationConfig, PretrainedConfig, PreTrainedTokenizer
+ 
++from skyrl.backends.skyrl_train.utils import device as accel
+ from skyrl.backends.skyrl_train.utils.io import io
+ from skyrl.utils.tok import check_is_vlm, get_processor
+ 
+@@ -81,7 +82,7 @@ class DistributedStrategy(ABC):
+             is_cpu_tensor = data.device.type == "cpu"
+ 
+             if is_cpu_tensor:
+-                data = data.to(torch.cuda.current_device())
++                data = data.to(accel.current_device())
+             if op == "mean":
+                 group_size = dist.get_world_size(group) if group is not None else self.world_size
+                 data /= group_size
+@@ -108,8 +109,8 @@ class DistributedStrategy(ABC):
+                 data = torch.Tensor([data])
+             is_cpu_tensor = data.device.type == "cpu"
+ 
+-            ret = [torch.zeros_like(data).to(torch.cuda.current_device()) for _ in range(self.world_size)]
+-            dist.all_gather(ret, data.to(torch.cuda.current_device()))
++            ret = [torch.zeros_like(data).to(accel.current_device()) for _ in range(self.world_size)]
++            dist.all_gather(ret, data.to(accel.current_device()))
+             return torch.cat(ret).cpu() if is_cpu_tensor else torch.cat(ret)
+ 
+     def save_hf_configs(self, model_config: PretrainedConfig, hf_dir: str, tokenizer: PreTrainedTokenizer = None):
+@@ -162,8 +163,9 @@ class DistributedStrategy(ABC):
+         }
+ 
+         # Only save CUDA RNG state if CUDA is available and being used
+-        if torch.cuda.is_available() and torch.cuda.device_count() > 0:
+-            rng_state["cuda"] = torch.cuda.get_rng_state()
++        device_rng_state = accel.get_rng_state()
++        if device_rng_state is not None:
++            rng_state["cuda"] = device_rng_state
+ 
+         return rng_state
+ 
+@@ -175,5 +177,5 @@ class DistributedStrategy(ABC):
+         random.setstate(rng_state["random"])
+ 
+         # Only restore CUDA RNG state if it was saved and CUDA is available
+-        if "cuda" in rng_state and torch.cuda.is_available() and torch.cuda.device_count() > 0:
+-            torch.cuda.set_rng_state(rng_state["cuda"])
++        if "cuda" in rng_state:
++            accel.set_rng_state(rng_state["cuda"])
+diff --git a/skyrl/backends/skyrl_train/utils/bert_padding.py b/skyrl/backends/skyrl_train/utils/bert_padding.py
+new file mode 100644
+index 00000000..0c580a9e
+--- /dev/null
++++ b/skyrl/backends/skyrl_train/utils/bert_padding.py
+@@ -0,0 +1,55 @@
++"""``pad_input`` / ``unpad_input`` without flash-attn.
++
++Vendored from flash-attn's ``flash_attn/bert_padding.py`` (BSD-3-Clause,
++Copyright (c) 2022 Tri Dao), keeping the signatures and return values
++``model_wrapper.py`` relies on. Both functions are plain PyTorch indexing, so
++they run on any device; they exist here because the flash-attn wheel cannot be
++installed off CUDA (e.g. on TPU), and ``model_wrapper`` imported it at module scope.
++"""
++
++import torch
++import torch.nn.functional as F
++
++
++def unpad_input(hidden_states, attention_mask, unused_mask=None):
++    """
++    Arguments:
++        hidden_states: (batch, seqlen, ...)
++        attention_mask: (batch, seqlen), bool / int, 1 means valid and 0 means not valid.
++        unused_mask: (batch, seqlen), bool / int, 1 means the element is allocated but unused.
++    Return:
++        hidden_states: (total_nnz, ...), where total_nnz = number of tokens selected in attention_mask + unused_mask.
++        indices: (total_nnz), the indices of masked tokens from the flattened input sequence.
++        cu_seqlens: (batch + 1), the cumulative sequence lengths, used to index into hidden_states.
++        max_seqlen_in_batch: int
++        seqused: (batch), returns the number of tokens selected in attention_mask + unused_mask.
++    """
++    all_masks = (attention_mask + unused_mask) if unused_mask is not None else attention_mask
++    seqlens_in_batch = all_masks.sum(dim=-1, dtype=torch.int32)
++    used_seqlens_in_batch = attention_mask.sum(dim=-1, dtype=torch.int32)
++    indices = torch.nonzero(all_masks.flatten(), as_tuple=False).flatten()
++    max_seqlen_in_batch = seqlens_in_batch.max().item()
++    cu_seqlens = F.pad(torch.cumsum(seqlens_in_batch, dim=0, dtype=torch.int32), (1, 0))
++    return (
++        hidden_states.reshape(-1, *hidden_states.shape[2:])[indices],
++        indices,
++        cu_seqlens,
++        max_seqlen_in_batch,
++        used_seqlens_in_batch,
++    )
++
++
++def pad_input(hidden_states, indices, batch, seqlen):
++    """
++    Arguments:
++        hidden_states: (total_nnz, ...), where total_nnz = number of tokens in selected in attention_mask.
++        indices: (total_nnz), the indices that represent the non-masked tokens of the original padded input sequence.
++        batch: int, batch size for the padded sequence.
++        seqlen: int, maximum sequence length for the padded sequence.
++    Return:
++        hidden_states: (batch, seqlen, ...)
++    """
++    dim = hidden_states.shape[1:]
++    output = torch.zeros((batch * seqlen), *dim, device=hidden_states.device, dtype=hidden_states.dtype)
++    output[indices] = hidden_states
++    return output.view(batch, seqlen, *dim)
+diff --git a/skyrl/backends/skyrl_train/utils/device.py b/skyrl/backends/skyrl_train/utils/device.py
+new file mode 100644
+index 00000000..d6493330
+--- /dev/null
++++ b/skyrl/backends/skyrl_train/utils/device.py
+@@ -0,0 +1,378 @@
++"""Accelerator shim for the FSDP training path.
++
++SkyRL's FSDP workers were written against ``torch.cuda``. This module is the one
++place that knows which accelerator the trainer runs on, so the workers can call
++``device.synchronize()`` instead of ``torch.cuda.synchronize()``.
++
++The accelerator is chosen by ``SKYRL_DEVICE``:
++
++==========  ============================================  ==================
++value       stack                                         c10d backend
++==========  ============================================  ==================
++``cuda``    stock PyTorch (default; upstream behaviour)   ``cpu:gloo,cuda:nccl``
++``tpu``     TorchTPU (``torch_tpu``, device ``"tpu"``)    ``cpu:gloo,tpu:tpu_dist``
++==========  ============================================  ==================
++
++With ``SKYRL_DEVICE`` unset every function here does exactly what the original
++``torch.cuda`` call did, so GPU runs are unchanged.
++
++TorchTPU notes (torch_tpu 0.2.x):
++
++* One process per chip. A chip can be opened by one process only, so policy,
++  ref and the rollout engine cannot share a chip (no ``colocate_all``).
++* ``torch.accelerator.*`` is the supported API for sync and memory stats;
++  ``torch.tpu.synchronize`` is deprecated.
++* Multi-process launch needs the topology env (``TORCH_TPU_TOPOLOGY``,
++  ``TORCH_TPU_SLICEBUILDER_ADDRESSES``, ...) set before the backend initialises.
++  :func:`configure_process_env` sets it from ``SKYRL_TPU_GROUP_ENV_<group>``
++  values that the launcher exports (see ``tpu_rl_benchmark/skyrl-tpu/skyrl_cholect50``).
++"""
++
++from __future__ import annotations
++
++import json
++import os
++from contextlib import nullcontext
++from functools import lru_cache
++from typing import Any, Optional
++
++import torch
++
++_CUDA = "cuda"
++_TPU = "tpu"
++
++
++@lru_cache(maxsize=None)
++def device_type() -> str:
++    """``"cuda"`` (default) or ``"tpu"``, from ``SKYRL_DEVICE``."""
++    value = os.environ.get("SKYRL_DEVICE", _CUDA).strip().lower()
++    if value not in (_CUDA, _TPU):
++        raise ValueError(f"SKYRL_DEVICE must be 'cuda' or 'tpu', got {value!r}")
++    return value
++
++
++def is_tpu() -> bool:
++    return device_type() == _TPU
++
++
++def is_cuda() -> bool:
++    return device_type() == _CUDA
++
++
++_BACKEND_LOADED = False
++
++
++def _ensure_backend_loaded() -> None:
++    """Register TorchTPU's ``"tpu"`` device in this process (idempotent; no-op off TPU).
++
++    The TPU run sets ``TORCH_DEVICE_BACKEND_AUTOLOAD=0`` (``tpu_env.sh``): with autoload on,
++    every process that imports torch, such as SkyRL's DataLoader workers, can open a TPU
++    chip and collide with the training workers (``/dev/vfio/1 ... already opened``, first
++    run 2026-10-24). So only processes that should own a chip call this, which runs
++    TorchTPU's autoload hook (``torch_tpu._loader:load``) explicitly. A plain
++    ``import torch_tpu`` does not register the device name.
++    """
++    global _BACKEND_LOADED
++    if _BACKEND_LOADED or not is_tpu():
++        return
++    try:
++        import torch_tpu  # noqa: F401
++    except ImportError as e:  # pragma: no cover - depends on the host
++        raise RuntimeError("SKYRL_DEVICE=tpu but torch_tpu is not installed (pip install torch_tpu)") from e
++    # `import torch_tpu` adds `torch.tpu` but leaves the backend unnamed ("privateuseone");
++    # only the loader registers "tpu" (checked on v6e, 2026-10-24).
++    if torch._C._get_privateuse1_backend_name() != "tpu":
++        from torch_tpu._loader import load
++
++        load()
++    _BACKEND_LOADED = True
++
++
++def is_available() -> bool:
++    if is_tpu():
++        _ensure_backend_loaded()
++        acc = getattr(torch, "accelerator", None)
++        return bool(acc is not None and acc.is_available())
++    return torch.cuda.is_available()
++
++
++def device_count() -> int:
++    if is_tpu():
++        # One process per chip: a TPU process sees exactly its own device.
++        return 1
++    return torch.cuda.device_count()
++
++
++def current_device() -> Any:
++    """What ``tensor.to(...)`` and ``to_empty(device=...)`` should receive."""
++    if is_tpu():
++        _ensure_backend_loaded()
++        return torch.device(_TPU)
++    return torch.cuda.current_device()
++
++
++def torch_device() -> torch.device:
++    """A ``torch.device`` for this rank's accelerator."""
++    if is_tpu():
++        return current_device()
++    return torch.device(_CUDA, torch.cuda.current_device())
++
++
++def set_device(local_rank: int) -> None:
++    if is_tpu():
++        # Device selection is done by the topology env before init, not per call.
++        _ensure_backend_loaded()
++        return
++    torch.cuda.set_device(local_rank)
++
++
++def synchronize() -> None:
++    if is_tpu():
++        torch.accelerator.synchronize()
++        return
++    torch.cuda.synchronize()
++
++
++def empty_cache() -> None:
++    if is_tpu():
++        acc = getattr(torch, "accelerator", None)
++        fn = getattr(acc, "empty_cache", None) if acc is not None else None
++        if fn is not None:
++            fn()
++        return
++    torch.cuda.empty_cache()
++
++
++def manual_seed_all(seed: int) -> None:
++    if is_tpu():
++        # torch.manual_seed seeds every registered device generator, including tpu.
++        torch.manual_seed(seed)
++        return
++    torch.cuda.manual_seed_all(seed)
++
++
++def get_rng_state() -> Optional[torch.Tensor]:
++    if is_tpu():
++        return None
++    if torch.cuda.is_available() and torch.cuda.device_count() > 0:
++        return torch.cuda.get_rng_state()
++    return None
++
++
++def set_rng_state(state: torch.Tensor) -> None:
++    if is_tpu() or state is None:
++        return
++    if torch.cuda.is_available() and torch.cuda.device_count() > 0:
++        torch.cuda.set_rng_state(state)
++
++
++def mem_get_info() -> tuple[int, int]:
++    """(free, total) bytes. TorchTPU exposes ``torch.accelerator.get_memory_info``."""
++    if is_tpu():
++        acc = torch.accelerator
++        fn = getattr(acc, "get_memory_info", None) or getattr(acc, "mem_get_info", None)
++        if fn is not None:
++            try:
++                info = fn()
++                if isinstance(info, (tuple, list)) and len(info) == 2:
++                    return int(info[0]), int(info[1])
++                if isinstance(info, dict):
++                    total = int(info.get("bytes_limit") or info.get("total") or 0)
++                    used = int(info.get("bytes_in_use") or info.get("used") or 0)
++                    return max(total - used, 0), total
++            except Exception:
++                pass
++        return 0, 0
++    return torch.cuda.mem_get_info()
++
++
++def memory_allocated() -> int:
++    if is_tpu():
++        fn = getattr(torch.accelerator, "memory_allocated", None)
++        return int(fn()) if fn is not None else 0
++    return torch.cuda.memory_allocated()
++
++
++def memory_reserved() -> int:
++    if is_tpu():
++        fn = getattr(torch.accelerator, "memory_reserved", None)
++        return int(fn()) if fn is not None else 0
++    return torch.cuda.memory_reserved()
++
++
++def dist_backend() -> str:
++    """Backend string for ``torch.distributed.init_process_group``.
++
++    ``SKYRL_DIST_BACKEND`` overrides it, for a TorchTPU release that names its
++    c10d backend differently.
++    """
++    override = os.environ.get("SKYRL_DIST_BACKEND")
++    if override:
++        return override
++    if is_tpu():
++        return "cpu:gloo,tpu:tpu_dist"
++    return "cpu:gloo,cuda:nccl"
++
++
++def autocast(dtype: torch.dtype = torch.bfloat16):
++    """bf16 autocast on CUDA. On TPU the weights are already bf16 and the MXU
++    computes bf16 x bf16 -> fp32 by default, so autocast is skipped unless
++    ``SKYRL_TPU_AUTOCAST=1`` (TorchTPU's autocast support is not documented)."""
++    if is_tpu():
++        if os.environ.get("SKYRL_TPU_AUTOCAST") == "1":
++            return torch.autocast(device_type=_TPU, dtype=dtype)
++        return nullcontext()
++    return torch.autocast(dtype=dtype, device_type=_CUDA)
++
++
++def supports_cuda_memory_tools() -> bool:
++    """Memory history, allocator settings, IPC, NUMA by PCI bus: CUDA only."""
++    return is_cuda() and torch.cuda.is_available()
++
++
++_FSDP_PATCHED = False
++
++
++def patch_fsdp_move_states_for_tpu() -> None:
++    """Let FSDP2 move CPU parameters onto ``tpu`` (idempotent; no-op off TPU).
++
++    ``fully_shard`` moves each CPU parameter with ``tensor.data = tensor.to(device)``
++    (``torch/distributed/fsdp/_fully_shard/_fsdp_init.py:_move_states_to_device``).
++    TorchTPU tensors are not shallow-copy compatible with CPU tensors, so that
++    assignment raises ``Attempted to call variable.set_data(tensor), but variable and
++    tensor have incompatible tensor type`` (P0 on v6e-8, 2026-10-24). FSDP2 already
++    swaps tensors instead of assigning ``.data`` for wrapper subclasses; this routes
++    every incompatible tensor through that same ``torch.utils.swap_tensors`` path.
++    Compatible tensors (all of them on CUDA) take the original code path unchanged.
++    """
++    global _FSDP_PATCHED
++    if _FSDP_PATCHED or not is_tpu():
++        return
++    import itertools
++
++    import torch.nn as nn
++    from torch.distributed.fsdp._fully_shard import _fsdp_init
++
++    original = _fsdp_init._move_states_to_device
++
++    def _move_states_to_device(params, buffers, device):
++        rest_params, rest_buffers = [], []
++        for tensor, bucket in itertools.chain(((p, rest_params) for p in params), ((b, rest_buffers) for b in buffers)):
++            if tensor.device == device or tensor.device.type == "meta" or type(tensor).__name__ == "DTensor":
++                bucket.append(tensor)
++                continue
++            with torch.no_grad():
++                moved = tensor.to(device)
++            if torch._has_compatible_shallow_copy_type(tensor, moved):
++                bucket.append(tensor)
++                continue
++            if isinstance(tensor, nn.Parameter):
++                moved = nn.Parameter(moved, requires_grad=tensor.requires_grad)
++            torch.utils.swap_tensors(tensor, moved)
++        original(rest_params, rest_buffers, device)
++
++    _fsdp_init._move_states_to_device = _move_states_to_device
++    _FSDP_PATCHED = True
++
++
++_MROPE_PATCHED = False
++
++
++def _apply_interleaved_mrope_cloned(self, freqs, mrope_section):
++    # Same result as transformers' version, without in-place writes: TorchTPU 0.2 aborts on its
++    # strided in-place assignment between views of one tensor (inversion.cc:112).
++    d = freqs.shape[-1]
++    col = torch.arange(d, device=freqs.device)
++    use_h = (col % 3 == 1) & (col < mrope_section[1] * 3)
++    use_w = (col % 3 == 2) & (col < mrope_section[2] * 3)
++    return torch.where(use_h, freqs[1], torch.where(use_w, freqs[2], freqs[0]))
++
++
++def patch_qwen35_mrope_for_tpu() -> None:
++    """Make Qwen3.5's ``apply_interleaved_mrope`` alias-free on TPU (idempotent; no-op off TPU).
++
++    It assigns into ``freqs[0]`` (a view) from other slices of ``freqs``. TorchTPU 0.2 aborts
++    on in-place operations between views of one tensor (``inversion.cc:112``, seen with batched
++    Qwen3.5 forward on v6e, 2026-10-24). The replacement uses ``torch.where``: same values, no
++    in-place writes.
++    """
++    global _MROPE_PATCHED
++    if _MROPE_PATCHED or not is_tpu():
++        return
++    import inspect
++
++    try:
++        from transformers.models.qwen3_5 import modeling_qwen3_5 as m
++    except ImportError:
++        return
++    for _, cls in inspect.getmembers(m, inspect.isclass):
++        if "apply_interleaved_mrope" in cls.__dict__:
++            cls.apply_interleaved_mrope = _apply_interleaved_mrope_cloned
++    _MROPE_PATCHED = True
++
++
++_VISION_ROPE_PATCHED = False
++
++
++def patch_qwen35_vision_rope_for_tpu() -> None:
++    """Make Qwen3.5's vision RoPE follow ``position_ids.device`` in every worker (idempotent; TPU only).
++
++    ``Qwen3_5VisionRotaryEmbedding.inv_freq`` is a non-persistent buffer that FSDP can leave on
++    CPU, and its forward multiplies it with on-device ``position_ids`` without moving it
++    (``tpu:0 and cpu`` in the ref worker's forward, run 2026-10-24). The GPU run had the same
++    fix in its entrypoint (``apply_vision_rope_device_patch``), which only reaches the driver,
++    not the Ray workers that run the model; here it runs in each worker.
++    """
++    global _VISION_ROPE_PATCHED
++    if _VISION_ROPE_PATCHED or not is_tpu():
++        return
++    try:
++        from transformers.models.qwen3_5 import modeling_qwen3_5 as m
++    except ImportError:
++        return
++    cls = getattr(m, "Qwen3_5VisionRotaryEmbedding", None)
++    if cls is not None:
++
++        def _forward(self, position_ids):
++            inv_freq = self.inv_freq.to(position_ids.device)
++            return (position_ids.unsqueeze(-1) * inv_freq).flatten(1)
++
++        cls.forward = _forward
++    _VISION_ROPE_PATCHED = True
++
++
++def configure_process_env(*, rank: int, local_rank: int, world_size: int, group: Optional[str] = None) -> None:
++    """Set this worker's TorchTPU launch env. Must run before the first TPU op.
++
++    The launcher exports, per actor group (``policy``, ``ref``, ``critic``), a
++    JSON object ``SKYRL_TPU_GROUP_ENV_<GROUP>`` of the form::
++
++        {"env": {"TORCH_TPU_TOPOLOGY": "2,2,1", ...},       # shared by the group
++         "per_rank": [{"TPU_VISIBLE_DEVICES": "0"}, ...]}   # one entry per rank
++
++    which is what ``python -m torch.tpu.distributed`` prints for that chip
++    subset, plus the per-rank device selection. Without it, the process keeps
++    whatever env it inherited (enough for a group that owns the whole VM).
++    """
++    if not is_tpu():
++        return
++    _ensure_backend_loaded()
++    patch_fsdp_move_states_for_tpu()
++    patch_qwen35_mrope_for_tpu()
++    patch_qwen35_vision_rope_for_tpu()
++    os.environ.setdefault("LOCAL_RANK", str(local_rank))
++    os.environ["RANK"] = str(rank)
++    os.environ["WORLD_SIZE"] = str(world_size)
++    os.environ.setdefault("NODE_RANK", "0")
++    if group is None:
++        return
++    raw = os.environ.get(f"SKYRL_TPU_GROUP_ENV_{group.upper()}")
++    if not raw:
++        return
++    spec = json.loads(raw)
++    for key, value in (spec.get("env") or {}).items():
++        os.environ[key] = str(value)
++    per_rank = spec.get("per_rank") or []
++    if rank < len(per_rank):
++        for key, value in per_rank[rank].items():
++            os.environ[key] = str(value)
+diff --git a/skyrl/backends/skyrl_train/weight_sync/__init__.py b/skyrl/backends/skyrl_train/weight_sync/__init__.py
+index 8264c49d..71e9b84b 100644
+--- a/skyrl/backends/skyrl_train/weight_sync/__init__.py
++++ b/skyrl/backends/skyrl_train/weight_sync/__init__.py
+@@ -10,6 +10,7 @@ it to a ``TrainerWeightTransferEngine`` (``weight_senders.py``) whose
+ ``ipc``          CUDA IPC handles; colocated (``placement.colocate_all``)
+ ``delta``        compressed checkpoint deltas via disk / ``gs://`` / ``s3://``
+ ``sharded_rdt``  the inference workers pull slices over NIXL
++``reload``       HF export + server restart (``reload.py``); no vLLM engine
+ ===============  ==========================================================
+ 
+ This package imports no vLLM at module scope: half the CPU suite runs without the
+@@ -44,6 +45,8 @@ def get_transfer_strategy(weight_sync_backend: str, colocate_all: bool) -> str:
+         return "sharded_rdt"
+     if weight_sync_backend == "delta":
+         return "delta"
++    if weight_sync_backend == "reload":
++        return "reload"
+     if weight_sync_backend == "nccl" and colocate_all:
+         return "ipc"
+     return "nccl"
+diff --git a/skyrl/backends/skyrl_train/weight_sync/reload.py b/skyrl/backends/skyrl_train/weight_sync/reload.py
+new file mode 100644
+index 00000000..28647126
+--- /dev/null
++++ b/skyrl/backends/skyrl_train/weight_sync/reload.py
+@@ -0,0 +1,197 @@
++"""``reload`` weight sync: export HF weights, restart the rollout server on them.
++
++The other backends push tensors into a running vLLM 0.31 engine through vLLM's
++weight-transfer API. That needs a matching vLLM on both sides. ``reload`` needs
++nothing from the rollout engine except "start on this checkpoint", so it works
++with engines that do not speak that API (vLLM-TPU, an HF ``generate`` server,
++an older vLLM). The cost is a full checkpoint write and an engine restart per
++step, which is fine for short runs (the CholecT50 run is 16 steps).
++
++One sync:
++
++1. Every policy rank joins the full-state-dict gather (FSDP2 collective).
++2. Rank 0 casts floating tensors to the inference dtype and writes HF safetensors
++   to ``SKYRL_RELOAD_EXPORT_DIR/v<version>``.
++3. Rank 0 publishes to every reload agent (one per rollout server), concurrently:
++   * ``http`` (default): ``PUT /v1/files/<version>/<name>`` for each file, then
++     ``POST /v1/reload {"version": v}``;
++   * ``path``: ``POST /v1/reload {"version": v, "model_dir": <dir>}`` when the
++     agent can read the export dir (same host or shared mount).
++   The agent restarts its server on the new weights and answers once it is healthy.
++
++The agent protocol is implemented by ``tpu_rl_benchmark/skyrl-tpu/rollout/rollout_supervisor.py``.
++
++Configuration (environment, read on the policy workers):
++
++* ``SKYRL_RELOAD_AGENT_URLS``: comma-separated agent URLs, one per entry of
++  ``external_server_urls`` and in the same order. Default: each server URL with
++  its port + 1.
++* ``SKYRL_RELOAD_EXPORT_DIR`` (default ``/tmp/skyrl_reload``), ``SKYRL_RELOAD_TRANSPORT``
++  (``http`` | ``path``), ``SKYRL_RELOAD_TIMEOUT_S`` (default 3600).
++* ``SKYRL_RELOAD_SKIP_INITIAL`` (default ``1``): skip the sync the trainer runs before
++  step 1. The servers were started on the same checkpoint the policy loads, so that
++  sync would only restart them on identical weights.
++
++This module imports no vLLM.
++"""
++
++from __future__ import annotations
++
++import concurrent.futures
++import json
++import os
++import shutil
++import time
++import urllib.error
++import urllib.request
++from dataclasses import dataclass, field
++from typing import List
++from urllib.parse import urlsplit, urlunsplit
++
++import torch
++import torch.distributed as dist
++from loguru import logger
++
++_DTYPES = {"bfloat16": torch.bfloat16, "bf16": torch.bfloat16, "float16": torch.float16, "fp16": torch.float16}
++
++
++def _default_agent_url(server_url: str) -> str:
++    parts = urlsplit(server_url)
++    if parts.port is None:
++        raise ValueError(f"cannot derive a reload agent URL from {server_url!r}; set SKYRL_RELOAD_AGENT_URLS")
++    netloc = f"{parts.hostname}:{parts.port + 1}"
++    return urlunsplit((parts.scheme, netloc, "", "", ""))
++
++
++def _request(method: str, url: str, *, body=None, headers=None, timeout: float) -> dict:
++    req = urllib.request.Request(url, data=body, method=method, headers=headers or {})
++    try:
++        with urllib.request.urlopen(req, timeout=timeout) as resp:
++            raw = resp.read()
++    except urllib.error.HTTPError as e:
++        detail = e.read().decode("utf-8", "replace")[:2000]
++        raise RuntimeError(f"{method} {url} -> HTTP {e.code}: {detail}") from e
++    return json.loads(raw) if raw else {}
++
++
++@dataclass
++class ReloadWeightSync:
++    agent_urls: List[str]
++    export_dir: str
++    transport: str = "http"
++    model_dtype: str = "bfloat16"
++    timeout_s: float = 3600.0
++    skip_initial: bool = True
++    version: int = 0
++    calls: int = 0
++    last_timings: dict = field(default_factory=dict)
++
++    @classmethod
++    def from_env(cls, *, server_urls: List[str], model_dtype: str) -> "ReloadWeightSync":
++        raw = os.environ.get("SKYRL_RELOAD_AGENT_URLS", "").strip()
++        agents = [u.strip().rstrip("/") for u in raw.split(",") if u.strip()] if raw else []
++        if not agents:
++            agents = [_default_agent_url(u) for u in server_urls]
++        if len(agents) != len(server_urls):
++            raise ValueError(
++                f"SKYRL_RELOAD_AGENT_URLS has {len(agents)} entries but there are {len(server_urls)} "
++                "external_server_urls; give one agent per server, in the same order."
++            )
++        transport = os.environ.get("SKYRL_RELOAD_TRANSPORT", "http")
++        if transport not in ("http", "path"):
++            raise ValueError(f"SKYRL_RELOAD_TRANSPORT must be 'http' or 'path', got {transport!r}")
++        return cls(
++            agent_urls=agents,
++            export_dir=os.environ.get("SKYRL_RELOAD_EXPORT_DIR", "/tmp/skyrl_reload"),
++            transport=transport,
++            model_dtype=model_dtype,
++            timeout_s=float(os.environ.get("SKYRL_RELOAD_TIMEOUT_S", "3600")),
++            skip_initial=os.environ.get("SKYRL_RELOAD_SKIP_INITIAL", "1") == "1",
++        )
++
++    # ------------------------------------------------------------------ export
++    def _export(self, strategy, model, out_dir: str) -> None:
++        """Collective: gather the full state dict; rank 0 writes HF safetensors."""
++        from skyrl.backends.skyrl_train.distributed.fsdp_utils import (
++            fsdp2_get_full_state_dict,
++        )
++        from skyrl.backends.skyrl_train.workers.model_wrapper import HFModelWrapper
++
++        fsdp_model = model.model if isinstance(model, HFModelWrapper) else model
++        state_dict = fsdp2_get_full_state_dict(fsdp_model, cpu_offload=True, rank0_only=True)
++        if dist.get_rank() != 0:
++            return
++
++        dtype = _DTYPES.get(str(self.model_dtype).lower(), torch.bfloat16)
++        for name, tensor in state_dict.items():
++            if torch.is_floating_point(tensor) and tensor.dtype != dtype:
++                state_dict[name] = tensor.to(dtype)
++
++        if os.path.exists(out_dir):
++            shutil.rmtree(out_dir)
++        os.makedirs(out_dir, exist_ok=True)
++        model_to_save = strategy._unwrap_model(model)
++        model_to_save.save_pretrained(out_dir, state_dict=state_dict, safe_serialization=True, max_shard_size="4GB")
++        strategy._fix_fsdp_config(model_to_save.config).save_pretrained(out_dir)
++        del state_dict
++
++    # ----------------------------------------------------------------- publish
++    def _publish_one(self, agent: str, out_dir: str) -> dict:
++        if self.transport == "path":
++            body = json.dumps({"version": self.version, "model_dir": out_dir}).encode()
++            return _request(
++                "POST",
++                f"{agent}/v1/reload",
++                body=body,
++                headers={"Content-Type": "application/json"},
++                timeout=self.timeout_s,
++            )
++
++        names = sorted(os.listdir(out_dir))
++        for name in names:
++            path = os.path.join(out_dir, name)
++            size = os.path.getsize(path)
++            with open(path, "rb") as f:
++                # urllib streams a file object when Content-Length is set.
++                _request(
++                    "PUT",
++                    f"{agent}/v1/files/{self.version}/{name}",
++                    body=f,
++                    headers={"Content-Type": "application/octet-stream", "Content-Length": str(size)},
++                    timeout=self.timeout_s,
++                )
++        body = json.dumps({"version": self.version, "files": names}).encode()
++        return _request(
++            "POST", f"{agent}/v1/reload", body=body, headers={"Content-Type": "application/json"}, timeout=self.timeout_s
++        )
++
++    def send(self, strategy, model) -> None:
++        """Run one sync. Must be called on every policy rank."""
++        self.calls += 1
++        if self.calls == 1 and self.skip_initial:
++            logger.info("[reload] skipping the pre-training sync: servers already run the initial checkpoint")
++            return
++        self.version += 1
++        out_dir = os.path.join(self.export_dir, f"v{self.version:06d}")
++        t0 = time.perf_counter()
++        self._export(strategy, model, out_dir)
++        t_export = time.perf_counter() - t0
++
++        if dist.get_rank() == 0:
++            t1 = time.perf_counter()
++            with concurrent.futures.ThreadPoolExecutor(max_workers=len(self.agent_urls)) as pool:
++                results = list(pool.map(lambda a: self._publish_one(a, out_dir), self.agent_urls))
++            t_publish = time.perf_counter() - t1
++            self.last_timings = {
++                "reload_export_s": t_export,
++                "reload_publish_and_restart_s": t_publish,
++            }
++            logger.info(
++                f"[reload] weight version {self.version}: export {t_export:.1f}s, "
++                f"publish+restart {t_publish:.1f}s on {len(self.agent_urls)} server(s): {results}"
++            )
++            # Keep only the latest export; the agents hold their own copies.
++            for entry in os.listdir(self.export_dir):
++                path = os.path.join(self.export_dir, entry)
++                if entry != os.path.basename(out_dir) and os.path.isdir(path):
++                    shutil.rmtree(path, ignore_errors=True)
+diff --git a/skyrl/backends/skyrl_train/workers/fsdp/fsdp_worker.py b/skyrl/backends/skyrl_train/workers/fsdp/fsdp_worker.py
+index 4233c376..45b93635 100644
+--- a/skyrl/backends/skyrl_train/workers/fsdp/fsdp_worker.py
++++ b/skyrl/backends/skyrl_train/workers/fsdp/fsdp_worker.py
+@@ -18,6 +18,7 @@ from skyrl.backends.skyrl_train.inference_servers.remote_inference_client import
+ from skyrl.backends.skyrl_train.training_batch import (
+     TrainingInputBatch,
+ )
++from skyrl.backends.skyrl_train.utils import device as accel
+ from skyrl.backends.skyrl_train.utils.profiler import build_profiler_from_policy_cfg
+ from skyrl.backends.skyrl_train.weight_sync import LoraLoadRequest
+ from skyrl.backends.skyrl_train.workers.model_wrapper import (
+@@ -39,7 +40,22 @@ class FSDPPolicyWorkerBase(PolicyWorkerBase):
+     async def init_weight_sync_state(self, inference_engine_client, inference_engine_cfg: "InferenceEngineConfig"):
+         if inference_engine_cfg.fp8_weight_sync_mode is not None:
+             raise ValueError("Serialized FP8 weight sync currently requires trainer.strategy='megatron'.")
+-        await super().init_weight_sync_state(inference_engine_client, inference_engine_cfg)
++        self._reload_sync = None
++        if inference_engine_cfg.weight_sync_backend == "reload":
++            # Checkpoint-and-reload: no vLLM weight-transfer engine on either side, so
++            # it also works against rollout servers that are not vLLM 0.31 (e.g. on TPU).
++            from skyrl.backends.skyrl_train.weight_sync.reload import ReloadWeightSync
++
++            if self._is_lora:
++                raise ValueError("weight_sync_backend='reload' supports full-model training only")
++            self._weight_sync_inference_client = inference_engine_client
++            self._reload_sync = ReloadWeightSync.from_env(
++                server_urls=list(inference_engine_client.server_urls),
++                model_dtype=inference_engine_cfg.model_dtype,
++            )
++            torch.distributed.barrier()
++        else:
++            await super().init_weight_sync_state(inference_engine_client, inference_engine_cfg)
+ 
+     def init_model(self, model_path, num_training_steps: int = None):
+         assert self.cfg.strategy == "fsdp"
+@@ -216,7 +232,7 @@ class FSDPPolicyWorkerBase(PolicyWorkerBase):
+             # PolicyWorkerBase) basename-guards against a malformed model_id
+             # escaping lora_sync_path even though api.py already validates IDs.
+             cache_reset_task = self._reset_prefix_cache_task(inference_engine_client, inference_engine_cfg)
+-            torch.cuda.empty_cache()
++            accel.empty_cache()
+             lora_name, lora_sync_path = self._resolve_lora_sync_target(model_id)
+             await self._save_lora_adapters_and_sync(
+                 peft_model, lora_sync_path, inference_engine_client, lora_name=lora_name
+@@ -224,7 +240,13 @@ class FSDPPolicyWorkerBase(PolicyWorkerBase):
+             if cache_reset_task is not None:
+                 await cache_reset_task
+             if self.cfg.placement.colocate_all:
+-                torch.cuda.empty_cache()
++                accel.empty_cache()
++            torch.distributed.barrier()
++            return
++
++        if getattr(self, "_reload_sync", None) is not None:
++            # Collective (every rank gathers), then rank 0 publishes and waits for the reload.
++            self._reload_sync.send(self.strategy, self.model)
+             torch.distributed.barrier()
+             return
+ 
+diff --git a/skyrl/backends/skyrl_train/workers/model_wrapper.py b/skyrl/backends/skyrl_train/workers/model_wrapper.py
+index 0dd344f9..656305dc 100644
+--- a/skyrl/backends/skyrl_train/workers/model_wrapper.py
++++ b/skyrl/backends/skyrl_train/workers/model_wrapper.py
+@@ -10,7 +10,10 @@ import numpy as np
+ import torch
+ import torch.nn as nn
+ import transformers
+-from flash_attn.bert_padding import pad_input, unpad_input
++try:
++    from flash_attn.bert_padding import pad_input, unpad_input
++except ImportError:  # no flash-attn wheel off CUDA (e.g. TPU); the pure-PyTorch versions
++    from skyrl.backends.skyrl_train.utils.bert_padding import pad_input, unpad_input
+ from loguru import logger
+ from packaging.version import Version
+ from peft import LoraConfig, TaskType, get_peft_model
+diff --git a/skyrl/backends/skyrl_train/workers/worker.py b/skyrl/backends/skyrl_train/workers/worker.py
+index e2201348..4dd32baa 100644
+--- a/skyrl/backends/skyrl_train/workers/worker.py
++++ b/skyrl/backends/skyrl_train/workers/worker.py
+@@ -40,6 +40,7 @@ from skyrl.backends.skyrl_train.training_batch import (
+     TrainingInputBatch,
+     TrainingOutputBatch,
+ )
++from skyrl.backends.skyrl_train.utils import device as accel
+ from skyrl.backends.skyrl_train.utils.io import io
+ from skyrl.backends.skyrl_train.utils.ppo_utils import (
+     PolicyLossRegistry,
+@@ -86,6 +87,15 @@ if TYPE_CHECKING:
+     from skyrl.train.config.config import InferenceEngineConfig
+ 
+ 
++def _actor_group_name(actor) -> Optional[str]:
++    """``policy`` / ``ref`` / ``critic`` from the worker class name, for per-group TPU env."""
++    name = type(actor).__name__.lower()
++    for group in ("policy", "critic", "ref"):
++        if group in name:
++            return group
++    return None
++
++
+ # Adapted from OpenRLHF: https://github.com/OpenRLHF/OpenRLHF/blob/main/openrlhf/trainer/ray/launcher.py#L17
+ class DistributedTorchRayActor:
+     def __init__(
+@@ -109,10 +119,17 @@ class DistributedTorchRayActor:
+         # environment variable for each actor, so always set device to 0
+         # os.environ["LOCAL_RANK"] = str(self._local_rank)
+         os.environ["LOCAL_RANK"] = str(ray.get_gpu_ids()[0]) if ray_noset_visible_devices() else "0"
++        # TPU: select this rank's chip and the group's topology before the first device op.
++        accel.configure_process_env(
++            rank=self._rank,
++            local_rank=int(os.environ["LOCAL_RANK"]),
++            world_size=self._world_size,
++            group=_actor_group_name(self),
++        )
+         self.sequence_parallel_size: int = sequence_parallel_size
+ 
+         self.record_memory = record_memory
+-        if record_memory:
++        if record_memory and accel.supports_cuda_memory_tools():
+             torch.cuda.memory._record_memory_history(max_entries=MEMORY_HISTORY_MAX_ENTRIES)
+ 
+         # Redirect worker output to log file (infra logs shouldn't pollute driver stdout)
+@@ -128,7 +145,7 @@ class DistributedTorchRayActor:
+         if not torch.distributed.is_initialized():
+             # Default torch dist pg init timeout is 10 minutes (600 seconds)
+             torch.distributed.init_process_group(
+-                backend="cpu:gloo,cuda:nccl", timeout=timedelta(seconds=SKYRL_WORKER_NCCL_TIMEOUT_IN_S)
++                backend=accel.dist_backend(), timeout=timedelta(seconds=SKYRL_WORKER_NCCL_TIMEOUT_IN_S)
+             )
+ 
+         # setup device mesh
+@@ -138,7 +155,7 @@ class DistributedTorchRayActor:
+         # This device mesh can be common across all the strategies we use
+         dp_size = self._world_size // self.sequence_parallel_size
+         device_mesh = torch.distributed.device_mesh.init_device_mesh(
+-            "cuda", mesh_shape=(dp_size, self.sequence_parallel_size), mesh_dim_names=("dp", "sp")
++            accel.device_type(), mesh_shape=(dp_size, self.sequence_parallel_size), mesh_dim_names=("dp", "sp")
+         )
+         self.device_mesh = device_mesh
+         self.mesh_rank = MeshRank(
+@@ -311,9 +328,9 @@ class Worker(DistributedTorchRayActor):
+         raise NotImplementedError()
+ 
+     def empty_cache(self) -> None:
+-        """Empty this worker's CUDA allocator cache."""
+-        if torch.cuda.is_available():
+-            torch.cuda.empty_cache()
++        """Empty this worker's accelerator allocator cache."""
++        if accel.is_available():
++            accel.empty_cache()
+ 
+     def _set_expandable_segments(self, enabled: bool) -> None:
+         """Toggle PyTorch's CUDA ``expandable_segments`` allocator at runtime.
+@@ -329,7 +346,7 @@ class Worker(DistributedTorchRayActor):
+         """
+         if not self.cfg.use_expandable_segments:
+             return
+-        if not torch.cuda.is_available():
++        if not accel.supports_cuda_memory_tools():
+             return
+         setting = f"expandable_segments:{enabled}"
+         try:
+@@ -369,7 +386,7 @@ class Worker(DistributedTorchRayActor):
+             # 235B allocator scale.
+             if not getattr(self, "_ipc_segment_cache_flushed", False):
+                 self._ipc_segment_cache_flushed = True
+-                torch.cuda.empty_cache()
++                accel.empty_cache()
+         try:
+             yield
+         finally:
+@@ -430,7 +447,8 @@ class Worker(DistributedTorchRayActor):
+             offload_optimizer: Whether to offload optimizer state (no-op when there is no optimizer, e.g. Ref worker).
+             offload_model: Whether to offload model parameters.
+         """
+-        self._set_numa_affinity(torch.distributed.get_rank() % torch.cuda.device_count())
++        if accel.is_cuda():
++            self._set_numa_affinity(torch.distributed.get_rank() % torch.cuda.device_count())
+         self.strategy.offload_to_cpu(
+             self._get_module_for_offload(),
+             self.optimizer,
+@@ -454,11 +472,11 @@ class Worker(DistributedTorchRayActor):
+ 
+     def get_cuda_memory(self) -> Dict[str, Any]:
+         """Get CUDA memory usage on worker's CUDA device."""
+-        torch.cuda.synchronize()
+-        free, total = torch.cuda.mem_get_info()
++        accel.synchronize()
++        free, total = accel.mem_get_info()
+         return {
+-            "allocated": torch.cuda.memory_allocated(),
+-            "reserved": torch.cuda.memory_reserved(),
++            "allocated": accel.memory_allocated(),
++            "reserved": accel.memory_reserved(),
+             "free": free,
+             "total": total,
+         }
+@@ -474,7 +492,7 @@ class Worker(DistributedTorchRayActor):
+         .. note::
+             This function should be called on all the ranks in the worker group simultaneously.
+         """
+-        if not self.record_memory:
++        if not self.record_memory or not accel.supports_cuda_memory_tools():
+             return
+ 
+         # Track snapshot count for unique filenames
+@@ -589,7 +607,7 @@ class Worker(DistributedTorchRayActor):
+         would all land on the wrong GPU. Capture it on the main thread, where it
+         is correct, and select it inside the thread.
+         """
+-        device = torch.cuda.current_device() if torch.cuda.is_available() else None
++        device = torch.cuda.current_device() if accel.supports_cuda_memory_tools() else None
+ 
+         def run():
+             if device is not None:
+@@ -647,7 +665,7 @@ class Worker(DistributedTorchRayActor):
+         if not engine.skyrl_handles_prefix_cache_reset:
+             cache_reset_task = self._reset_prefix_cache_task(inference_engine_client, inference_engine_cfg)
+ 
+-        torch.cuda.empty_cache()
++        accel.empty_cache()
+ 
+         # Under colocate_all the CUDA-IPC path calls cudaIpcGetMemHandle, which
+         # is incompatible with the VMM addresses expandable segments use; some
+@@ -663,7 +681,7 @@ class Worker(DistributedTorchRayActor):
+         # 0.25-0.53s per rank at 235B and buys nothing. Under colocation an
+         # inference engine wants the physical memory, so empty regardless.
+         if engine.skyrl_empty_cache_after_send or self.cfg.placement.colocate_all:
+-            torch.cuda.empty_cache()
++            accel.empty_cache()
+         torch.distributed.barrier()
+ 
+     def forward(self, *args, **kwargs) -> WorkerOutput:
+@@ -1092,7 +1110,7 @@ class PolicyWorkerBase(Worker):
+         """
+         self.model.train()
+ 
+-        experience.to_device(torch.cuda.current_device())
++        experience.to_device(accel.current_device())
+ 
+         sequences = experience.sequences
+         old_action_log_probs = experience.action_log_probs
+@@ -1128,7 +1146,7 @@ class PolicyWorkerBase(Worker):
+             loss_config = type(loss_config).from_dict_config(new_loss_config)
+ 
+         # TODO (sumanthrh): don't think this does anything for fsdp rn because autocast happens internally
+-        with torch.autocast(dtype=torch.bfloat16, device_type="cuda"):
++        with accel.autocast(torch.bfloat16):
+             # actor loss
+             action_log_probs, output = self.model(
+                 sequences,
+@@ -1386,7 +1404,7 @@ class PolicyWorkerBase(Worker):
+                 ``loss_fn_outputs`` when callers read only ``metrics``.
+         """
+         self.model.eval()
+-        experience.to_device(torch.cuda.current_device())
++        experience.to_device(accel.current_device())
+ 
+         sequences = experience.sequences
+         old_action_log_probs = experience.action_log_probs
+@@ -1408,7 +1426,7 @@ class PolicyWorkerBase(Worker):
+             new_loss_config = OmegaConf.merge(OmegaConf.create(asdict(loss_config)), OmegaConf.create(loss_fn_config))
+             loss_config = type(loss_config).from_dict_config(new_loss_config)
+ 
+-        with torch.no_grad(), torch.autocast(dtype=torch.bfloat16, device_type="cuda"):
++        with torch.no_grad(), accel.autocast(torch.bfloat16):
+             action_log_probs, _ = self.model(
+                 sequences,
+                 num_actions,
+@@ -1475,7 +1493,7 @@ class PolicyWorkerBase(Worker):
+         }
+ 
+     def _forward_micro_batch(self, micro_batch: TrainingInputBatch) -> TrainingOutputBatch:
+-        device = torch.cuda.current_device()
++        device = accel.current_device()
+         micro_batch.to(device)
+         self.model.eval()
+         sequences = micro_batch["sequences"]
+@@ -1485,7 +1503,7 @@ class PolicyWorkerBase(Worker):
+         image_grid_thw = micro_batch.get("image_grid_thw", None)
+         sample_support_replay = self.cfg.algorithm.enable_sample_support_replay
+ 
+-        with torch.no_grad(), torch.autocast(dtype=torch.bfloat16, device_type="cuda"):
++        with torch.no_grad(), accel.autocast(torch.bfloat16):
+             policy_logprob = self.model(
+                 sequences,
+                 response_length,
+@@ -1637,7 +1655,7 @@ class CriticWorkerBase(Worker):
+         """
+         self.model.train()
+ 
+-        experience.to_device(torch.cuda.current_device())
++        experience.to_device(accel.current_device())
+ 
+         sequences = experience.sequences
+         old_values = experience.values
+@@ -1646,7 +1664,7 @@ class CriticWorkerBase(Worker):
+         attention_mask = experience.attention_mask
+         loss_mask = experience.loss_mask
+ 
+-        with torch.autocast(dtype=torch.bfloat16, device_type="cuda"):
++        with accel.autocast(torch.bfloat16):
+             # critic loss
+             values, _ = self.model(
+                 sequences,
+@@ -1709,13 +1727,13 @@ class CriticWorkerBase(Worker):
+         micro_batch: TrainingInputBatch,
+     ) -> TrainingOutputBatch:
+         """Generates critic values."""
+-        device = torch.cuda.current_device()
++        device = accel.current_device()
+         micro_batch.to(device)
+         sequences = micro_batch["sequences"]
+         response_length = micro_batch.metadata["response_length"]
+         attention_mask = micro_batch["attention_mask"]
+         self.model.eval()
+-        with torch.no_grad(), torch.autocast(dtype=torch.bfloat16, device_type="cuda"):
++        with torch.no_grad(), accel.autocast(torch.bfloat16):
+             value = self.model(
+                 sequences,
+                 response_length,
+@@ -1783,7 +1801,7 @@ class RefWorkerBase(Worker):
+         return WorkerOutput(loss_fn_outputs=loss_fn_outputs, metrics={})
+ 
+     def _forward_micro_batch(self, micro_batch: TrainingInputBatch) -> TrainingOutputBatch:
+-        device = torch.cuda.current_device()
++        device = accel.current_device()
+         micro_batch.to(device)
+         sequences = micro_batch["sequences"]
+         response_length = micro_batch.metadata["response_length"]
+@@ -1791,7 +1809,7 @@ class RefWorkerBase(Worker):
+         pixel_values = micro_batch.get("pixel_values", None)
+         image_grid_thw = micro_batch.get("image_grid_thw", None)
+         sample_support_replay = self.cfg.algorithm.enable_sample_support_replay
+-        with torch.no_grad(), torch.autocast(dtype=torch.bfloat16, device_type="cuda"):
++        with torch.no_grad(), accel.autocast(torch.bfloat16):
+             log_probs = self.model(
+                 sequences,
+                 response_length,
+diff --git a/skyrl/backends/skyrl_train/workers/worker_utils.py b/skyrl/backends/skyrl_train/workers/worker_utils.py
+index 48f000f5..e3063e3c 100644
+--- a/skyrl/backends/skyrl_train/workers/worker_utils.py
++++ b/skyrl/backends/skyrl_train/workers/worker_utils.py
+@@ -366,8 +366,10 @@ class TokenBasedBatchIterator(BaseBatchIterator):
+             return local_num_microbatches
+ 
+         # Get the maximum number of batches across all DP workers
+-        if torch.cuda.is_available():
+-            device = torch.cuda.current_device()
++        from skyrl.backends.skyrl_train.utils import device as accel
++
++        if accel.is_available():
++            device = accel.current_device()
+         else:
+             device = torch.device("cpu")
+         num_microbatches_tensor = torch.tensor(local_num_microbatches, dtype=torch.long, device=device)
+diff --git a/skyrl/train/utils/utils.py b/skyrl/train/utils/utils.py
+index 581f1b08..82276475 100644
+--- a/skyrl/train/utils/utils.py
++++ b/skyrl/train/utils/utils.py
+@@ -1056,7 +1056,12 @@ def prepare_runtime_environment(cfg: SkyRLTrainConfig) -> dict[str, str]:
+             ]
+         )
+     max_num_gpus_per_node = max(gpu_counts) if gpu_counts else 1
+-    if not peer_access_supported(max_num_gpus_per_node=max_num_gpus_per_node):
++    if os.environ.get("SKYRL_DEVICE", "cuda").lower() == "tpu":
++        # Ray "GPU" slots stand for TPU chips; there is no NCCL and no CUDA peer access to probe.
++        for key, value in os.environ.items():
++            if key == "SKYRL_DEVICE" or key.startswith(("SKYRL_TPU_", "SKYRL_RELOAD_", "SKYRL_DIST_", "TORCH_TPU_", "TPU_", "PJRT_")):
++                env_vars[key] = value
++    elif not peer_access_supported(max_num_gpus_per_node=max_num_gpus_per_node):
+         logger.info("Peer access is not supported on this node type, disabling NCCL P2P and SHM")
+         env_vars["NCCL_P2P_DISABLE"] = "1"
+         env_vars["NCCL_SHM_DISABLE"] = "1"

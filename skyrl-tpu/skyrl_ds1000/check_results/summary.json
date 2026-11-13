@@ -1,0 +1,45 @@
+{
+ "net_isolated": true,
+ "checks": {
+  "split": {
+   "ok": true,
+   "detail": "train 794, val 206, shared originals 0, val by library {'Pandas': 58, 'Numpy': 48, 'Matplotlib': 32, 'Tensorflow': 9, 'Scipy': 21, 'Sklearn': 24, 'Pytorch': 14}"
+  },
+  "reference": {
+   "ok": true,
+   "detail": "1000/1000 pass in 154s; failing by library {}"
+  },
+  "empty[empty]": {
+   "ok": true,
+   "detail": "0/1000 pass (143s)"
+  },
+  "empty[pass]": {
+   "ok": true,
+   "detail": "0/1000 pass (143s)"
+  },
+  "hacks[os._exit]": {
+   "ok": true,
+   "detail": "40 problems -> {'no_marker': 38, 'failed': 2}"
+  },
+  "hacks[sys.exit]": {
+   "ok": true,
+   "detail": "40 problems -> {'no_marker': 38, 'failed': 2}"
+  },
+  "hacks[loop]": {
+   "ok": true,
+   "detail": "40 problems -> {'timeout': 38, 'failed': 2}"
+  },
+  "official[gpt-4-turbo-2024-04-09]": {
+   "ok": true,
+   "detail": "ours 0.538, published 0.539 (155s); by library {'Matplotlib': 0.716, 'Numpy': 0.614, 'Pandas': 0.423, 'Pytorch': 0.5, 'Scipy': 0.5, 'Sklearn': 0.504, 'Tensorflow': 0.533}"
+  },
+  "official[codex002]": {
+   "ok": true,
+   "detail": "ours 0.388, published 0.388 (150s); by library {'Matplotlib': 0.548, 'Numpy': 0.432, 'Pandas': 0.265, 'Pytorch': 0.397, 'Scipy': 0.349, 'Sklearn': 0.435, 'Tensorflow': 0.378}"
+  },
+  "env": {
+   "ok": false,
+   "detail": "20 problems: fenced reference -> 19.0/20 reward 1.0; no code -> 0.0 total reward"
+  }
+ }
+}

@@ -1,0 +1,15 @@
+wrote /home/dev/ds1000/check/skyrl_parquet/train.parquet (794 rows) {'Matplotlib': 123, 'Numpy': 172, 'Pandas': 233, 'Pytorch': 54, 'Scipy': 85, 'Sklearn': 91, 'Tensorflow': 36}
+wrote /home/dev/ds1000/check/skyrl_parquet/val.parquet (206 rows) {'Matplotlib': 32, 'Numpy': 48, 'Pandas': 58, 'Pytorch': 14, 'Scipy': 21, 'Sklearn': 24, 'Tensorflow': 9}
+DONE
+DS1000_PYTHON=/home/dev/.venv-ds1000-exec/bin/python  network isolated: True  workers: 8
+[PASS] split: train 794, val 206, shared originals 0, val by library {'Pandas': 58, 'Numpy': 48, 'Matplotlib': 32, 'Tensorflow': 9, 'Scipy': 21, 'Sklearn': 24, 'Pytorch': 14}
+[PASS] reference: 1000/1000 pass in 154s; failing by library {}
+[PASS] empty[empty]: 0/1000 pass (143s)
+[PASS] empty[pass]: 0/1000 pass (143s)
+[PASS] hacks[os._exit]: 40 problems -> {'no_marker': 38, 'failed': 2}
+[PASS] hacks[sys.exit]: 40 problems -> {'no_marker': 38, 'failed': 2}
+[PASS] hacks[loop]: 40 problems -> {'timeout': 38, 'failed': 2}
+[PASS] official[gpt-4-turbo-2024-04-09]: ours 0.538, published 0.539 (155s); by library {'Matplotlib': 0.716, 'Numpy': 0.614, 'Pandas': 0.423, 'Pytorch': 0.5, 'Scipy': 0.5, 'Sklearn': 0.504, 'Tensorflow': 0.533}
+[PASS] official[codex002]: ours 0.388, published 0.388 (150s); by library {'Matplotlib': 0.548, 'Numpy': 0.432, 'Pandas': 0.265, 'Pytorch': 0.397, 'Scipy': 0.349, 'Sklearn': 0.435, 'Tensorflow': 0.378}
+[FAIL] env: 20 problems: fenced reference -> 19.0/20 reward 1.0; no code -> 0.0 total reward
+FAILED: ['env']

@@ -1,0 +1,35 @@
+{
+  "platform": "skyrl",
+  "generated_utc": "2026-10-19T20:30:00Z",
+  "experiments": {
+    "cholec_rl": {
+      "experiment": "cholec_t50_grpo_rlvr",
+      "method": "grpo",
+      "job_id": "skyrl-cholec-rl-qwen3.5-4b",
+      "state": "failed",
+      "base_model": "Qwen/Qwen3.5-4B",
+      "hf_model_id": "Qwen/Qwen3.5-4B",
+      "output_model": null,
+      "lora_rank": null,
+      "learning_rate": 1e-5,
+      "max_context_length": 4096,
+      "epochs": 1,
+      "dataset_size": 256,
+      "steps": 15,
+      "final_train_loss": null,
+      "estimated_cost_usd": 21.3,
+      "wall_time_s": 13500,
+      "start_score": 0.3286,
+      "final_score": null,
+      "reward_curve": [0.093, 0.092, 0.154, 0.061, 0.011, 0.076, 0.221, 0.181, 0.186, 0.208, 0.248, 0.181, 0.306, 0.0, 0.0],
+      "findings": [
+        "Full-model FSDP2 GRPO on SkyRL mirrored verl's hyperparameters (batch 16 / group 8 / lr 1e-5 / kl 0.04 / temp 0.7 / max_tokens 256 / max_prompt 4096 / 1 epoch), but the training reward collapsed to 0.0 (pass@8=0.0) over the final steps instead of improving.",
+        "eval_before_train was 0.329 (the checkpoint emits valid triplets), unlike verl's 0.0 (thinking-disabled SFT emitting empty output) — so the two baselines are not directly comparable; verl is a 0->0.715 learning demo, SkyRL is a 0.329->0.0 forgetting failure.",
+        "The final HF-weight save OOM'd: cpu_offload=true pins ~180GB (params + fp32 AdamW + master weights), and save_hf_model consolidated the full model on top, pushing RAM to 185.8/186.7GB. Ray killed a worker at 99.5% and infinite-retried, so eval_interval=16 never ran and no final weights were written.",
+        "ckpt_interval=0 + hf_save_interval=16 was set to avoid the ~53GB full checkpoint (bf16 weights + fp32 optimizer) on a disk with limited free space; the HF-weights-only save is what OOM'd.",
+        "256 train frames / batch 16 nominally yields 16 steps; the log records 15 completed steps (global_step 1-15, 15 rollout rewards) before the final save OOM'd.",
+        "estimated_cost_usd and wall_time_s are approximate (g5.12xlarge on-demand ~$5.67/hr, ~3.75h for the RL run) and exclude the extensive pre-run debugging/smoke tests on the same instance."
+      ]
+    }
+  }
+}

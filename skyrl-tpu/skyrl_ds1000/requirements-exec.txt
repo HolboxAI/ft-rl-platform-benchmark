@@ -1,0 +1,13 @@
+# Libraries DS-1000's tests run against: DS-1000's environment.yml (python 3.10), as pip pins.
+# Installed into a venv of its own (setup_exec_venv.sh), never into the TorchTPU trainer venv.
+gensim==4.3.2
+matplotlib==3.8.4
+numpy==1.26.4
+pandas==1.5.3
+seaborn==0.13.2
+scikit-learn==1.4.0
+scipy==1.12.0
+statsmodels==0.14.1
+xgboost==2.0.3
+pyyaml
+tensorflow-cpu==2.16.1

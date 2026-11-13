@@ -1,0 +1,9 @@
+{
+ "net_isolated": true,
+ "checks": {
+  "env": {
+   "ok": false,
+   "detail": "1000 problems: fenced reference -> 999/1000 reward 1.0 (failing: [701]); no code -> 0.0 total reward"
+  }
+ }
+}

@@ -1,0 +1,17 @@
+2026-10-29T11:40:24Z == setup
+2026-10-29T11:40:43Z exec venv: numpy        1.26.4 pandas       1.5.3 torch        2.2.0+cpu tensorflow   2.16.1 
+2026-10-29T11:40:44Z DS-1000 @ b39aab7
+2026-10-29T11:40:44Z == check_reward
+2026-10-29T11:54:30Z check_reward exit 1
+[PASS] split: train 794, val 206, shared originals 0, val by library {'Pandas': 58, 'Numpy': 48, 'Matplotlib': 32, 'Tensorflow': 9, 'Scipy': 21, 'Sklearn': 24, 'Pytorch': 14}
+[PASS] reference: 1000/1000 pass in 154s; failing by library {}
+[PASS] empty[empty]: 0/1000 pass (143s)
+[PASS] empty[pass]: 0/1000 pass (143s)
+[PASS] hacks[os._exit]: 40 problems -> {'no_marker': 38, 'failed': 2}
+[PASS] hacks[sys.exit]: 40 problems -> {'no_marker': 38, 'failed': 2}
+[PASS] hacks[loop]: 40 problems -> {'timeout': 38, 'failed': 2}
+[PASS] official[gpt-4-turbo-2024-04-09]: ours 0.538, published 0.539 (155s); by library {'Matplotlib': 0.716, 'Numpy': 0.614, 'Pandas': 0.423, 'Pytorch': 0.5, 'Scipy': 0.5, 'Sklearn': 0.504, 'Tensorflow': 0.533}
+[PASS] official[codex002]: ours 0.388, published 0.388 (150s); by library {'Matplotlib': 0.548, 'Numpy': 0.432, 'Pandas': 0.265, 'Pytorch': 0.397, 'Scipy': 0.349, 'Sklearn': 0.435, 'Tensorflow': 0.378}
+[FAIL] env: 20 problems: fenced reference -> 19.0/20 reward 1.0; no code -> 0.0 total reward
+FAILED: ['env']
+2026-10-29T11:54:30Z == done

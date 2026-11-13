@@ -1,0 +1,11 @@
+2026-10-28T14:06:23Z == setup
+2026-10-28T14:06:56Z uv 0.13.6 (x86_64-unknown-linux-gnu)
+2026-10-28T14:07:02Z patch applied:  19 files changed, 1071 insertions(+), 62 deletions(-)
+2026-10-28T14:08:28Z pr 1_precommit exit 0 in 86s | Detect hardcoded secrets.................................................Passed
+2026-10-28T14:22:36Z pr 2_cpu_no_vllm_megatron exit 0 in 848s | === 2514 passed, 41 skipped, 40 deselected, 90 warnings in 455.57s (0:07:35) ===
+2026-10-28T14:28:15Z pr 3_cpu_vllm exit 0 in 339s | == 433 passed, 13 skipped, 2541 deselected, 16 warnings in 172.14s (0:02:52) ===
+2026-10-28T14:32:08Z pr 4_cpu_megatron exit 0 in 233s | ======== 113 passed, 2965 deselected, 20 warnings in 101.79s (0:01:41) =========
+2026-10-28T14:34:20Z pr 5_tinker_skyrl_train exit 0 in 132s | ============ 93 passed, 22 skipped, 1 warning in 108.98s (0:01:48) =============
+2026-10-28T14:46:21Z pr 6_tinker_api_jax exit 0 in 721s | ======================= 144 passed in 703.03s (0:11:43) ========================
+2026-10-28T14:47:19Z pr 7_skyrl_gym exit 0 in 58s | ============================= 119 passed in 53.36s =============================
+2026-10-28T14:47:19Z == done

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="330" viewBox="0 0 760 330" role="img" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+<title>Train reward per step: TPU vs GPU</title>
+<desc>TPU run: 0.292 at step 1, then 0.0 for steps 2 to 16. GPU run: 0.09 to 0.31 for steps 1 to 13, then 0.0 at steps 14 and 15.</desc>
+<line x1="48" y1="18" x2="66" y2="18" stroke="#3987e5" stroke-width="2" stroke-linecap="round"/>
+<text x="72" y="22" font-size="13" fill="#c3c2b7">GPU run, 4× A10G</text>
+<line x1="228" y1="18" x2="246" y2="18" stroke="#d95926" stroke-width="2" stroke-linecap="round"/>
+<text x="252" y="22" font-size="13" fill="#c3c2b7">TPU run, v6e-8</text>
+<line x1="48" y1="290.0" x2="736" y2="290.0" stroke="#383835" stroke-width="1"/>
+<text x="40" y="294.0" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric:tabular-nums">0.0</text>
+<line x1="48" y1="228.5" x2="736" y2="228.5" stroke="#2c2c2a" stroke-width="1"/>
+<text x="40" y="232.5" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric:tabular-nums">0.1</text>
+<line x1="48" y1="167.0" x2="736" y2="167.0" stroke="#2c2c2a" stroke-width="1"/>
+<text x="40" y="171.0" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric:tabular-nums">0.2</text>
+<line x1="48" y1="105.5" x2="736" y2="105.5" stroke="#2c2c2a" stroke-width="1"/>
+<text x="40" y="109.5" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric:tabular-nums">0.3</text>
+<line x1="48" y1="44.0" x2="736" y2="44.0" stroke="#2c2c2a" stroke-width="1"/>
+<text x="40" y="48.0" font-size="11" text-anchor="end" fill="#898781" style="font-variant-numeric:tabular-nums">0.4</text>
+<text x="48.0" y="306" font-size="11" text-anchor="middle" fill="#898781">1</text>
+<text x="93.9" y="306" font-size="11" text-anchor="middle" fill="#898781">2</text>
+<text x="139.7" y="306" font-size="11" text-anchor="middle" fill="#898781">3</text>
+<text x="185.6" y="306" font-size="11" text-anchor="middle" fill="#898781">4</text>
+<text x="231.5" y="306" font-size="11" text-anchor="middle" fill="#898781">5</text>
+<text x="277.3" y="306" font-size="11" text-anchor="middle" fill="#898781">6</text>
+<text x="323.2" y="306" font-size="11" text-anchor="middle" fill="#898781">7</text>
+<text x="369.1" y="306" font-size="11" text-anchor="middle" fill="#898781">8</text>
+<text x="414.9" y="306" font-size="11" text-anchor="middle" fill="#898781">9</text>
+<text x="460.8" y="306" font-size="11" text-anchor="middle" fill="#898781">10</text>
+<text x="506.7" y="306" font-size="11" text-anchor="middle" fill="#898781">11</text>
+<text x="552.5" y="306" font-size="11" text-anchor="middle" fill="#898781">12</text>
+<text x="598.4" y="306" font-size="11" text-anchor="middle" fill="#898781">13</text>
+<text x="644.3" y="306" font-size="11" text-anchor="middle" fill="#898781">14</text>
+<text x="690.1" y="306" font-size="11" text-anchor="middle" fill="#898781">15</text>
+<text x="736.0" y="306" font-size="11" text-anchor="middle" fill="#898781">16</text>
+<text x="736" y="324" font-size="11" text-anchor="end" fill="#898781">training step</text>
+<path d="M48.0,110.5 L93.9,290.0 L139.7,290.0 L185.6,290.0 L231.5,290.0 L277.3,290.0 L323.2,290.0 L369.1,290.0 L414.9,290.0 L460.8,290.0 L506.7,290.0 L552.5,290.0 L598.4,290.0 L644.3,290.0 L690.1,290.0 L736.0,290.0" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="736.0" cy="290.0" r="4" fill="#d95926" stroke="#0d1117" stroke-width="2"/>
+<path d="M48.0,232.8 L93.9,233.4 L139.7,195.3 L185.6,252.5 L231.5,283.2 L277.3,243.3 L323.2,154.1 L369.1,178.7 L414.9,175.6 L460.8,162.1 L506.7,137.5 L552.5,178.7 L598.4,101.8 L644.3,290.0 L690.1,290.0" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="690.1" cy="290.0" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"/>
+<circle cx="48.0" cy="110.5" r="4" fill="#d95926" stroke="#0d1117" stroke-width="2"/>
+<text x="57.0" y="102.5" font-size="12" fill="#f0efec"><tspan font-weight="600">0.292</tspan><tspan fill="#c3c2b7"> TPU, step 1 — then 0.0</tspan></text>
+<circle cx="598.4" cy="101.8" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"/>
+<text x="598.4" y="91.8" font-size="12" text-anchor="middle" fill="#f0efec"><tspan font-weight="600">0.306</tspan><tspan fill="#c3c2b7"> GPU peak</tspan></text>
+<text x="650.3" y="268.0" font-size="12" fill="#c3c2b7">GPU collapse</text>
+</svg>
