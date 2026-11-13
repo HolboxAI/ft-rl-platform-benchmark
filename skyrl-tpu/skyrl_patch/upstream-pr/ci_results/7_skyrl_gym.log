@@ -1,0 +1,17 @@
+Using CPython 3.12.16
+Creating virtual environment at: .venv
+============================= test session starts ==============================
+platform linux -- Python 3.12.16, pytest-8.4.1, pluggy-1.6.0
+rootdir: /home/dev/ci/pr
+configfile: pyproject.toml
+collected 119 items
+
+tests/test_aime.py ..........                                            [  8%]
+tests/test_gsm8k.py ...                                                  [ 10%]
+tests/test_lcb.py ...                                                    [ 13%]
+tests/test_rlm.py .......................                                [ 32%]
+tests/test_search.py ................................................    [ 73%]
+tests/test_searchcode.py ......                                          [ 78%]
+tests/test_sql.py ..........................                             [100%]
+
+============================= 119 passed in 53.36s =============================

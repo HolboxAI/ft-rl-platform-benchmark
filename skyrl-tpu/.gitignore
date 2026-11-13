@@ -1,0 +1,2 @@
+# config/tpu.env holds GCP defaults only (no secrets); re-include it over the root *.env rule.
+!config/tpu.env
