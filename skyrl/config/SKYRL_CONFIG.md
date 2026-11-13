@@ -89,7 +89,7 @@ mirrors the verl leg (`../verl/`) one-to-one where the two frameworks allow.
 | `trainer.project_name` | `cholec` |
 | `trainer.run_name` | `cholec_rl_qwen3_5_4b_skyrl` |
 | `trainer.ckpt_interval` | `0` (disabled — avoids ~53 GB full checkpoint) |
-| `trainer.hf_save_interval` | `16` (HF weights only) |
+| `trainer.hf_save_interval` | `0` (disabled — avoids the HF-weights save that OOM'd the node; no epoch-end model save) |
 | `trainer.dump_eval_results` | `true` |
 
 ### Hardware / runtime
@@ -98,7 +98,7 @@ mirrors the verl leg (`../verl/`) one-to-one where the two frameworks allow.
 |---|---|
 | Instance | AWS EC2 `g5.12xlarge` — 4× A10G 24 GB, 186 GB RAM |
 | Launch | `uv run --isolated --extra fsdp python examples/train/cholec/entrypoint.py …` |
-| Env | `RAY_memory_usage_threshold=0.99`, `USE_HUB_KERNELS=NO` |
+| Env | `RAY_memory_usage_threshold=0.99`, `USE_HUB_KERNELS=NO`, `SKYRL_WAIT_UNTIL_INFERENCE_SERVER_HEALTHY_TIMEOUT_S=1800` |
 | Result | collapsed to 0.0 reward; final `save_hf_model` OOM'd (186 GB RAM) |
 
 ## Eval

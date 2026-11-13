@@ -1,11 +1,11 @@
 {
-  "updated": "2026-10-19T20:30:00Z",
+  "updated": "2026-11-13T17:05:00Z",
   "platform": "skyrl",
   "compute": "AWS EC2 g5.12xlarge (self-managed)",
   "instance_types": ["g5.12xlarge"],
   "sdk": "SkyRL (NovaSky-AI) — FSDP2 + vLLM, git 2c54cefc",
   "orchestrator": "Ray (initialize_ray) — colocated FSDP2 policy/critic/ref + vLLM",
-  "note": "RL / GRPO stage only, mirroring the verl leg (full-model FSDP, no LoRA). Loads the Tinker SFT checkpoint (merged). Collapsed to 0.0 reward; final HF save OOM'd on the 186GB node.",
+  "note": "RL / GRPO stage only, mirroring the verl leg (full-model FSDP, no LoRA). Loads the Tinker SFT checkpoint (merged). Re-run 2026-11-13 completed cleanly (succeeded) after the OOM fix: ckpt_interval=0 + hf_save_interval=0 (no epoch-end model save) and SKYRL_WAIT_UNTIL_INFERENCE_SERVER_HEALTHY_TIMEOUT_S=1800 (vLLM health timeout).",
   "experiments": [
     {
       "name": "cholec_rl",
@@ -13,17 +13,17 @@
       "base_model": "Qwen/Qwen3.5-4B",
       "sft_checkpoint": "Tinker output, LoRA merged",
       "job_id": "skyrl-cholec-rl-qwen3.5-4b",
-      "state": "failed",
+      "state": "succeeded",
       "dataset_size": 256,
       "val_size": 32,
-      "steps": 15,
+      "steps": 16,
       "learning_rate": 1e-5,
       "rollout_n": 8,
       "temperature": 0.7,
       "kl_loss_coef": 0.04,
       "max_tokens": 256,
-      "start_score": 0.3286,
-      "final_score": null
+      "start_score": 0.3792,
+      "final_score": 0.0
     }
   ]
 }

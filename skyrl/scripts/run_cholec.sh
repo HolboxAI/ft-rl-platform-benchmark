@@ -22,6 +22,8 @@ export RAY_memory_usage_threshold=0.99
 # fallback to the installed fla + causal_conv1d packages instead — the exact
 # kernel path verl's working run uses.
 export USE_HUB_KERNELS=NO
+export SKYRL_WAIT_UNTIL_INFERENCE_SERVER_HEALTHY_TIMEOUT_S=1800
+
 
 # Resolve the SkyRL repo root (this script lives at examples/train/cholec/,
 # three levels below the repo root).
@@ -60,7 +62,7 @@ uv run --isolated --extra fsdp \
   trainer.micro_forward_batch_size_per_gpu=1 \
   trainer.micro_train_batch_size_per_gpu=1 \
   trainer.ckpt_interval=0 \
-  trainer.hf_save_interval=16 \
+  trainer.hf_save_interval=0 \
   trainer.remove_microbatch_padding=false \
   trainer.max_prompt_length=4096 \
   generator.sampling_params.max_generate_length=256 \
