@@ -1,0 +1,6 @@
+# kept local only
+/data/ds1000/test.jsonl
+/TRAINIUM_VS_G6E_BENCHMARK.md
+/phase_timer.py
+.DS_Store
+__pycache__/

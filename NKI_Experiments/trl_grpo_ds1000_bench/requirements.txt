@@ -1,0 +1,7 @@
+# Training-side packages, same on every platform. torch comes from the AMI
+# (CUDA build on g6e, torch-neuronx on Trainium) and is NOT listed here.
+# Install the exact same versions on both platforms; run_info.csv records what was used.
+trl>=0.19,<0.30
+transformers>=4.53
+accelerate>=1.4
+datasets>=3.0
