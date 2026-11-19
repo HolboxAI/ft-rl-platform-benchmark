@@ -1,0 +1,34 @@
+{
+  "_comment": "Shared settings for every platform. Change them here, not per platform, so g6e and Trainium do identical work.",
+
+  "model_name": "Qwen/Qwen2.5-Coder-0.5B-Instruct",
+  "torch_dtype": "bfloat16",
+  "attn_implementation": "sdpa",
+
+  "subset_file": "data/ds1000_subset32.jsonl",
+  "num_instances": 32,
+  "subset_seed": 1234,
+  "exclude_libraries": ["Matplotlib", "Tensorflow"],
+
+  "max_steps": 10,
+  "warmup_steps_excluded_from_stats": 2,
+  "num_generations": 4,
+  "prompts_per_step": 8,
+  "per_device_train_batch_size": 8,
+  "gradient_accumulation_steps": 4,
+  "max_prompt_length": 512,
+  "max_completion_length": 256,
+  "learning_rate": 1e-6,
+  "beta": 0.04,
+  "temperature": 0.9,
+  "top_p": 1.0,
+  "max_grad_norm": 1.0,
+  "seed": 42,
+
+  "static_shapes": true,
+  "fixed_length_generation": true,
+  "cache_implementation": "static",
+
+  "reward_timeout_s": 30,
+  "reward_workers": 8
+}
