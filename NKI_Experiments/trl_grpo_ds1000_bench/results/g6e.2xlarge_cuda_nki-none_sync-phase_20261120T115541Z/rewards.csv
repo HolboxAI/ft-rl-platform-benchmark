@@ -1,0 +1,321 @@
+step,sample_idx,problem_id,library,completion_chars,completion_tokens,reward,passed,status,exec_time_s
+1,0,59,Pandas,890,255,0,0,AssertionError,0.475
+1,1,59,Pandas,762,253,0,0,KeyError,0.4542
+1,2,59,Pandas,757,244,0,0,pandas.errors.SpecificationError,0.664
+1,3,59,Pandas,841,255,0,0,AttributeError,0.4887
+1,4,766,Scipy,974,256,0,0,SyntaxError,0.2651
+1,5,766,Scipy,951,256,0,0,SyntaxError,0.4595
+1,6,766,Scipy,894,256,0,0,NameError,0.2992
+1,7,766,Scipy,813,254,0,0,AttributeError,0.2704
+1,8,802,Scipy,993,255,0,0,IndexError,0.1508
+1,9,802,Scipy,999,254,0,0,"       [1, 0, 0]])",0.2475
+1,10,802,Scipy,1024,256,0,0,"       [1, 0, 0]])",0.1701
+1,11,802,Scipy,1193,256,0,0,SyntaxError,0.1373
+1,12,929,Sklearn,1061,256,0,0,SyntaxError,1.026
+1,13,929,Sklearn,1124,256,0,0,NameError,1.1618
+1,14,929,Sklearn,1181,255,0,0,NameError,1.1416
+1,15,929,Sklearn,1171,256,0,0,ImportError,1.1423
+1,16,995,Pytorch,997,256,0,0,IndentationError,1.6982
+1,17,995,Pytorch,807,256,0,0,IndentationError,1.7815
+1,18,995,Pytorch,984,256,0,0,IndentationError,2.06
+1,19,995,Pytorch,952,256,0,0,IndentationError,1.674
+1,20,955,Pytorch,995,250,0,0,NameError,1.8418
+1,21,955,Pytorch,973,255,0,0,NameError,1.8114
+1,22,955,Pytorch,1012,255,0,0,SyntaxError,1.6872
+1,23,955,Pytorch,889,256,0,0,NameError,1.9032
+1,24,798,Scipy,747,256,0,0,NotImplementedError,0.2318
+1,25,798,Scipy,803,256,0,0,NotImplementedError,0.2447
+1,26,798,Scipy,1074,256,0,0,ImportError,0.352
+1,27,798,Scipy,811,256,0,0,SyntaxError,0.2284
+1,28,50,Pandas,1101,255,0,0,AssertionError,0.4271
+1,29,50,Pandas,936,256,0,0,NameError,0.4314
+1,30,50,Pandas,941,252,0,0,NameError,0.4212
+1,31,50,Pandas,817,254,0,0,NameError,0.486
+2,0,392,Numpy,805,255,0,0,"       [0.969585, 0.775133, 0.939499, 0.894827, 0.5979  , 0.",0.457
+2,1,392,Numpy,480,246,0,0,"       [4, 5, 6, 7, 5, 3, 2, 5]])",0.4522
+2,2,392,Numpy,735,256,0,0,"       [4, 5, 6, 7, 5, 3, 2, 5]])",0.4562
+2,3,392,Numpy,639,254,0,0,"       [0.969585, 0.775133, 0.939499, 0.894827, 0.5979  , 0.",0.4522
+2,4,17,Pandas,422,256,0,0,AssertionError,0.4443
+2,5,17,Pandas,509,256,0,0,AssertionError,0.4408
+2,6,17,Pandas,461,256,0,0,SyntaxError,0.4326
+2,7,17,Pandas,448,256,0,0,SyntaxError,0.4315
+2,8,825,Sklearn,1145,255,0,0,ModuleNotFoundError,0.9414
+2,9,825,Sklearn,969,256,0,0,NameError,0.9401
+2,10,825,Sklearn,1212,255,0,0,KeyError,0.9764
+2,11,825,Sklearn,1207,253,0,0,NameError,1.0686
+2,12,786,Scipy,727,254,0,0,SyntaxError,0.1361
+2,13,786,Scipy,684,256,0,0,SyntaxError,0.1422
+2,14,786,Scipy,606,255,0,0,SyntaxError,0.1471
+2,15,786,Scipy,727,256,0,0,NameError,0.3062
+2,16,356,Numpy,878,256,0,0,"        [ 6, 16, 26]],...",0.1729
+2,17,356,Numpy,740,253,0,0,"        [ 6, 16, 26]],...",0.2825
+2,18,356,Numpy,986,255,0,0,SyntaxError,0.2195
+2,19,356,Numpy,730,256,0,0,SyntaxError,0.138
+2,20,46,Pandas,1119,256,0,0,SyntaxError,0.4172
+2,21,46,Pandas,1049,256,0,0,AssertionError,0.5864
+2,22,46,Pandas,1037,256,0,0,AssertionError,0.5537
+2,23,46,Pandas,1150,256,0,0,TypeError,0.4408
+2,24,784,Scipy,1074,256,0,0,IndentationError,0.2649
+2,25,784,Scipy,1011,256,0,0,IndentationError,0.318
+2,26,784,Scipy,1130,256,0,0,IndentationError,0.2479
+2,27,784,Scipy,1005,256,0,0,IndentationError,0.25
+2,28,958,Pytorch,1005,256,1,1,pass,1.4582
+2,29,958,Pytorch,892,256,0,0,AssertionError,1.4022
+2,30,958,Pytorch,889,256,0,0,NameError,1.4573
+2,31,958,Pytorch,994,256,0,0,NameError,1.4887
+3,0,846,Sklearn,1122,255,0,0,NameError,1.0231
+3,1,846,Sklearn,1072,256,0,0,NameError,1.0517
+3,2,846,Sklearn,1002,247,0,0,AssertionError,1.0734
+3,3,846,Sklearn,1086,256,0,0,NameError,1.0211
+3,4,990,Pytorch,1196,254,0,0,NameError,2.055
+3,5,990,Pytorch,787,254,0,0,TypeError,1.9064
+3,6,990,Pytorch,800,254,0,0,NameError,1.9496
+3,7,990,Pytorch,1030,256,0,0,NameError,2.038
+3,8,971,Pytorch,1240,255,0,0,RuntimeError,1.9475
+3,9,971,Pytorch,1045,256,0,0,NameError,2.1054
+3,10,971,Pytorch,939,254,0,0,AssertionError,2.1032
+3,11,971,Pytorch,824,256,0,0,NameError,2.0264
+3,12,298,Numpy,923,256,0,0,"       [0., 1., 0.]])",0.1718
+3,13,298,Numpy,971,256,0,0,"       [0., 1., 0.]])",0.1629
+3,14,298,Numpy,879,254,0,0,"       [0., 1., 0.]])",0.1579
+3,15,298,Numpy,746,254,0,0,NameError,0.2381
+3,16,918,Sklearn,1001,256,0,0,ValueError,1.0356
+3,17,918,Sklearn,1030,255,0,0,ValueError,1.1638
+3,18,918,Sklearn,1072,255,1,1,pass,1.05
+3,19,918,Sklearn,966,256,0,0,KeyError,1.0551
+3,20,848,Sklearn,1139,256,0,0,NameError,1.1969
+3,21,848,Sklearn,1217,255,0,0,NameError,1.0745
+3,22,848,Sklearn,1218,256,0,0,NameError,1.0232
+3,23,848,Sklearn,1182,255,0,0,NameError,0.9988
+3,24,225,Pandas,701,256,0,0,AssertionError,0.6059
+3,25,225,Pandas,976,256,0,0,AssertionError,0.5392
+3,26,225,Pandas,750,256,0,0,AssertionError,0.5224
+3,27,225,Pandas,778,252,0,0,AssertionError,0.4226
+3,28,501,Numpy,646,254,0,0,KeyError,0.1449
+3,29,501,Numpy,622,254,0,0,"        0.785176],...",0.1706
+3,30,501,Numpy,643,256,0,0,"       [13, 15, 16]])",0.1643
+3,31,501,Numpy,744,256,0,0,TypeError,0.1374
+4,0,386,Numpy,805,257,0,0,KeyError,0.1451
+4,1,386,Numpy,545,256,0,0,ValueError,0.1415
+4,2,386,Numpy,878,256,0,0,...,0.1645
+4,3,386,Numpy,906,256,0,0,TypeError,0.1435
+4,4,3,Pandas,875,255,0,0,AssertionError,0.5886
+4,5,3,Pandas,727,252,0,0,SyntaxError,0.4341
+4,6,3,Pandas,1133,255,0,0,SyntaxError,0.432
+4,7,3,Pandas,861,256,0,0,AttributeError,0.4278
+4,8,353,Numpy,703,256,0,0,NameError,0.2171
+4,9,353,Numpy,596,255,0,0,NameError,0.1407
+4,10,353,Numpy,944,256,0,0,NameError,0.1417
+4,11,353,Numpy,831,256,0,0,AttributeError,0.2172
+4,12,42,Pandas,1060,256,0,0,AssertionError,0.4119
+4,13,42,Pandas,1064,255,0,0,FileNotFoundError,0.4593
+4,14,42,Pandas,523,256,0,0,SyntaxError,0.3963
+4,15,42,Pandas,702,256,0,0,KeyError,0.5429
+4,16,750,Scipy,485,256,0,0,SyntaxError,0.4625
+4,17,750,Scipy,719,256,0,0,ValueError,0.4637
+4,18,750,Scipy,1285,257,0,0,ValueError,0.4622
+4,19,750,Scipy,674,256,0,0,SyntaxError,0.2852
+4,20,936,Pytorch,957,256,0,0,ModuleNotFoundError,1.4879
+4,21,936,Pytorch,1019,255,0,0,ModuleNotFoundError,1.6386
+4,22,936,Pytorch,1081,256,0,0,ModuleNotFoundError,1.5649
+4,23,936,Pytorch,1006,256,0,0,ModuleNotFoundError,1.5219
+4,24,326,Numpy,1100,256,0,0,AssertionError,0.1352
+4,25,326,Numpy,891,256,0,0,AssertionError,0.1471
+4,26,326,Numpy,839,256,1,1,pass,0.1423
+4,27,326,Numpy,876,256,0,0,NameError,0.133
+4,28,873,Sklearn,1282,256,0,0,SyntaxError,0.8133
+4,29,873,Sklearn,1180,256,0,0,NameError,0.9679
+4,30,873,Sklearn,1072,256,0,0,SyntaxError,0.7769
+4,31,873,Sklearn,1097,256,0,0,NameError,0.9612
+5,0,501,Numpy,648,256,0,0,IndexError,0.1427
+5,1,501,Numpy,691,256,0,0,KeyError,0.1666
+5,2,501,Numpy,671,256,0,0,ValueError,0.144
+5,3,501,Numpy,569,255,0,0,"       [13, 15, 16]])",0.1963
+5,4,42,Pandas,594,256,0,0,SyntaxError,0.431
+5,5,42,Pandas,1125,255,0,0,ValueError,0.447
+5,6,42,Pandas,621,256,0,0,SyntaxError,0.4289
+5,7,42,Pandas,677,256,0,0,SyntaxError,0.4328
+5,8,17,Pandas,444,256,0,0,SyntaxError,0.4285
+5,9,17,Pandas,409,255,0,0,AssertionError,0.4265
+5,10,17,Pandas,568,256,0,0,SyntaxError,0.4274
+5,11,17,Pandas,741,256,0,0,SyntaxError,0.4268
+5,12,50,Pandas,598,256,0,0,AssertionError,0.4411
+5,13,50,Pandas,1005,256,0,0,AssertionError,0.4294
+5,14,50,Pandas,745,254,0,0,ValueError,0.441
+5,15,50,Pandas,914,255,0,0,AssertionError,0.4299
+5,16,825,Sklearn,1149,256,0,0,ImportError,0.916
+5,17,825,Sklearn,1082,256,0,0,AssertionError,1.0102
+5,18,825,Sklearn,1165,256,0,0,NameError,0.881
+5,19,825,Sklearn,1095,256,0,0,NameError,0.9249
+5,20,955,Pytorch,1027,254,0,0,NameError,2.14
+5,21,955,Pytorch,893,256,0,0,TypeError,1.9637
+5,22,955,Pytorch,1062,254,0,0,NameError,1.9602
+5,23,955,Pytorch,1196,255,0,0,AssertionError,2.0828
+5,24,225,Pandas,927,254,0,0,AssertionError,0.5333
+5,25,225,Pandas,856,256,0,0,AssertionError,0.5443
+5,26,225,Pandas,755,256,0,0,TypeError,0.4041
+5,27,225,Pandas,738,256,0,0,AssertionError,0.4132
+5,28,873,Sklearn,1045,255,0,0,NameError,0.9726
+5,29,873,Sklearn,1023,254,0,0,ImportError,0.9496
+5,30,873,Sklearn,1176,256,0,0,SyntaxError,0.7251
+5,31,873,Sklearn,995,255,0,0,IndentationError,0.7261
+6,0,59,Pandas,859,256,0,0,SyntaxError,0.4556
+6,1,59,Pandas,707,254,0,0,KeyError,0.4678
+6,2,59,Pandas,955,256,0,0,SyntaxError,0.4571
+6,3,59,Pandas,713,254,0,0,AssertionError,0.4627
+6,4,3,Pandas,778,256,0,0,SyntaxError,0.4366
+6,5,3,Pandas,858,254,0,0,ValueError,0.45
+6,6,3,Pandas,972,256,0,0,AttributeError,0.4508
+6,7,3,Pandas,957,256,0,0,KeyError,0.4499
+6,8,786,Scipy,729,254,0,0,SyntaxError,0.1425
+6,9,786,Scipy,931,254,0,0,TypeError,0.3698
+6,10,786,Scipy,1021,254,0,0,NameError,0.4016
+6,11,786,Scipy,739,256,0,0,SyntaxError,0.1386
+6,12,392,Numpy,637,250,0,0,"       [4, 5, 6, 7, 5, 3, 2, 5]])",0.5016
+6,13,392,Numpy,668,256,0,0,"       [0.969585, 0.775133, 0.939499, 0.894827, 0.5979  , 0.",0.5037
+6,14,392,Numpy,716,247,0,0,"       [0.969585, 0.775133, 0.939499, 0.894827, 0.5979  , 0.",0.5467
+6,15,392,Numpy,483,256,0,0,"       [0.969585, 0.775133, 0.939499, 0.894827, 0.5979  , 0.",0.446
+6,16,750,Scipy,506,256,0,0,SyntaxError,0.2458
+6,17,750,Scipy,1259,256,0,0,SyntaxError,0.3334
+6,18,750,Scipy,486,256,0,0,SyntaxError,0.4155
+6,19,750,Scipy,1235,254,0,0,ValueError,0.4568
+6,20,784,Scipy,959,256,0,0,IndentationError,0.2691
+6,21,784,Scipy,907,256,0,0,IndentationError,0.2572
+6,22,784,Scipy,936,252,0,0,IndentationError,0.2523
+6,23,784,Scipy,1101,256,0,0,IndentationError,0.2523
+6,24,936,Pytorch,1053,256,0,0,ModuleNotFoundError,1.6151
+6,25,936,Pytorch,953,255,0,0,ModuleNotFoundError,1.6621
+6,26,936,Pytorch,1023,256,0,0,ModuleNotFoundError,1.5783
+6,27,936,Pytorch,1104,256,0,0,ModuleNotFoundError,1.6509
+6,28,848,Sklearn,1198,256,0,0,NameError,1.2189
+6,29,848,Sklearn,1152,256,0,0,NameError,1.1982
+6,30,848,Sklearn,1187,256,0,0,NameError,1.1565
+6,31,848,Sklearn,1131,255,0,0,NameError,1.2372
+7,0,918,Sklearn,1036,256,0,0,ValueError,1.0664
+7,1,918,Sklearn,1070,256,0,0,NameError,1.1265
+7,2,918,Sklearn,1104,255,0,0,SyntaxError,0.019
+7,3,918,Sklearn,999,256,0,0,NameError,1.1127
+7,4,326,Numpy,1072,253,0,0,SyntaxError,0.1441
+7,5,326,Numpy,973,256,0,0,KeyError,0.1372
+7,6,326,Numpy,1036,254,0,0,SyntaxError,0.136
+7,7,326,Numpy,851,256,0,0,KeyError,0.1574
+7,8,766,Scipy,747,254,0,0,SyntaxError,0.2655
+7,9,766,Scipy,661,256,0,0,SyntaxError,0.2761
+7,10,766,Scipy,906,256,0,0,TypeError,0.281
+7,11,766,Scipy,915,256,0,0,SyntaxError,0.3264
+7,12,802,Scipy,712,256,0,0,TypeError,0.2368
+7,13,802,Scipy,891,254,0,0,ValueError,0.1537
+7,14,802,Scipy,1037,255,0,0,"       [1, 0, 0]])",0.1701
+7,15,802,Scipy,725,247,0,0,"       [1, 0, 0]])",0.1873
+7,16,386,Numpy,836,254,0,0,...,0.2712
+7,17,386,Numpy,588,256,0,0,NameError,0.1433
+7,18,386,Numpy,769,255,0,0,...,0.2017
+7,19,386,Numpy,853,256,0,0,...,0.1843
+7,20,971,Pytorch,1034,255,0,0,NameError,1.7773
+7,21,971,Pytorch,1006,256,0,0,NameError,1.8019
+7,22,971,Pytorch,1031,254,0,0,NameError,1.7473
+7,23,971,Pytorch,1011,256,0,0,NameError,1.5702
+7,24,353,Numpy,607,256,0,0,NameError,0.1346
+7,25,353,Numpy,916,255,0,0,IndexError,0.1411
+7,26,353,Numpy,1037,254,0,0,NameError,0.1428
+7,27,353,Numpy,811,254,0,0,NameError,0.1377
+7,28,46,Pandas,1068,256,0,0,AssertionError,0.5357
+7,29,46,Pandas,911,256,0,0,AssertionError,0.4153
+7,30,46,Pandas,1188,256,0,0,AssertionError,0.4447
+7,31,46,Pandas,1091,256,0,0,AssertionError,0.4047
+8,0,990,Pytorch,948,256,0,0,NameError,2.2558
+8,1,990,Pytorch,1109,255,0,0,NameError,1.9905
+8,2,990,Pytorch,1041,256,0,0,SyntaxError,1.7091
+8,3,990,Pytorch,1106,254,0,0,NameError,1.9718
+8,4,995,Pytorch,858,256,0,0,IndentationError,1.6774
+8,5,995,Pytorch,1013,256,0,0,IndentationError,1.7181
+8,6,995,Pytorch,971,256,0,0,IndentationError,1.7678
+8,7,995,Pytorch,1111,256,0,0,IndentationError,1.736
+8,8,798,Scipy,663,254,0,0,NotImplementedError,0.241
+8,9,798,Scipy,946,256,0,0,AttributeError,0.2596
+8,10,798,Scipy,711,251,0,0,Timeout,30.1303
+8,11,798,Scipy,863,256,0,0,TypeError,0.5023
+8,12,846,Sklearn,1213,254,0,0,NameError,1.2145
+8,13,846,Sklearn,1124,256,0,0,NameError,1.1757
+8,14,846,Sklearn,1143,256,0,0,NameError,1.3893
+8,15,846,Sklearn,1054,255,0,0,NameError,1.1308
+8,16,356,Numpy,714,255,0,0,"        [ 6, 16, 26]],...",0.2454
+8,17,356,Numpy,577,256,0,0,"        [ 6, 16, 26]],...",0.1971
+8,18,356,Numpy,858,254,0,0,"        [ 6, 16, 26]],...",0.1956
+8,19,356,Numpy,856,256,0,0,SyntaxError,0.1584
+8,20,298,Numpy,707,254,0,0,"       [0., 1., 0.]])",0.3353
+8,21,298,Numpy,1027,255,0,0,"       [0., 1., 0.]])",0.3399
+8,22,298,Numpy,977,254,0,0,"       [0., 1., 0.]])",0.1713
+8,23,298,Numpy,967,256,0,0,"       [0., 1., 0.]])",0.192
+8,24,929,Sklearn,1106,256,0,0,ImportError,1.2325
+8,25,929,Sklearn,1229,255,0,0,NameError,1.2417
+8,26,929,Sklearn,1215,256,0,0,ImportError,1.3904
+8,27,929,Sklearn,1088,256,0,0,AttributeError,1.1524
+8,28,958,Pytorch,941,256,0,0,NameError,2.0795
+8,29,958,Pytorch,741,256,0,0,NameError,1.9817
+8,30,958,Pytorch,743,256,0,0,NameError,2.081
+8,31,958,Pytorch,952,255,0,0,NameError,1.7973
+9,0,326,Numpy,1062,255,0,0,AssertionError,0.1391
+9,1,326,Numpy,1031,256,1,1,pass,0.1394
+9,2,326,Numpy,978,256,0,0,KeyError,0.1423
+9,3,326,Numpy,864,248,0,0,AssertionError,0.1292
+9,4,995,Pytorch,957,256,0,0,IndentationError,1.7949
+9,5,995,Pytorch,919,256,0,0,IndentationError,1.6959
+9,6,995,Pytorch,998,256,0,0,IndentationError,1.9014
+9,7,995,Pytorch,990,256,0,0,IndentationError,1.6774
+9,8,958,Pytorch,1000,257,0,0,AssertionError,2.0692
+9,9,958,Pytorch,1150,252,0,0,NameError,1.9772
+9,10,958,Pytorch,1212,256,0,0,NameError,2.0781
+9,11,958,Pytorch,928,256,0,0,NameError,1.9875
+9,12,353,Numpy,695,248,0,0,NameError,0.1469
+9,13,353,Numpy,759,252,0,0,NameError,0.1448
+9,14,353,Numpy,449,256,0,0,ValueError,0.1339
+9,15,353,Numpy,482,256,0,0,ValueError,0.1346
+9,16,386,Numpy,637,256,0,0,KeyError,0.1324
+9,17,386,Numpy,661,256,0,0,...,0.1878
+9,18,386,Numpy,747,256,0,0,...,0.1906
+9,19,386,Numpy,814,256,0,0,...,0.1607
+9,20,825,Sklearn,1074,256,0,0,ValueError,0.8667
+9,21,825,Sklearn,820,256,0,0,TypeError,0.9037
+9,22,825,Sklearn,1143,256,0,0,NameError,0.9203
+9,23,825,Sklearn,961,256,0,0,NameError,0.8354
+9,24,784,Scipy,1124,254,0,0,IndentationError,0.2715
+9,25,784,Scipy,995,252,0,0,IndentationError,0.3998
+9,26,784,Scipy,1032,256,0,0,IndentationError,0.2658
+9,27,784,Scipy,767,256,0,0,IndentationError,0.2638
+9,28,802,Scipy,1038,252,0,0,"       [1, 0, 0]])",0.2504
+9,29,802,Scipy,1038,254,0,0,"       [1, 0, 0]])",0.2001
+9,30,802,Scipy,949,254,0,0,ValueError,0.2966
+9,31,802,Scipy,952,255,0,0,"       [1, 0, 0]])",0.2081
+10,0,298,Numpy,1081,255,0,0,"       [0., 1., 0.]])",0.1798
+10,1,298,Numpy,979,256,0,0,"       [0., 1., 0.]])",0.1668
+10,2,298,Numpy,906,256,0,0,"       [0., 1., 0.]])",0.1634
+10,3,298,Numpy,651,254,0,0,TypeError,0.1399
+10,4,766,Scipy,801,256,0,0,SyntaxError,0.263
+10,5,766,Scipy,979,256,0,0,KeyError,0.2631
+10,6,766,Scipy,905,256,0,0,AttributeError,0.3207
+10,7,766,Scipy,946,256,0,0,NameError,0.3221
+10,8,392,Numpy,749,255,0,0,"       [0.969585, 0.775133, 0.939499, 0.894827, 0.5979  , 0.",0.4437
+10,9,392,Numpy,490,255,0,0,"       [4, 5, 6, 7, 5, 3, 2, 5]])",0.4478
+10,10,392,Numpy,792,256,0,0,"       [0.969585, 0.775133, 0.939499, 0.894827, 0.5979  , 0.",0.5994
+10,11,392,Numpy,629,256,0,0,"       [0.969585, 0.775133, 0.939499, 0.894827, 0.5979  , 0.",0.4749
+10,12,356,Numpy,903,254,0,0,IndexError,0.3123
+10,13,356,Numpy,940,246,0,0,SyntaxError,0.1483
+10,14,356,Numpy,952,254,0,0,"        [ 6, 16, 26]],...",0.1695
+10,15,356,Numpy,694,256,0,0,SyntaxError,0.1431
+10,16,501,Numpy,781,254,0,0,"       [13, 15, 16]])",0.1768
+10,17,501,Numpy,739,256,0,0,"       [13, 15, 16]])",0.2318
+10,18,501,Numpy,669,254,0,0,IndexError,0.1366
+10,19,501,Numpy,640,255,0,0,ValueError,0.2244
+10,20,936,Pytorch,977,257,0,0,ModuleNotFoundError,1.711
+10,21,936,Pytorch,1083,256,0,0,ModuleNotFoundError,1.8736
+10,22,936,Pytorch,954,256,0,0,ModuleNotFoundError,1.6837
+10,23,936,Pytorch,706,255,0,0,ModuleNotFoundError,1.6656
+10,24,971,Pytorch,1017,256,0,0,NameError,1.9501
+10,25,971,Pytorch,1169,254,0,0,ValueError,2.0237
+10,26,971,Pytorch,834,256,0,0,SyntaxError,1.716
+10,27,971,Pytorch,968,255,0,0,NameError,1.9624
+10,28,955,Pytorch,780,256,0,0,TypeError,1.5681
+10,29,955,Pytorch,1032,254,0,0,NameError,1.447
+10,30,955,Pytorch,1048,256,0,0,NameError,1.5645
+10,31,955,Pytorch,866,256,0,0,NameError,1.471

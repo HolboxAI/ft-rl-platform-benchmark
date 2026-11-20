@@ -33,20 +33,25 @@ T = TRAIN_B * TRAIN_S
 
 
 def timed(fn, backend, warmup, iters):
+    # Keep each result referenced until after the sync: on XLA, a lazy tensor that is dropped
+    # before mark_step is never computed, which would time an empty graph.
     pu.synchronize(backend)
     t0 = time.perf_counter()
-    fn()
+    out = fn()
     pu.synchronize(backend)
     first = (time.perf_counter() - t0) * 1e3          # includes compile on Neuron
+    del out
     for _ in range(warmup):
-        fn()
+        out = fn()
         pu.synchronize(backend)
+        del out
     times = []
     for _ in range(iters):
         t0 = time.perf_counter()
-        fn()
+        out = fn()
         pu.synchronize(backend)
         times.append((time.perf_counter() - t0) * 1e3)
+        del out
     times.sort()
     return {"first_call_ms": first, "median_ms": statistics.median(times),
             "p10_ms": times[int(0.1 * (len(times) - 1))], "p90_ms": times[int(0.9 * (len(times) - 1))],
@@ -75,8 +80,10 @@ def build_ops(torch, dev, dtype, nki_ok, flash_fwd):
     def lin_fb():
         y = F.linear(x_g, w_g)
         y.float().sum().backward()
+        g = (x_g.grad, w_g.grad)      # returned so the backward graph is actually executed
         x_g.grad = None
         w_g.grad = None
+        return g
     ops.append(("linear_fwd_bwd_train", "torch", f"{T}x{H}x{I}", lin_fb, 6 * T * H * I, None))
 
     # GRPO's signature op: logits -> log_softmax -> gather selected-token log-probs
@@ -90,19 +97,22 @@ def build_ops(torch, dev, dtype, nki_ok, flash_fwd):
     ops.append(("lm_head_logprob_gather", "torch", f"{M}x{H}x{V}", logprob,
                 2 * M * H * V, 2 * V * H + 4 * M * V * 2))
 
-    # attention (GQA heads expanded to 14), prefill (causal) and single-token decode
-    for S in (TRAIN_S, 1024):
+    # attention (GQA heads expanded to 14), prefill (causal) and single-token decode.
+    # Causal FLOPs = half of the full S x S score/value matmuls. s2048 exists because the NKI
+    # flash-attention kernel needs seqlen divisible by 2048.
+    for S in (TRAIN_S, 1024, 2048):
         q, k, v = rnd(TRAIN_B, NH, S, HD), rnd(TRAIN_B, NH, S, HD), rnd(TRAIN_B, NH, S, HD)
         ops.append((f"attention_prefill_s{S}", "torch", f"{TRAIN_B}x{NH}x{S}x{HD}",
                     lambda q=q, k=k, v=v: F.scaled_dot_product_attention(q, k, v, is_causal=True),
                     2 * TRAIN_B * NH * S * S * HD, 2 * 4 * TRAIN_B * NH * S * HD))
-        if flash_fwd is not None and S == 1024:
+        if flash_fwd is not None and S % 2048 == 0:
             # NKI flash attention layout: q,k [b, h, d, s]; v [b, h, s, d]
             qn, kn = q.transpose(2, 3).contiguous(), k.transpose(2, 3).contiguous()
             ops.append((f"attention_prefill_s{S}", "nki", f"{TRAIN_B}x{NH}x{S}x{HD}",
                         lambda qn=qn, kn=kn, v=v: flash_fwd[TRAIN_B, NH](qn, kn, v, None, use_causal_mask=True,
                                                                         mixed_precision=True),
                         2 * TRAIN_B * NH * S * S * HD, 2 * 4 * TRAIN_B * NH * S * HD))
+        # (2*B*H*S*S*D = causal half of QK^T + PV, i.e. 4*B*H*S*S*D / 2)
     qd, kd, vd = rnd(GEN_B, NH, 1, HD), rnd(GEN_B, NH, KV_LEN, HD), rnd(GEN_B, NH, KV_LEN, HD)
     ops.append(("attention_decode", "torch", f"{GEN_B}x{NH}x1x{KV_LEN}x{HD}",
                 lambda: F.scaled_dot_product_attention(qd, kd, vd),

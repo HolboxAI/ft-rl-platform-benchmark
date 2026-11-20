@@ -1,0 +1,11 @@
+platform,backend,nki_ops,sync_mode,run_name,phase,parent,calls_total,mean_s_per_step,median_s_per_step,p90_s_per_step,min_s_per_step,max_s_per_step,std_s_per_step,first_call_s,warmup_mean_s_per_step,share_of_step_pct
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,step_total,,10,14.8275,11.5971,20.2849,9.72356,39.6277,9.39736,25.7365,18.3893,100
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,rollout_total,step_total,40,13.7181,10.2818,19.2997,8.9546,38.67,9.44923,19.8038,14.8526,92.5184
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,generation,rollout_total,10,5.8005,5.80454,5.87291,5.6938,5.95353,0.0727797,14.2806,9.99418,39.12
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,reward,rollout_total,10,6.72372,3.03737,12.4971,2.4145,31.8727,9.52446,3.54582,3.24963,45.3464
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,logprob_nograd,rollout_total,10,1.16424,1.05516,1.54644,0.794741,1.54876,0.254886,1.60593,1.40732,7.85189
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,loss_compute,step_total,40,0.325762,0.29733,0.42372,0.229408,0.424211,0.0665858,0.666393,0.585485,2.19702
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,policy_forward,loss_compute,40,0.320394,0.292003,0.418406,0.224056,0.418764,0.0665839,0.068007,0.281502,2.16082
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,backward,step_total,40,0.742899,0.674256,0.988767,0.498943,0.990919,0.167569,1.1448,1.16269,5.01029
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,optimizer_step,step_total,10,0.0281126,0.0281005,0.0282582,0.027972,0.02838,0.000124847,1.66629,0.847133,0.189598
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,other,step_total,,0.0125419,0.0125145,0.0126373,0.012473,0.012652,6.69448e-05,,0.941379,0.0845855
