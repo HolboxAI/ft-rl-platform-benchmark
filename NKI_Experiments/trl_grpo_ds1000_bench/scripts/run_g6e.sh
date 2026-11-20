@@ -8,6 +8,12 @@
 #   REPEATS                runs per variant (default 1; use 3 and report medians)
 #   INSTANCE_PRICE_USD_HR  on-demand $/hr on the day of the test (for cost columns)
 #   S3_RESULTS             optional s3://... prefix to sync results to
+# GPU Deep Learning AMIs keep PyTorch in a venv (/opt/pytorch); activate it if present.
+TORCH_VENV="${TORCH_VENV:-/opt/pytorch}"
+if [ -f "$TORCH_VENV/bin/activate" ]; then
+  # shellcheck disable=SC1091
+  source "$TORCH_VENV/bin/activate"
+fi
 source "$(dirname "$0")/_common.sh"
 
 PLATFORM="${PLATFORM:-g6e.xlarge}"

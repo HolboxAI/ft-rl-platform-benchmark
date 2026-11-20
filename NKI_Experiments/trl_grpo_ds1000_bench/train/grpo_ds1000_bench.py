@@ -105,6 +105,11 @@ def main():
     print(f"[bench] backend={backend} run_dir={run_dir}", flush=True)
 
     import torch
+    if backend == "neuron":
+        pu.install_xla_workarounds()
+        if cfg["static_shapes"]:
+            from bench.static_shapes import install_trl_static_padding
+            install_trl_static_padding(cfg["max_prompt_length"], cfg["max_completion_length"])
     from datasets import load_dataset
     from transformers import AutoModelForCausalLM, AutoTokenizer
     from train.instrumented_trainer import BenchState, InstrumentedGRPOTrainer
@@ -160,6 +165,7 @@ def main():
         "run_name": run_name, "platform_label": args.platform, "sync_mode": args.sync_mode,
         "nki_ops": args.nki_ops, "nki_modules_patched": nki_patched,
         "model_load_s": round(load_s, 3), "trainer_init_s": round(init_s, 3),
+        "generation_impl": bench.generation_impl,
         "hooks_installed": ";".join(bench.hooks_installed),
         "hooks_missing": ";".join(bench.hooks_missing),
         "grpo_config_dropped_keys": ";".join(dropped),

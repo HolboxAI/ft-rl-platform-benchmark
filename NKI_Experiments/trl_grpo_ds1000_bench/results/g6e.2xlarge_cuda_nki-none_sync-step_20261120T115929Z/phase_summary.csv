@@ -1,0 +1,11 @@
+platform,backend,nki_ops,sync_mode,run_name,phase,parent,calls_total,mean_s_per_step,median_s_per_step,p90_s_per_step,min_s_per_step,max_s_per_step,std_s_per_step,first_call_s,warmup_mean_s_per_step,share_of_step_pct
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,step_total,,10,14.8952,11.5635,20.4776,9.61612,39.7606,9.42529,11.492,11.2946,100
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,rollout_total,step_total,40,13.7888,10.2765,19.4962,8.84942,38.8028,9.47546,10.5687,10.265,92.5718
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,generation,rollout_total,10,5.83114,5.83006,5.94326,5.68236,5.94729,0.0853911,6.12744,5.97217,39.1477
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,reward,rollout_total,10,6.7572,3.11442,12.6222,2.28179,31.9381,9.54016,3.48886,3.2028,45.3649
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,logprob_nograd,rollout_total,10,0.912177,0.823129,1.21192,0.627074,1.2211,0.197899,0.718375,0.824336,6.12395
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,loss_compute,step_total,40,0.325662,0.29727,0.422594,0.229469,0.424243,0.0660383,0.077957,0.290937,2.18635
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,policy_forward,loss_compute,40,0.104585,0.105268,0.106299,0.102159,0.106415,0.00174081,0.057954,0.125873,0.702139
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,backward,step_total,40,0.540761,0.494289,0.707383,0.376284,0.707915,0.113237,0.158382,0.512892,3.63043
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,optimizer_step,step_total,10,0.00333613,0.0033395,0.003359,0.003298,0.00338,2.31432e-05,0.047791,0.0255875,0.0223973
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,other,step_total,,0.236676,0.214737,0.314655,0.157605,0.314911,0.0532739,,0.200065,1.58894

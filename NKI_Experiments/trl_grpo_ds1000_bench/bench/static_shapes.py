@@ -37,3 +37,30 @@ def generation_kwargs(cfg, tokenizer):
     if tokenizer.pad_token_id is not None:
         kw["pad_token_id"] = tokenizer.pad_token_id
     return kw
+
+
+def install_trl_static_padding(prompt_len, completion_len):
+    """Trainium only: make TRL's own padding produce fixed shapes.
+
+    TRL 0.29 tokenizes prompts without padding and then pads every batch itself with
+    `trl.trainer.utils.pad` to the longest sequence in that batch, so the tokenizer patch above
+    never applies and prompt length changes every step (= new graphs for generation, log-prob
+    forward and backward). Here every left-padded tensor (prompts) is padded to `prompt_len` and
+    every right-padded tensor (completions) to `completion_len`, via pad_to_multiple_of.
+    """
+    from trl.trainer import grpo_trainer as gt
+    if getattr(gt.pad, "_bench_patched", False):
+        return
+    orig = gt.pad
+
+    def pad(tensors, padding_value=0, padding_side="right", pad_to_multiple_of=None):
+        if pad_to_multiple_of is None:
+            longest = max((t.shape[0] for t in tensors), default=0)
+            target = prompt_len if padding_side == "left" else completion_len
+            if longest <= target:
+                pad_to_multiple_of = target
+        return orig(tensors, padding_value=padding_value, padding_side=padding_side,
+                    pad_to_multiple_of=pad_to_multiple_of)
+
+    pad._bench_patched = True
+    gt.pad = pad

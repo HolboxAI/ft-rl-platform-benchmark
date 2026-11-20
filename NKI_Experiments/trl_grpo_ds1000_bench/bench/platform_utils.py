@@ -42,6 +42,52 @@ def get_device(backend):
     return torch.device("cpu")
 
 
+def install_xla_workarounds():
+    """Patch ops that the Neuron compiler rejects in stock HF/TRL code paths.
+
+    torch.isin (used by transformers' EOS stopping criteria) lowers to an int64 `dot`, which
+    neuronx-cc refuses (NCC_EVRF035). On XLA tensors we use an equivalent broadcast
+    comparison instead; other devices keep the original op.
+    """
+    import torch
+    if getattr(torch.isin, "_bench_patched", False):
+        return
+    orig = torch.isin
+
+    def isin(elements, test_elements, *, assume_unique=False, invert=False):
+        if isinstance(elements, torch.Tensor) and elements.device.type == "xla":
+            t = test_elements if isinstance(test_elements, torch.Tensor) else torch.tensor(test_elements)
+            t = t.to(device=elements.device, dtype=elements.dtype).reshape(-1)
+            out = (elements.unsqueeze(-1) == t).any(-1)
+            return ~out if invert else out
+        return orig(elements, test_elements, assume_unique=assume_unique, invert=invert)
+
+    isin._bench_patched = True
+    torch.isin = isin
+
+    # Integer cumsum (position ids from attention_mask.long().cumsum(-1)) lowers to an int64
+    # triangular `dot` -> same NCC_EVRF035. Run it in fp32 (exact below 2**24) and cast back.
+    _int_types = (torch.int64, torch.int32, torch.int16, torch.int8, torch.uint8, torch.bool)
+    orig_cumsum, orig_tcumsum = torch.cumsum, torch.Tensor.cumsum
+
+    def _xla_int(x):
+        return isinstance(x, torch.Tensor) and x.device.type == "xla" and x.dtype in _int_types
+
+    def cumsum(input, dim, *, dtype=None, out=None):
+        if out is None and _xla_int(input):
+            res_dtype = dtype or (torch.int64 if input.dtype in (torch.bool, torch.uint8, torch.int8,
+                                                                 torch.int16, torch.int32) else input.dtype)
+            if res_dtype in _int_types:
+                return orig_cumsum(input.float(), dim).round().to(res_dtype)
+        return orig_cumsum(input, dim, dtype=dtype, out=out)
+
+    def tcumsum(self, dim, *, dtype=None):
+        return cumsum(self, dim, dtype=dtype) if _xla_int(self) else orig_tcumsum(self, dim, dtype=dtype)
+
+    torch.cumsum = cumsum
+    torch.Tensor.cumsum = tcumsum
+
+
 def synchronize(backend):
     """Block until all queued device work has finished.
 

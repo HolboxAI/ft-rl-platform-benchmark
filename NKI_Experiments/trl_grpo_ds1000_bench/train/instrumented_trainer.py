@@ -14,6 +14,8 @@ TRL versions as long as the method names below exist (missing ones are skipped a
   optimizer_step  callback on_pre_optimizer_step -> on_optimizer_step
 """
 
+import functools
+import os
 import statistics
 import time
 
@@ -38,6 +40,7 @@ class BenchState:
         self.reward_fn = reward_fn
         self.hooks_installed = []
         self.hooks_missing = []
+        self.generation_impl = "hf_generate"
         self._reset_step()
         self.pending_rows = {}
 
@@ -59,7 +62,13 @@ class InstrumentedGRPOTrainer(GRPOTrainer):
 
         # generation
         gen_model = self.accelerator.unwrap_model(self.model)
-        gen_model.generate = self._timed_generate(gen_model.generate)
+        gen_fn = gen_model.generate
+        if bench.backend == "neuron" and os.environ.get("BENCH_XLA_GENERATE", "1") != "0":
+            # HF generate grows tensors every token -> one neuronx-cc compile per token on XLA.
+            from bench.xla_generate import static_generate
+            gen_fn = functools.partial(static_generate, gen_model)
+            bench.generation_impl = "xla_static_loop"
+        gen_model.generate = self._timed_generate(gen_fn)
         bench.hooks_installed.append("generation")
 
         # log-prob forward passes (name depends on TRL version; wrap only one so nothing double-counts)
@@ -72,6 +81,13 @@ class InstrumentedGRPOTrainer(GRPOTrainer):
         else:
             bench.hooks_missing.append("logprobs")
 
+        # Neuron, single process: accelerate's gather issues an XLA all-gather across every visible
+        # NeuronCore and blocks forever waiting for peers that were never launched. With one
+        # process gather is the identity, so skip the collective.
+        if bench.backend == "neuron" and self.accelerator.num_processes == 1:
+            self.accelerator.gather = lambda tensor: tensor
+            bench.hooks_installed.append("gather:identity")
+
         # backward
         self.accelerator.backward = t.wrap(self.accelerator.backward, "backward")
         bench.hooks_installed.append("backward")
@@ -81,6 +97,30 @@ class InstrumentedGRPOTrainer(GRPOTrainer):
     def _prepare_inputs(self, *args, **kwargs):
         with self.bench.timer.phase("rollout_total"):
             return super()._prepare_inputs(*args, **kwargs)
+
+    def _generate_single_turn(self, prompt_ids, images, multimodal_fields, *rest, **kw):
+        """Neuron: same as TRL's regular (non-vLLM, text-only) path, but generation runs the
+        fixed-shape XLA loop and EOS truncation happens on CPU. TRL does it with per-row boolean
+        indexing on the device, which is a dynamic shape the Neuron compiler cannot build."""
+        has_images = images is not None and any(i is not None for i in images)
+        if (self.bench.generation_impl != "xla_static_loop" or getattr(self, "use_vllm", False)
+                or has_images or multimodal_fields or rest or kw):
+            return super()._generate_single_turn(prompt_ids, images, multimodal_fields, *rest, **kw)
+        from trl.trainer import grpo_trainer as gt
+        tensors = [torch.tensor(ids) for ids in prompt_ids]
+        input_ids = gt.pad(tensors, padding_value=self.pad_token_id, padding_side="left")
+        attn = gt.pad([torch.ones_like(t) for t in tensors], padding_value=0, padding_side="left")
+        dev = self.accelerator.device
+        gen_model = self.accelerator.unwrap_model(self.model)
+        with torch.no_grad():
+            seqs = gen_model.generate(input_ids=input_ids.to(dev), attention_mask=attn.to(dev),
+                                      generation_config=self.generation_config)
+        completions = []
+        for row in seqs[:, input_ids.shape[1]:].cpu().tolist():
+            if self.eos_token_id in row:
+                row = row[:row.index(self.eos_token_id) + 1]
+            completions.append(row)
+        return completions, None, {}
 
     def compute_loss(self, *args, **kwargs):
         with self.bench.timer.phase("loss_compute"):

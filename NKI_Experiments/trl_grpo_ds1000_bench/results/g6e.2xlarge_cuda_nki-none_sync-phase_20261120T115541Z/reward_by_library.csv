@@ -1,0 +1,6 @@
+platform,backend,nki_ops,sync_mode,run_name,library,completions,pass_rate,exec_time_mean_s,timeouts
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,Numpy,84,0.0238095,0.216685,0
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,Pandas,56,0,0.462393,0
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,Pytorch,68,0.0147059,1.80504,0
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,Scipy,60,0,0.77388,1
+g6e.2xlarge,cuda,none,phase,g6e.2xlarge_cuda_nki-none_sync-phase_20261120T115541Z,Sklearn,52,0.0192308,1.02652,0

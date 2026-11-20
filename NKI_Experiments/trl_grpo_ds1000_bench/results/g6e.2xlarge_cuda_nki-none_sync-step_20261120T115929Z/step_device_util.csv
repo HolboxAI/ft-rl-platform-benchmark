@@ -1,0 +1,11 @@
+platform,backend,nki_ops,sync_mode,run_name,step,is_warmup,samples,util_mean_pct,util_max_pct,mem_max_mb,power_mean_w
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,1,1,305,27.6852,100,26575,136.877
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,2,1,305,27.6852,100,26575,136.877
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,3,0,305,27.6852,100,26575,136.877
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,4,0,305,27.6852,100,26575,136.877
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,5,0,305,27.6852,100,26575,136.877
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,6,0,305,27.6852,100,26575,136.877
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,7,0,305,27.6852,100,26575,136.877
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,8,0,305,27.6852,100,26575,136.877
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,9,0,305,27.6852,100,26575,136.877
+g6e.2xlarge,cuda,none,step,g6e.2xlarge_cuda_nki-none_sync-step_20261120T115929Z,10,0,305,27.6852,100,26575,136.877
