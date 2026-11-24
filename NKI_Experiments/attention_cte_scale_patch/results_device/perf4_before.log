@@ -1,0 +1,11 @@
+....                                                                     [100%]
+QoR data collected to /home/ubuntu/results/perf4_before/qor_data_20261124_173514.csv
+
+=============================== warnings summary ===============================
+../../../../source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/python_ops/nki_kernels/_grouped_mm_2d_2d.py:29
+  /source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/python_ops/nki_kernels/_grouped_mm_2d_2d.py:29: DeprecationWarning: nki.jit 'mode' parameter is deprecated, and its value is ignored.
+    @nki.jit(mode="trace")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4 passed, 646 deselected, 1 warning in 105.45s (0:01:45)
+EXIT 0

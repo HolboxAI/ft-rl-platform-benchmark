@@ -1,0 +1,271 @@
+diff --git a/src/nkilib_src/nkilib/core/attention/attention_cte.py b/src/nkilib_src/nkilib/core/attention/attention_cte.py
+index 899396b..cda987b 100644
+--- a/src/nkilib_src/nkilib/core/attention/attention_cte.py
++++ b/src/nkilib_src/nkilib/core/attention/attention_cte.py
+@@ -253,9 +253,11 @@ def attention_cte(
+       q (nt.tensor): Query tensor with layout dependent on tp_q parameter
+       k (nt.tensor): Key tensor with layout dependent on tp_k parameter
+       v (nt.tensor): Value tensor with shape (batch_size_kv, seqlen, d)
+-      scale (float, optional): Scaling factor for attention scores. It must be set to 1.0 (default value) when
+-                     using sliding window, context parallel, or prefix caching. In these cases, q
+-                     can be scaled before calling the kernel.
++      scale (float, optional): Scaling factor for attention scores (default 1.0). Any positive scale is
++                     supported with sliding window, context parallel, prefix caching, kv_used_len and
++                     sequence packing. A power-of-two scale is folded into Q (exact in bf16); any
++                     other positive scale, or any positive scale combined with position_bias, is
++                     applied in fp32 inside the softmax exp.
+       causal_mask (bool, optional): whether to use causal mask (default True)
+       k_prior (nt.tensor, optional): (Prefix caching) Prior key tensor with layout dependent on tp_k parameter
+       v_prior (nt.tensor, optional): (Prefix caching) Prior value tensor with shape (batch_size_kv, seqlen_prior, d)
+@@ -849,7 +851,9 @@ def _attention_cte(
+     #
+     # Decided here rather than in _compute_tile_parameters because a single ac is shared by every
+     # _attention_cte_impl call below; mutating it per call would zero the scale on the second.
+-    _uses_range_select = is_prefix_caching or sliding_window > 0 or global_cp_deg is not None or has_kv_used_len
++    _uses_range_select = (
++        is_prefix_caching or sliding_window > 0 or global_cp_deg is not None or has_kv_used_len or is_sequence_packed
++    )
+ 
+     # The static causal diagonal has a range_select form too (``atp.static_causal_range_sel``),
+     # gated on scale == 1.0 for the same reason. Folded only for power-of-two scales so
+@@ -868,18 +872,31 @@ def _attention_cte(
+     # of two.
+     _scale_is_pow2 = scale > 0.0 and math.frexp(scale)[0] == 0.5
+     q_prescale = 1.0
+-    if scale != 1.0 and (_uses_range_select or (_plain_causal and _scale_is_pow2 and position_bias is None)):
++    # A non-power-of-two scale (e.g. 1/sqrt(128) = 0.0884) is not exact in bf16, and folding it into
++    # the bf16 Q tile adds a rounding error of up to 2^-9 per Q element that grows with |QK|. Instead,
++    # keep MM1 scores unscaled in fp32 and apply the scale inside the exp activation:
++    #   softmax(scale * S) == exp(scale * S - scale * max(S)) / sum   (scale > 0)
++    # which is the same fp32 arithmetic as scaling on the evict. This lets the range_select paths and
++    # the static causal range_select diagonal use any positive scale without the bf16 fold.
++    exp_scale = 1.0
++    if scale != 1.0 and (_uses_range_select or (_plain_causal and scale > 0.0 and position_bias is None)):
+         # position_bias is preloaded into PSUM, so MM1 accumulates QK + bias and the evict scales
+         # the sum: mask(scale * (QK + bias)). Folding into Q gives scale * QK + bias instead, so
+         # the caller must pre-divide the bias -- which the position_bias docstring already
+         # describes for the ALiBi case.
+-        kernel_assert(
+-            position_bias is None,
+-            "SWA/Prefix Caching/CP/kv_used_len with position_bias only support scale=1.0, "
+-            f"because the scale is folded into Q and would not reach the bias, but got {scale=}. "
+-            "Pre-divide position_bias by scale and pass scale=1.0.",
+-        )
+-        q_prescale = scale
++        if scale > 0.0 and (not _scale_is_pow2 or position_bias is not None):
++            # Applied in fp32 by the exp: exp(scale * (QK + bias) - scale * max). Exact for any positive
++            # scale, and a position_bias preloaded into PSUM is scaled with QK exactly as documented.
++            exp_scale = scale
++        else:
++            # Folded into Q: exact in bf16 for powers of two. Negative scales keep the previous behaviour.
++            kernel_assert(
++                position_bias is None,
++                "SWA/Prefix Caching/CP/kv_used_len/sequence packing with position_bias require scale > 0, "
++                f"because a negative scale is folded into Q and would not reach the bias, but got {scale=}. "
++                "Pre-divide position_bias by scale and pass scale=1.0.",
++            )
++            q_prescale = scale
+         scale = 1.0
+ 
+     # Create AttnConfig with high-level configuration
+@@ -902,6 +919,7 @@ def _attention_cte(
+         cp_striped_input=cp_striped_input,
+         scale=scale,
+         q_prescale=q_prescale,
++        exp_scale=exp_scale,
+         cache_softmax=cache_softmax,
+         skip_output_normalization=skip_output_normalization,
+         dtype=q.dtype,
+@@ -1113,6 +1131,11 @@ class AttnConfig(nl.NKIObject):
+     # 1.0, because the evict applies the scale; the range_select masking paths have no
+     # scale operand, so on those paths the scale moves here instead.
+     q_prescale: float = 1.0
++    # Softmax scale applied inside the exp (fp32) instead of on the MM1 evict or on Q. Used for
++    # non-power-of-two scales on the range_select masking paths, which have no scale operand.
++    # mm1_masked and mm1_running_max then hold unscaled scores; every exp uses
++    # exp(exp_scale * s + exp_scale * neg_max).
++    exp_scale: float = 1.0
+     cache_softmax: bool = None
+     skip_output_normalization: bool = None  # Skip 1/S normalization; return unnormalized output + raw sum
+     dtype: Any = None
+@@ -1255,6 +1278,10 @@ def _attention_cte_impl(
+         # Load sink from HBM to SBUF
+         nisa.dma_copy(dst=bufs.sink_sb[0, 0], src=sink[batch_id, 0])
+         stream_shuffle_broadcast(src=bufs.sink_sb, dst=bufs.sink_sb)
++        if ac.exp_scale != 1.0:
++            # The sink competes in the row max with unscaled scores, so store it unscaled too;
++            # its exp applies exp_scale like every score.
++            nisa.tensor_scalar(dst=bufs.sink_sb, data=bufs.sink_sb, op0=nl.multiply, operand0=1.0 / ac.exp_scale)
+ 
+     # Setup range select bounds for dynamic masking (used in CP/SWA/Prefix caching/kv_used_len)
+     _setup_range_select_bounds(
+@@ -1360,9 +1387,13 @@ def _attention_cte_impl(
+     # multi-section prior>0 path. prior=0 has one section and cannot expose it.
+     bufs.mm1_running_max_pos = (
+         allocator.alloc_sbuf_tensor(shape=(atp.sb_p, atp.num_grps), dtype=nl.float32)
+-        if (ac.allow_vector_exp and is_trn3_b1())
++        # nisa.exponential has no scale operand, so exp_scale != 1.0 uses the Scalar-Engine activation.
++        if (ac.allow_vector_exp and is_trn3_b1() and ac.exp_scale == 1.0)
+         else None
+     )
++    bufs.mm1_running_max_scaled = (
++        allocator.alloc_sbuf_tensor(shape=(atp.sb_p, atp.num_grps), dtype=nl.float32) if ac.exp_scale != 1.0 else None
++    )
+     bufs.exp_running_sum = allocator.alloc_sbuf_tensor(shape=(atp.sb_p, atp.num_grps), dtype=nl.float32)
+     bufs.exp_sum_reciprocal = allocator.alloc_sbuf_tensor(shape=(atp.sb_p, atp.num_grps), dtype=nl.float32)
+ 
+@@ -1485,9 +1516,19 @@ def _attention_cte_impl(
+     src_ap = [[atp.num_grps, atp.sb_p], [1, shard_seqlen_q_length]]
+     src_offset = shard_seqlen_q_start
+     if out_neg_max is not None:
++        neg_max_src = bufs.mm1_running_max
++        if ac.exp_scale != 1.0:
++            # Callers expect the negated max of the scaled scores.
++            nisa.tensor_scalar(
++                dst=bufs.mm1_running_max_scaled[...],
++                data=bufs.mm1_running_max[...],
++                op0=nl.multiply,
++                operand0=ac.exp_scale,
++            )
++            neg_max_src = bufs.mm1_running_max_scaled
+         nisa.dma_copy(
+             out_neg_max.ap(pattern=dst_ap, offset=dst_offset),
+-            src=bufs.mm1_running_max.ap(pattern=src_ap, offset=src_offset),
++            src=neg_max_src.ap(pattern=src_ap, offset=src_offset),
+         )
+     if out_sum_recip is not None:
+         if ac.skip_output_normalization:
+@@ -1528,6 +1569,7 @@ class AttnInternalBuffers(nl.NKIObject):
+     mm1_section_max = None  # max for section after MM1
+     mm1_running_max = None  # (persistent across sections) Running max across sections for output after MM1
+     mm1_running_max_pos = None  # (persistent across sections) mm1_running_max un-negated, for the Vector-Engine exp
++    mm1_running_max_scaled = None  # mm1_running_max * exp_scale, the exp bias when exp_scale != 1.0
+     prev_mm1_running_max = None  # Previous running max across sections for output after MM1 (used to hold value temporarily before section update)
+     flash_attn_correction_factor = None  # Correction factor for flash attn (exp(prev_max-curr_max))
+ 
+@@ -3166,8 +3208,8 @@ def _update_max_impl(
+                 bufs.flash_attn_correction_factor[grp_i][:, 0],
+                 nl.exp,
+                 bufs.prev_mm1_running_max[grp_i],
+-                bias=bufs.mm1_running_max[:, grp_i],
+-                scale=1.0,
++                bias=_exp_bias(bufs.mm1_running_max[:, grp_i], bufs.mm1_running_max_scaled, grp_i, ac),
++                scale=ac.exp_scale,
+             )
+ 
+ 
+@@ -3279,6 +3321,21 @@ def _exp_tile_selection(grp_i, large_tile_idx, exp_tile_idx, ac: AttnConfig, atp
+     return in_section and tile_info.unmasked, tile_info.num_valid_k
+ 
+ 
++def _exp_bias(neg_max, scaled_buf, grp_i, ac: AttnConfig, num_p=None):
++    """Bias for exp(exp_scale * s + bias).
++
++    mm1_running_max holds the negated row max of the scores as stored in mm1_masked. When the
++    softmax scale is applied in the exp (ac.exp_scale != 1.0) those scores are unscaled, so the
++    bias must be exp_scale * neg_max; it is written once into scaled_buf. Otherwise neg_max is
++    returned unchanged and the emitted instructions are identical to before.
++    """
++    if ac.exp_scale == 1.0:
++        return neg_max
++    dst = scaled_buf[:num_p, grp_i] if num_p is not None else scaled_buf[:, grp_i]
++    nisa.tensor_scalar(dst=dst, data=neg_max, op0=nl.multiply, operand0=ac.exp_scale)
++    return dst
++
++
+ def _exp_impl(
+     grp_i,
+     ac: AttnConfig,
+@@ -3335,6 +3392,11 @@ def _exp_impl(
+             operand0=-1.0,
+         )
+ 
++    # Scalar-Engine exp bias: the negated running max, scaled once per Q group when exp_scale != 1.0.
++    # Always defined: the Vector exp can still fall back to the Scalar Engine below (odd tile widths).
++    # With exp_scale == 1.0 this is just the running-max slice and emits no instruction.
++    exp_bias = _exp_bias(bufs.mm1_running_max[:num_p, grp_i], bufs.mm1_running_max_scaled, grp_i, ac, num_p)
++
+     # Precompute each exp tile's selection once (shared by the loop below) and chain the fused
+     # sum: reset on the first executed tile, accumulate on the rest, single read-out on the last.
+     exp_selections = []
+@@ -3399,7 +3461,8 @@ def _exp_impl(
+                     reduce_op=nl.add,
+                     reduce_cmd=exp_reduce_cmd,
+                     reduce_res=exp_reduce_res,
+-                    bias=bufs.mm1_running_max[:num_p, grp_i],
++                    bias=exp_bias,
++                    scale=ac.exp_scale,
+                 )
+ 
+             # Step 2: Perform DMA transpose
+@@ -3471,7 +3534,8 @@ def _exp_impl(
+             bufs.exp_partial_sum[grp_i][:, frs_sink_idx],
+             op=nl.exp,
+             data=bufs.sink_sb,
+-            bias=bufs.mm1_running_max[:, grp_i],
++            bias=_exp_bias(bufs.mm1_running_max[:, grp_i], bufs.mm1_running_max_scaled, grp_i, ac),
++            scale=ac.exp_scale,
+         )
+ 
+ 
+diff --git a/test/integration/nkilib/core/attention/test_attention_cte.py b/test/integration/nkilib/core/attention/test_attention_cte.py
+index 2d7677b..064c1f2 100644
+--- a/test/integration/nkilib/core/attention/test_attention_cte.py
++++ b/test/integration/nkilib/core/attention/test_attention_cte.py
+@@ -361,9 +361,8 @@ class TestRangedAttentionCTEKernels:
+         if bs * seqlen_q * seqlen_kv_total > _MAX_BS_TIMES_SEQLEN_QK:
+             is_negative_test_case = True
+ 
+-        # softmax scale must be 1.0 for SWA/Prefix Caching/CP
+-        if (sliding_window > 0 or seqlen_kv_prior or use_cp) and softmax_scale != 1.0:
+-            is_negative_test_case = True
++        # Any positive softmax scale is supported for SWA/Prefix Caching/CP: a power-of-two scale is
++        # folded into Q and any other scale is applied in fp32 inside the exp.
+ 
+         # SWA/CP only works with causal mask
+         if (sliding_window > 0 or use_cp) and not bool_dims[CAUSAL_MASK_DIM_NAME]:
+@@ -506,6 +505,11 @@ class TestRangedAttentionCTEKernels:
+         [1, 9216, 9216, 64, 0.5, np.float32, False, True, False, 125e7],
+         [1, 9216, 9216, 64, 0.134, nl.bfloat16, False, True, False, 125e7],
+ 
++        # Causal, non-power-of-two scale 1/sqrt(128): scale applied in the exp, range_select diagonal
++        [1, 2048, 2048, 128, 0.08838834764831845, nl.bfloat16, True, True, False, None],
++        [1, 4096, 4096, 128, 0.08838834764831845, nl.bfloat16, True, True, False, None],
++        [1, 2048, 2048, 96, 0.10206207261596575, nl.bfloat16, True, True, False, None],
++
+         # Causal attention
+         # [1, 32*1024-1, 32*1024-1, 128, 1.000, np.float16, True, True, False, 950e7 * 1.02], # TODO: NKIFE-518
+         # [1, 32*1024, 32*1024, 64, 1.000, np.float16, True, True, False, 930e7 * 1.02], # TODO: NKIFE-518
+@@ -745,6 +749,12 @@ class TestRangedAttentionCTEKernels:
+         [2, 1, 20480, 20480, 4096, 4096 - 512, 128, 1.0, nl.bfloat16, True, False, True, True, False, 0, (233e7, None)],
+         [2, 1, 20480, 20480, 4096, 4096 - 512, 128, 1.0, nl.bfloat16, True, True, True, True, False, 0, (236e7, None)],
+ 
++        # non-power-of-two scale 1/sqrt(128): prefix caching, sink, SWA, and >10K KV (multi-section)
++        [2, 1, 2048, 2048, 2048, 2048 - 511, 128, 0.08838834764831845, nl.bfloat16, True, False, False, True, False, 0, None],
++        [2, 1, 2048, 2048, 2048, 2048 - 511, 128, 0.08838834764831845, nl.bfloat16, True, False, False, True, True, 0, None],
++        [2, 1, 4096, 4096, 2048, 1543, 128, 0.08838834764831845, nl.bfloat16, True, False, False, True, False, 1024, None],
++        [2, 1, 20480, 20480, 4096, 4096 - 512, 128, 0.08838834764831845, nl.bfloat16, True, False, False, True, False, 0, None],
++
+         # d > 128 support (prefix caching)
+         [2, 2, 2048, 2048, 1024, 512, 192, 1.0, nl.bfloat16, True, False, False, False, False, 0, None],
+         [2, 1, 4096, 4096, 2048, 1543, 256, 1.0, nl.bfloat16, True, False, False, True, False, 0, None],
+@@ -1764,7 +1774,7 @@ class TestRangedAttentionCTEKernels:
+         ),
+         coverage="pairs",
+     )
+-    @pytest.mark.parametrize("softmax_scale", [0.125, 1.0])
++    @pytest.mark.parametrize("softmax_scale", [0.125, 0.08838834764831845, 1.0])
+     def test_ranged_attn_cte_sweep_nocp(
+         self,
+         test_manager: Orchestrator,
+@@ -2442,6 +2452,10 @@ class TestRangedAttentionCTEKernels:
+         [2, 1, 1, 4096, 128, 1.0, nl.bfloat16,  False, True,  False, True,  0,   32],
+         [2, 2, 2, 2048, 96,  1.0, nl.bfloat16,  False, False, False, False, 0,   16],
+ 
++        # ── Non-power-of-two scale 1/sqrt(128) ────────────────────────────
++        [1, 1, 1, 2048, 128, 0.08838834764831845, nl.bfloat16,  True,  True,  False, False, 0,   8],
++        [1, 1, 1, 4096, 128, 0.08838834764831845, nl.bfloat16,  False, True,  False, True,  0,   16],
++
+         # ── d > 128 support ──────────────────────────────────────────────
+         [1, 1, 1, 2048, 256, 1.0, nl.bfloat16,  True,  False, False, False, 0,   4],
+         [1, 1, 1, 2048, 256, 1.0, nl.bfloat16,  False, False, False, True,  0,   4],
