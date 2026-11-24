@@ -1,0 +1,2 @@
+TestName,TpbSgCyclesSum,MbuEstimatedPercent,ProfilerMFU,InferenceTime,ActiveInferenceTime,SeparatedComputeTime,SeparatedMemoryTime,ExplorerProfileURL
+test_attention_cte_no_cp_vnc_apc_klr_unit_trn2_vnc_2_b_1_skv_2048_sq_2048_pl_2048_pul_1537_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_1_tp_q_0_tp_k_0_tp_out_1_sink_1_sw_0_tpbSgCyclesSum_1000000000000.0,84426534,8.022710122608462,25.81366114839159,"[10.978819608688354, 8.0990707e-05]",7.2366275e-05,-1.0,-1.0,-1.0

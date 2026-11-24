@@ -1,0 +1,16 @@
+.......s..                                                               [100%]
+QoR data collected to /home/ubuntu/results/out_after/qor_data_20261124_172630.csv
+
+=============================== warnings summary ===============================
+../../../../source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/python_ops/nki_kernels/_grouped_mm_2d_2d.py:29
+  /source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/python_ops/nki_kernels/_grouped_mm_2d_2d.py:29: DeprecationWarning: nki.jit 'mode' parameter is deprecated, and its value is ignored.
+    @nki.jit(mode="trace")
+
+integration/nkilib/core/attention/test_attention_cte.py::TestRangedAttentionCTEKernels::test_attention_cte_seq_pack_unit[trn2-lnc-1_b-1_bkv-1_s-2048_d-128_sc-0.08838834764831845_dtype-bfloat16_cm-1_tp_q-1_tp_k-0_tp_out-0_sw-0_nps-8]
+integration/nkilib/core/attention/test_attention_cte.py::TestRangedAttentionCTEKernels::test_attention_cte_seq_pack_unit[trn2-lnc-1_b-1_bkv-1_s-4096_d-128_sc-0.08838834764831845_dtype-bfloat16_cm-0_tp_q-1_tp_k-0_tp_out-1_sw-0_nps-16]
+  /opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/ncc_driver.py:1020: FutureWarning: Tensors allocated with shared_hbm are currently demoted to private_hbm when the Logical NeuronCore (LNC) degree is 1. In a future release they will stay shared by default. Set the NKI_LNC1_SHARED_HBM environment variable to 1 to adopt the new behavior now, or to 0 to keep the current demotion (equivalent to allocating with private_hbm); either value silences this warning.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+9 passed, 1 skipped, 639 deselected, 3 warnings in 162.44s (0:02:42)
+EXIT 0

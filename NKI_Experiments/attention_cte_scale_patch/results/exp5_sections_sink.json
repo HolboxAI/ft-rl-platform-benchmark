@@ -1,0 +1,69 @@
+{
+ "sq": 512,
+ "skv": 2048,
+ "rows": [
+  {
+   "sections": 1,
+   "sink": null,
+   "max_out_diff": 0.0,
+   "max_negmax_diff": 0.0,
+   "bit_identical": true
+  },
+  {
+   "sections": 1,
+   "sink": 2.5,
+   "max_out_diff": 0.0,
+   "max_negmax_diff": 0.0,
+   "bit_identical": true
+  },
+  {
+   "sections": 1,
+   "sink": 20.0,
+   "max_out_diff": 0.0,
+   "max_negmax_diff": 0.0,
+   "bit_identical": true
+  },
+  {
+   "sections": 4,
+   "sink": null,
+   "max_out_diff": 0.0,
+   "max_negmax_diff": 0.0,
+   "bit_identical": true
+  },
+  {
+   "sections": 4,
+   "sink": 2.5,
+   "max_out_diff": 0.0,
+   "max_negmax_diff": 0.0,
+   "bit_identical": true
+  },
+  {
+   "sections": 4,
+   "sink": 20.0,
+   "max_out_diff": 0.0,
+   "max_negmax_diff": 0.0,
+   "bit_identical": true
+  },
+  {
+   "sections": 8,
+   "sink": null,
+   "max_out_diff": 0.0,
+   "max_negmax_diff": 0.0,
+   "bit_identical": true
+  },
+  {
+   "sections": 8,
+   "sink": 2.5,
+   "max_out_diff": 0.0,
+   "max_negmax_diff": 0.0,
+   "bit_identical": true
+  },
+  {
+   "sections": 8,
+   "sink": 20.0,
+   "max_out_diff": 0.0,
+   "max_negmax_diff": 0.0,
+   "bit_identical": true
+  }
+ ]
+}

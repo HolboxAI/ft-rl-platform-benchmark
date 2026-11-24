@@ -1,0 +1,695 @@
+.......sFF                                                               [100%]
+QoR data collected to /home/ubuntu/results/out_before/qor_data_20261124_172630.csv
+
+=================================== FAILURES ===================================
+_ TestRangedAttentionCTEKernels.test_attention_cte_seq_pack_unit[trn2-lnc-1_b-1_bkv-1_s-2048_d-128_sc-0.08838834764831845_dtype-bfloat16_cm-1_tp_q-1_tp_k-0_tp_out-0_sw-0_nps-8] _
+
+self = <test.utils.test_orchestrator.Orchestrator object at 0x7769b6863350>
+collector = MetricsCollector(test_name='test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_2048_d_128_sc_0.08838834764831845_...s.logger.metrics_context.MetricsContext object at 0x77698667e390>, logger=<Logger test.utils.metrics_collector (INFO)>)
+kernel_under_test = KernelArgs(kernel_func=Kernel(func=<function attention_cte at 0x776a66372200>, lnc=None, schedule=(), schedule_kind=No....logger.metrics_context.MetricsContext object at 0x77698667e390>, logger=<Logger test.utils.metrics_collector (INFO)>))
+output_names = ['out']
+
+    def _run_compilation(
+        self,
+        collector: IMetricsCollector,
+        kernel_under_test: KernelArgs,
+        output_names: list[str] | None,
+    ) -> None:
+        """Run kernel compilation phase."""
+        # Skip compilation for simulator mode
+        if self.trace_mode == TraceMode.Simulator:
+            logging.info("Skipping compilation in simulator mode")
+            return
+    
+        # Lazy import to avoid loading nki.compiler.backends in simulation mode
+        from .kernel_tracer import trace_kernel
+    
+        logging.info(f"Running compilation for {self.fs_config.artifacts_output_directory_path=}")
+        try:
+            with collector.timer(MetricName.COMPILATION_TIME):
+                # Dump birsim inputs/goldens when the user opts in via the framework flag or
+                # via raw compiler args. See _has_user_birsim_flag for the set of accepted forms.
+                additional_cmd_args = kernel_under_test.compiler_input.additional_cmd_args or []
+                if kernel_under_test.compiler_input.enable_birsim or _has_user_birsim_flag(additional_cmd_args):
+                    self._dump_birsim_artifacts(kernel_under_test)
+    
+                # A test may pin the frontend via CompilerArgs.nki_compilation_mode;
+                # otherwise fall back to the session/CLI default (--nki-compilation-mode).
+                frontend_mode = kernel_under_test.compiler_input.nki_compilation_mode or self.nki_compilation_mode
+>               self._compiled_kernel = trace_kernel(
+                    kernel_under_test=kernel_under_test,
+                    mode=self.trace_mode,
+                    output_directory=self.fs_config.artifacts_output_directory_path,
+                    output_names=output_names,
+                    frontendMode=frontend_mode,
+                    # A test may pin the flow via CompilerArgs.compile_mode;
+                    # otherwise use the session/CLI default (--compile-mode).
+                    compile_mode=(kernel_under_test.compiler_input.compile_mode or self.compile_mode),
+                    neuronx_cc_cache_path=self.neuronx_cc_cache_path,
+                    collector=collector,
+                )
+
+test/utils/test_orchestrator.py:520: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test/utils/kernel_tracer.py:250: in trace_kernel
+    result = compile_to_bir(
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py:98: in compile_to_bir
+    compilation_result = _trace()
+                         ^^^^^^^^
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py:80: in _trace
+    return frontend.compile(
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py:197: in compile
+    result = self._compile(
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py:520: in _compile
+    result = kernel.func(**kernel_args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/nkilib_src/nkilib/core/attention/attention_cte.py:430: in attention_cte
+    return _attention_cte(
+src/nkilib_src/nkilib/core/attention/attention_cte.py:965: in _attention_cte
+    _attention_cte_impl(
+src/nkilib_src/nkilib/core/attention/attention_cte.py:1446: in _attention_cte_impl
+    _qk_and_max_impl(shard_seqlen_q_start, ac, atp, sp, bufs, batch_id)
+src/nkilib_src/nkilib/core/attention/attention_cte.py:3111: in _qk_and_max_impl
+    _qk_and_max_large_tile_impl(grp_i, large_tile_idx, ac, atp, sp, bufs, batch_id)
+src/nkilib_src/nkilib/core/attention/attention_cte.py:4290: in _qk_and_max_large_tile_impl
+    kernel_assert(ac.scale == 1.0, "range_select path doesn't support scale != 1.0")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, error_text = "range_select path doesn't support scale != 1.0"
+
+    def kernel_assert(condition: bool, error_text: str):
+>       assert condition, (  # noqa: S101
+               ^^^^^^^^^
+            f"[INTERNAL_ERROR] [NCC_INKI016] Kernel validation exception: {error_text} - Please check the validation message and adjust kernel inputs accordingly"
+        )
+E       AssertionError: [INTERNAL_ERROR] [NCC_INKI016] Kernel validation exception: range_select path doesn't support scale != 1.0 - Please check the validation message and adjust kernel inputs accordingly
+
+src/nkilib_src/nkilib/core/utils/kernel_assert.py:17: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+self = <test.integration.nkilib.core.attention.test_attention_cte.TestRangedAttentionCTEKernels object at 0x776a6585da30>
+test_manager = <test.utils.test_orchestrator.Orchestrator object at 0x7769b6863350>
+collector = MetricsCollector(test_name='test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_2048_d_128_sc_0.08838834764831845_...s.logger.metrics_context.MetricsContext object at 0x77698667e390>, logger=<Logger test.utils.metrics_collector (INFO)>)
+platform_target = <Platforms.TRN2: 'trn2'>, lnc_degree = 1, bs = 1, bs_kv = 1
+seqlen = 2048, d = 128, softmax_scale = 0.08838834764831845, dtype = 'bfloat16'
+causal_mask = True, tp_q = True, tp_k = False, tp_out = False
+sliding_window = 0, n_packed_sequences = 8
+
+    @pytest_parametrize(
+        attention_cte_seq_pack_unit_params, attention_cte_seq_pack_unit_perms, abbrevs=_ATTN_CTE_ABBREVS
+    )
+    def test_attention_cte_seq_pack_unit(
+        self,
+        test_manager: Orchestrator,
+        collector: IMetricsCollector,
+        platform_target: Platforms,
+        lnc_degree,
+        bs,
+        bs_kv,
+        seqlen,
+        d,
+        softmax_scale,
+        dtype,
+        causal_mask,
+        tp_q,
+        tp_k,
+        tp_out,
+        sliding_window,
+        n_packed_sequences,
+    ):
+        np.random.seed(42)
+        compiler_args = CompilerArgs(logical_nc_config=lnc_degree, platform_target=platform_target)
+>       self.run_attention_cte_test(
+            test_manager=test_manager,
+            compiler_args=compiler_args,
+            collector=collector,
+            bool_dims={
+                CAUSAL_MASK_DIM_NAME: causal_mask,
+                TP_Q_DIM_NAME: tp_q,
+                TP_OUT_DIM_NAME: tp_out,
+                TP_K_DIM_NAME: tp_k,
+                SINK_DIM_NAME: False,
+            },
+            bs=bs,
+            bs_kv=bs_kv,
+            cache_softmax=False,
+            cp_degree=None,
+            d=d,
+            dtype=dtype,
+            seqlen_kv=seqlen,
+            seqlen_kv_prior=None,
+            seqlen_q=seqlen,
+            sliding_window=sliding_window,
+            softmax_scale=softmax_scale,
+            cp_rank_id=None,
+            use_cp=False,
+            n_packed_sequences=n_packed_sequences,
+        )
+
+test/integration/nkilib/core/attention/test_attention_cte.py:2492: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test/integration/nkilib/core/attention/test_attention_cte.py:491: in run_attention_cte_test
+    framework.run_test(
+test/utils/unit_test_framework.py:265: in run_test
+    self.test_manager.execute(kernel_args)
+test/utils/test_orchestrator.py:318: in execute
+    self._run_compilation(self.collector, kernel_under_test, output_names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test.utils.test_orchestrator.Orchestrator object at 0x7769b6863350>
+collector = MetricsCollector(test_name='test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_2048_d_128_sc_0.08838834764831845_...s.logger.metrics_context.MetricsContext object at 0x77698667e390>, logger=<Logger test.utils.metrics_collector (INFO)>)
+kernel_under_test = KernelArgs(kernel_func=Kernel(func=<function attention_cte at 0x776a66372200>, lnc=None, schedule=(), schedule_kind=No....logger.metrics_context.MetricsContext object at 0x77698667e390>, logger=<Logger test.utils.metrics_collector (INFO)>))
+output_names = ['out']
+
+    def _run_compilation(
+        self,
+        collector: IMetricsCollector,
+        kernel_under_test: KernelArgs,
+        output_names: list[str] | None,
+    ) -> None:
+        """Run kernel compilation phase."""
+        # Skip compilation for simulator mode
+        if self.trace_mode == TraceMode.Simulator:
+            logging.info("Skipping compilation in simulator mode")
+            return
+    
+        # Lazy import to avoid loading nki.compiler.backends in simulation mode
+        from .kernel_tracer import trace_kernel
+    
+        logging.info(f"Running compilation for {self.fs_config.artifacts_output_directory_path=}")
+        try:
+            with collector.timer(MetricName.COMPILATION_TIME):
+                # Dump birsim inputs/goldens when the user opts in via the framework flag or
+                # via raw compiler args. See _has_user_birsim_flag for the set of accepted forms.
+                additional_cmd_args = kernel_under_test.compiler_input.additional_cmd_args or []
+                if kernel_under_test.compiler_input.enable_birsim or _has_user_birsim_flag(additional_cmd_args):
+                    self._dump_birsim_artifacts(kernel_under_test)
+    
+                # A test may pin the frontend via CompilerArgs.nki_compilation_mode;
+                # otherwise fall back to the session/CLI default (--nki-compilation-mode).
+                frontend_mode = kernel_under_test.compiler_input.nki_compilation_mode or self.nki_compilation_mode
+                self._compiled_kernel = trace_kernel(
+                    kernel_under_test=kernel_under_test,
+                    mode=self.trace_mode,
+                    output_directory=self.fs_config.artifacts_output_directory_path,
+                    output_names=output_names,
+                    frontendMode=frontend_mode,
+                    # A test may pin the flow via CompilerArgs.compile_mode;
+                    # otherwise use the session/CLI default (--compile-mode).
+                    compile_mode=(kernel_under_test.compiler_input.compile_mode or self.compile_mode),
+                    neuronx_cc_cache_path=self.neuronx_cc_cache_path,
+                    collector=collector,
+                )
+    
+            # Record MLIR→BIR and BIR→NEFF sub-phase timings from the compiled kernel
+            if self._compiled_kernel is not None:
+                collector.record_timer(MetricName.MLIR_TO_BIR_TIME, self._compiled_kernel.mlir_time)
+                collector.record_timer(MetricName.BIR_TO_NEFF_TIME, self._compiled_kernel.neuronx_cc_time)
+        except Exception as e:
+            # Print full exception details including stdout, stderr, and stacktrace
+            error_msg = f"Compilation failed with exception: {type(e).__name__}: {str(e)}\n"
+    
+            # If it's a CalledProcessError, include stdout and stderr
+            if isinstance(e, subprocess.CalledProcessError):
+                error_msg += f"\nReturn code: {e.returncode}\n"
+                error_msg += f"\nStdout:\n{e.stdout}\n" if e.stdout else "\nStdout: (empty)\n"
+                error_msg += f"\nStderr:\n{e.stderr}\n" if e.stderr else "\nStderr: (empty)\n"
+    
+            # Add full stacktrace
+            error_msg += f"\nFull traceback:\n{''.join(traceback.format_tb(e.__traceback__))}"
+    
+            logging.error(error_msg)
+>           raise CompilationException(error_msg) from e
+E           test.utils.exceptions.CompilationException: Compilation failed with exception: AssertionError: [INTERNAL_ERROR] [NCC_INKI016] Kernel validation exception: range_select path doesn't support scale != 1.0 - Please check the validation message and adjust kernel inputs accordingly
+E           
+E           Full traceback:
+E             File "/home/ubuntu/work/before_newtests/test/utils/test_orchestrator.py", line 520, in _run_compilation
+E               self._compiled_kernel = trace_kernel(
+E                                       ^^^^^^^^^^^^^
+E             File "/home/ubuntu/work/before_newtests/test/utils/kernel_tracer.py", line 250, in trace_kernel
+E               result = compile_to_bir(
+E                        ^^^^^^^^^^^^^^^
+E             File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 98, in compile_to_bir
+E               compilation_result = _trace()
+E                                    ^^^^^^^^
+E             File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 80, in _trace
+E               return frontend.compile(
+E                      ^^^^^^^^^^^^^^^^^
+E             File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 197, in compile
+E               result = self._compile(
+E                        ^^^^^^^^^^^^^^
+E             File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 520, in _compile
+E               result = kernel.func(**kernel_args)
+E                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 430, in attention_cte
+E               return _attention_cte(
+E                      ^^^^^^^^^^^^^^^
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 965, in _attention_cte
+E               _attention_cte_impl(
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 1446, in _attention_cte_impl
+E               _qk_and_max_impl(shard_seqlen_q_start, ac, atp, sp, bufs, batch_id)
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 3111, in _qk_and_max_impl
+E               _qk_and_max_large_tile_impl(grp_i, large_tile_idx, ac, atp, sp, bufs, batch_id)
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 4290, in _qk_and_max_large_tile_impl
+E               kernel_assert(ac.scale == 1.0, "range_select path doesn't support scale != 1.0")
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/utils/kernel_assert.py", line 17, in kernel_assert
+E               assert condition, (  # noqa: S101
+E                      ^^^^^^^^^
+
+test/utils/test_orchestrator.py:551: CompilationException
+----------------------------- Captured stderr call -----------------------------
+2026-11-24 17:28:59 INFO [11311| gw_master] [root]: neuronx-cc jobs capped to 192 (test_orchestrator.py:287)
+2026-11-24 17:28:59 INFO [11311| gw_master] [root]: Running compilation for self.fs_config.artifacts_output_directory_path='/home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_2048_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_1_tp_q_1_tp_k_0_tp_out_0_sw_0_nps_8' (test_orchestrator.py:508)
+2026-11-24 17:28:59 ERROR [11311| gw_master] [root]: Compilation failed with exception: AssertionError: [INTERNAL_ERROR] [NCC_INKI016] Kernel validation exception: range_select path doesn't support scale != 1.0 - Please check the validation message and adjust kernel inputs accordingly
+
+Full traceback:
+  File "/home/ubuntu/work/before_newtests/test/utils/test_orchestrator.py", line 520, in _run_compilation
+    self._compiled_kernel = trace_kernel(
+                            ^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/test/utils/kernel_tracer.py", line 250, in trace_kernel
+    result = compile_to_bir(
+             ^^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 98, in compile_to_bir
+    compilation_result = _trace()
+                         ^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 80, in _trace
+    return frontend.compile(
+           ^^^^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 197, in compile
+    result = self._compile(
+             ^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 520, in _compile
+    result = kernel.func(**kernel_args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 430, in attention_cte
+    return _attention_cte(
+           ^^^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 965, in _attention_cte
+    _attention_cte_impl(
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 1446, in _attention_cte_impl
+    _qk_and_max_impl(shard_seqlen_q_start, ac, atp, sp, bufs, batch_id)
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 3111, in _qk_and_max_impl
+    _qk_and_max_large_tile_impl(grp_i, large_tile_idx, ac, atp, sp, bufs, batch_id)
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 4290, in _qk_and_max_large_tile_impl
+    kernel_assert(ac.scale == 1.0, "range_select path doesn't support scale != 1.0")
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/utils/kernel_assert.py", line 17, in kernel_assert
+    assert condition, (  # noqa: S101
+           ^^^^^^^^^
+ (test_orchestrator.py:550)
+2026-11-24 17:28:59 WARNING [11311| gw_master] [test.utils.metrics_collector]: Failed to parse info.json: [Errno 2] No such file or directory: '/home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_2048_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_1_tp_q_1_tp_k_0_tp_out_0_sw_0_nps_8/info.json' (metrics_collector.py:688)
+2026-11-24 17:28:59 WARNING [11311| gw_master] [test.utils.metrics_collector]: log-infer.txt not found (metrics_collector.py:625)
+2026-11-24 17:28:59 WARNING [11311| gw_master] [test.utils.metrics_collector]: No show_session_*.json files found in /home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_2048_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_1_tp_q_1_tp_k_0_tp_out_0_sw_0_nps_8/infer_result (metrics_collector.py:731)
+------------------------------ Captured log call -------------------------------
+2026-11-24 17:28:59 INFO [11311| __worker_id__] [root]: neuronx-cc jobs capped to 192 (test_orchestrator.py:287)
+2026-11-24 17:28:59 INFO [11311| __worker_id__] [root]: Running compilation for self.fs_config.artifacts_output_directory_path='/home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_2048_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_1_tp_q_1_tp_k_0_tp_out_0_sw_0_nps_8' (test_orchestrator.py:508)
+2026-11-24 17:28:59 ERROR [11311| __worker_id__] [root]: Compilation failed with exception: AssertionError: [INTERNAL_ERROR] [NCC_INKI016] Kernel validation exception: range_select path doesn't support scale != 1.0 - Please check the validation message and adjust kernel inputs accordingly
+
+Full traceback:
+  File "/home/ubuntu/work/before_newtests/test/utils/test_orchestrator.py", line 520, in _run_compilation
+    self._compiled_kernel = trace_kernel(
+                            ^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/test/utils/kernel_tracer.py", line 250, in trace_kernel
+    result = compile_to_bir(
+             ^^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 98, in compile_to_bir
+    compilation_result = _trace()
+                         ^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 80, in _trace
+    return frontend.compile(
+           ^^^^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 197, in compile
+    result = self._compile(
+             ^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 520, in _compile
+    result = kernel.func(**kernel_args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 430, in attention_cte
+    return _attention_cte(
+           ^^^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 965, in _attention_cte
+    _attention_cte_impl(
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 1446, in _attention_cte_impl
+    _qk_and_max_impl(shard_seqlen_q_start, ac, atp, sp, bufs, batch_id)
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 3111, in _qk_and_max_impl
+    _qk_and_max_large_tile_impl(grp_i, large_tile_idx, ac, atp, sp, bufs, batch_id)
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 4290, in _qk_and_max_large_tile_impl
+    kernel_assert(ac.scale == 1.0, "range_select path doesn't support scale != 1.0")
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/utils/kernel_assert.py", line 17, in kernel_assert
+    assert condition, (  # noqa: S101
+           ^^^^^^^^^
+ (test_orchestrator.py:550)
+2026-11-24 17:28:59 WARNING [11311| __worker_id__] [test.utils.metrics_collector]: Failed to parse info.json: [Errno 2] No such file or directory: '/home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_2048_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_1_tp_q_1_tp_k_0_tp_out_0_sw_0_nps_8/info.json' (metrics_collector.py:688)
+2026-11-24 17:28:59 WARNING [11311| __worker_id__] [test.utils.metrics_collector]: log-infer.txt not found (metrics_collector.py:625)
+2026-11-24 17:28:59 WARNING [11311| __worker_id__] [test.utils.metrics_collector]: No show_session_*.json files found in /home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_2048_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_1_tp_q_1_tp_k_0_tp_out_0_sw_0_nps_8/infer_result (metrics_collector.py:731)
+_ TestRangedAttentionCTEKernels.test_attention_cte_seq_pack_unit[trn2-lnc-1_b-1_bkv-1_s-4096_d-128_sc-0.08838834764831845_dtype-bfloat16_cm-0_tp_q-1_tp_k-0_tp_out-1_sw-0_nps-16] _
+
+self = <test.utils.test_orchestrator.Orchestrator object at 0x77698667e750>
+collector = MetricsCollector(test_name='test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_4096_d_128_sc_0.08838834764831845_...s.logger.metrics_context.MetricsContext object at 0x77698667ef30>, logger=<Logger test.utils.metrics_collector (INFO)>)
+kernel_under_test = KernelArgs(kernel_func=Kernel(func=<function attention_cte at 0x776a66372200>, lnc=None, schedule=(), schedule_kind=No....logger.metrics_context.MetricsContext object at 0x77698667ef30>, logger=<Logger test.utils.metrics_collector (INFO)>))
+output_names = ['out']
+
+    def _run_compilation(
+        self,
+        collector: IMetricsCollector,
+        kernel_under_test: KernelArgs,
+        output_names: list[str] | None,
+    ) -> None:
+        """Run kernel compilation phase."""
+        # Skip compilation for simulator mode
+        if self.trace_mode == TraceMode.Simulator:
+            logging.info("Skipping compilation in simulator mode")
+            return
+    
+        # Lazy import to avoid loading nki.compiler.backends in simulation mode
+        from .kernel_tracer import trace_kernel
+    
+        logging.info(f"Running compilation for {self.fs_config.artifacts_output_directory_path=}")
+        try:
+            with collector.timer(MetricName.COMPILATION_TIME):
+                # Dump birsim inputs/goldens when the user opts in via the framework flag or
+                # via raw compiler args. See _has_user_birsim_flag for the set of accepted forms.
+                additional_cmd_args = kernel_under_test.compiler_input.additional_cmd_args or []
+                if kernel_under_test.compiler_input.enable_birsim or _has_user_birsim_flag(additional_cmd_args):
+                    self._dump_birsim_artifacts(kernel_under_test)
+    
+                # A test may pin the frontend via CompilerArgs.nki_compilation_mode;
+                # otherwise fall back to the session/CLI default (--nki-compilation-mode).
+                frontend_mode = kernel_under_test.compiler_input.nki_compilation_mode or self.nki_compilation_mode
+>               self._compiled_kernel = trace_kernel(
+                    kernel_under_test=kernel_under_test,
+                    mode=self.trace_mode,
+                    output_directory=self.fs_config.artifacts_output_directory_path,
+                    output_names=output_names,
+                    frontendMode=frontend_mode,
+                    # A test may pin the flow via CompilerArgs.compile_mode;
+                    # otherwise use the session/CLI default (--compile-mode).
+                    compile_mode=(kernel_under_test.compiler_input.compile_mode or self.compile_mode),
+                    neuronx_cc_cache_path=self.neuronx_cc_cache_path,
+                    collector=collector,
+                )
+
+test/utils/test_orchestrator.py:520: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test/utils/kernel_tracer.py:250: in trace_kernel
+    result = compile_to_bir(
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py:98: in compile_to_bir
+    compilation_result = _trace()
+                         ^^^^^^^^
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py:80: in _trace
+    return frontend.compile(
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py:197: in compile
+    result = self._compile(
+/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py:520: in _compile
+    result = kernel.func(**kernel_args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/nkilib_src/nkilib/core/attention/attention_cte.py:430: in attention_cte
+    return _attention_cte(
+src/nkilib_src/nkilib/core/attention/attention_cte.py:965: in _attention_cte
+    _attention_cte_impl(
+src/nkilib_src/nkilib/core/attention/attention_cte.py:1446: in _attention_cte_impl
+    _qk_and_max_impl(shard_seqlen_q_start, ac, atp, sp, bufs, batch_id)
+src/nkilib_src/nkilib/core/attention/attention_cte.py:3111: in _qk_and_max_impl
+    _qk_and_max_large_tile_impl(grp_i, large_tile_idx, ac, atp, sp, bufs, batch_id)
+src/nkilib_src/nkilib/core/attention/attention_cte.py:4290: in _qk_and_max_large_tile_impl
+    kernel_assert(ac.scale == 1.0, "range_select path doesn't support scale != 1.0")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, error_text = "range_select path doesn't support scale != 1.0"
+
+    def kernel_assert(condition: bool, error_text: str):
+>       assert condition, (  # noqa: S101
+               ^^^^^^^^^
+            f"[INTERNAL_ERROR] [NCC_INKI016] Kernel validation exception: {error_text} - Please check the validation message and adjust kernel inputs accordingly"
+        )
+E       AssertionError: [INTERNAL_ERROR] [NCC_INKI016] Kernel validation exception: range_select path doesn't support scale != 1.0 - Please check the validation message and adjust kernel inputs accordingly
+
+src/nkilib_src/nkilib/core/utils/kernel_assert.py:17: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+self = <test.integration.nkilib.core.attention.test_attention_cte.TestRangedAttentionCTEKernels object at 0x776a6585daf0>
+test_manager = <test.utils.test_orchestrator.Orchestrator object at 0x77698667e750>
+collector = MetricsCollector(test_name='test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_4096_d_128_sc_0.08838834764831845_...s.logger.metrics_context.MetricsContext object at 0x77698667ef30>, logger=<Logger test.utils.metrics_collector (INFO)>)
+platform_target = <Platforms.TRN2: 'trn2'>, lnc_degree = 1, bs = 1, bs_kv = 1
+seqlen = 4096, d = 128, softmax_scale = 0.08838834764831845, dtype = 'bfloat16'
+causal_mask = False, tp_q = True, tp_k = False, tp_out = True
+sliding_window = 0, n_packed_sequences = 16
+
+    @pytest_parametrize(
+        attention_cte_seq_pack_unit_params, attention_cte_seq_pack_unit_perms, abbrevs=_ATTN_CTE_ABBREVS
+    )
+    def test_attention_cte_seq_pack_unit(
+        self,
+        test_manager: Orchestrator,
+        collector: IMetricsCollector,
+        platform_target: Platforms,
+        lnc_degree,
+        bs,
+        bs_kv,
+        seqlen,
+        d,
+        softmax_scale,
+        dtype,
+        causal_mask,
+        tp_q,
+        tp_k,
+        tp_out,
+        sliding_window,
+        n_packed_sequences,
+    ):
+        np.random.seed(42)
+        compiler_args = CompilerArgs(logical_nc_config=lnc_degree, platform_target=platform_target)
+>       self.run_attention_cte_test(
+            test_manager=test_manager,
+            compiler_args=compiler_args,
+            collector=collector,
+            bool_dims={
+                CAUSAL_MASK_DIM_NAME: causal_mask,
+                TP_Q_DIM_NAME: tp_q,
+                TP_OUT_DIM_NAME: tp_out,
+                TP_K_DIM_NAME: tp_k,
+                SINK_DIM_NAME: False,
+            },
+            bs=bs,
+            bs_kv=bs_kv,
+            cache_softmax=False,
+            cp_degree=None,
+            d=d,
+            dtype=dtype,
+            seqlen_kv=seqlen,
+            seqlen_kv_prior=None,
+            seqlen_q=seqlen,
+            sliding_window=sliding_window,
+            softmax_scale=softmax_scale,
+            cp_rank_id=None,
+            use_cp=False,
+            n_packed_sequences=n_packed_sequences,
+        )
+
+test/integration/nkilib/core/attention/test_attention_cte.py:2492: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test/integration/nkilib/core/attention/test_attention_cte.py:491: in run_attention_cte_test
+    framework.run_test(
+test/utils/unit_test_framework.py:265: in run_test
+    self.test_manager.execute(kernel_args)
+test/utils/test_orchestrator.py:318: in execute
+    self._run_compilation(self.collector, kernel_under_test, output_names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test.utils.test_orchestrator.Orchestrator object at 0x77698667e750>
+collector = MetricsCollector(test_name='test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_4096_d_128_sc_0.08838834764831845_...s.logger.metrics_context.MetricsContext object at 0x77698667ef30>, logger=<Logger test.utils.metrics_collector (INFO)>)
+kernel_under_test = KernelArgs(kernel_func=Kernel(func=<function attention_cte at 0x776a66372200>, lnc=None, schedule=(), schedule_kind=No....logger.metrics_context.MetricsContext object at 0x77698667ef30>, logger=<Logger test.utils.metrics_collector (INFO)>))
+output_names = ['out']
+
+    def _run_compilation(
+        self,
+        collector: IMetricsCollector,
+        kernel_under_test: KernelArgs,
+        output_names: list[str] | None,
+    ) -> None:
+        """Run kernel compilation phase."""
+        # Skip compilation for simulator mode
+        if self.trace_mode == TraceMode.Simulator:
+            logging.info("Skipping compilation in simulator mode")
+            return
+    
+        # Lazy import to avoid loading nki.compiler.backends in simulation mode
+        from .kernel_tracer import trace_kernel
+    
+        logging.info(f"Running compilation for {self.fs_config.artifacts_output_directory_path=}")
+        try:
+            with collector.timer(MetricName.COMPILATION_TIME):
+                # Dump birsim inputs/goldens when the user opts in via the framework flag or
+                # via raw compiler args. See _has_user_birsim_flag for the set of accepted forms.
+                additional_cmd_args = kernel_under_test.compiler_input.additional_cmd_args or []
+                if kernel_under_test.compiler_input.enable_birsim or _has_user_birsim_flag(additional_cmd_args):
+                    self._dump_birsim_artifacts(kernel_under_test)
+    
+                # A test may pin the frontend via CompilerArgs.nki_compilation_mode;
+                # otherwise fall back to the session/CLI default (--nki-compilation-mode).
+                frontend_mode = kernel_under_test.compiler_input.nki_compilation_mode or self.nki_compilation_mode
+                self._compiled_kernel = trace_kernel(
+                    kernel_under_test=kernel_under_test,
+                    mode=self.trace_mode,
+                    output_directory=self.fs_config.artifacts_output_directory_path,
+                    output_names=output_names,
+                    frontendMode=frontend_mode,
+                    # A test may pin the flow via CompilerArgs.compile_mode;
+                    # otherwise use the session/CLI default (--compile-mode).
+                    compile_mode=(kernel_under_test.compiler_input.compile_mode or self.compile_mode),
+                    neuronx_cc_cache_path=self.neuronx_cc_cache_path,
+                    collector=collector,
+                )
+    
+            # Record MLIR→BIR and BIR→NEFF sub-phase timings from the compiled kernel
+            if self._compiled_kernel is not None:
+                collector.record_timer(MetricName.MLIR_TO_BIR_TIME, self._compiled_kernel.mlir_time)
+                collector.record_timer(MetricName.BIR_TO_NEFF_TIME, self._compiled_kernel.neuronx_cc_time)
+        except Exception as e:
+            # Print full exception details including stdout, stderr, and stacktrace
+            error_msg = f"Compilation failed with exception: {type(e).__name__}: {str(e)}\n"
+    
+            # If it's a CalledProcessError, include stdout and stderr
+            if isinstance(e, subprocess.CalledProcessError):
+                error_msg += f"\nReturn code: {e.returncode}\n"
+                error_msg += f"\nStdout:\n{e.stdout}\n" if e.stdout else "\nStdout: (empty)\n"
+                error_msg += f"\nStderr:\n{e.stderr}\n" if e.stderr else "\nStderr: (empty)\n"
+    
+            # Add full stacktrace
+            error_msg += f"\nFull traceback:\n{''.join(traceback.format_tb(e.__traceback__))}"
+    
+            logging.error(error_msg)
+>           raise CompilationException(error_msg) from e
+E           test.utils.exceptions.CompilationException: Compilation failed with exception: AssertionError: [INTERNAL_ERROR] [NCC_INKI016] Kernel validation exception: range_select path doesn't support scale != 1.0 - Please check the validation message and adjust kernel inputs accordingly
+E           
+E           Full traceback:
+E             File "/home/ubuntu/work/before_newtests/test/utils/test_orchestrator.py", line 520, in _run_compilation
+E               self._compiled_kernel = trace_kernel(
+E                                       ^^^^^^^^^^^^^
+E             File "/home/ubuntu/work/before_newtests/test/utils/kernel_tracer.py", line 250, in trace_kernel
+E               result = compile_to_bir(
+E                        ^^^^^^^^^^^^^^^
+E             File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 98, in compile_to_bir
+E               compilation_result = _trace()
+E                                    ^^^^^^^^
+E             File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 80, in _trace
+E               return frontend.compile(
+E                      ^^^^^^^^^^^^^^^^^
+E             File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 197, in compile
+E               result = self._compile(
+E                        ^^^^^^^^^^^^^^
+E             File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 520, in _compile
+E               result = kernel.func(**kernel_args)
+E                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 430, in attention_cte
+E               return _attention_cte(
+E                      ^^^^^^^^^^^^^^^
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 965, in _attention_cte
+E               _attention_cte_impl(
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 1446, in _attention_cte_impl
+E               _qk_and_max_impl(shard_seqlen_q_start, ac, atp, sp, bufs, batch_id)
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 3111, in _qk_and_max_impl
+E               _qk_and_max_large_tile_impl(grp_i, large_tile_idx, ac, atp, sp, bufs, batch_id)
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 4290, in _qk_and_max_large_tile_impl
+E               kernel_assert(ac.scale == 1.0, "range_select path doesn't support scale != 1.0")
+E             File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/utils/kernel_assert.py", line 17, in kernel_assert
+E               assert condition, (  # noqa: S101
+E                      ^^^^^^^^^
+
+test/utils/test_orchestrator.py:551: CompilationException
+----------------------------- Captured stderr call -----------------------------
+2026-11-24 17:28:59 INFO [11311| gw_master] [root]: neuronx-cc jobs capped to 192 (test_orchestrator.py:287)
+2026-11-24 17:28:59 INFO [11311| gw_master] [root]: Running compilation for self.fs_config.artifacts_output_directory_path='/home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_4096_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_0_tp_q_1_tp_k_0_tp_out_1_sw_0_nps_16' (test_orchestrator.py:508)
+2026-11-24 17:29:00 ERROR [11311| gw_master] [root]: Compilation failed with exception: AssertionError: [INTERNAL_ERROR] [NCC_INKI016] Kernel validation exception: range_select path doesn't support scale != 1.0 - Please check the validation message and adjust kernel inputs accordingly
+
+Full traceback:
+  File "/home/ubuntu/work/before_newtests/test/utils/test_orchestrator.py", line 520, in _run_compilation
+    self._compiled_kernel = trace_kernel(
+                            ^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/test/utils/kernel_tracer.py", line 250, in trace_kernel
+    result = compile_to_bir(
+             ^^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 98, in compile_to_bir
+    compilation_result = _trace()
+                         ^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 80, in _trace
+    return frontend.compile(
+           ^^^^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 197, in compile
+    result = self._compile(
+             ^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 520, in _compile
+    result = kernel.func(**kernel_args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 430, in attention_cte
+    return _attention_cte(
+           ^^^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 965, in _attention_cte
+    _attention_cte_impl(
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 1446, in _attention_cte_impl
+    _qk_and_max_impl(shard_seqlen_q_start, ac, atp, sp, bufs, batch_id)
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 3111, in _qk_and_max_impl
+    _qk_and_max_large_tile_impl(grp_i, large_tile_idx, ac, atp, sp, bufs, batch_id)
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 4290, in _qk_and_max_large_tile_impl
+    kernel_assert(ac.scale == 1.0, "range_select path doesn't support scale != 1.0")
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/utils/kernel_assert.py", line 17, in kernel_assert
+    assert condition, (  # noqa: S101
+           ^^^^^^^^^
+ (test_orchestrator.py:550)
+2026-11-24 17:29:00 WARNING [11311| gw_master] [test.utils.metrics_collector]: Failed to parse info.json: [Errno 2] No such file or directory: '/home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_4096_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_0_tp_q_1_tp_k_0_tp_out_1_sw_0_nps_16/info.json' (metrics_collector.py:688)
+2026-11-24 17:29:00 WARNING [11311| gw_master] [test.utils.metrics_collector]: log-infer.txt not found (metrics_collector.py:625)
+2026-11-24 17:29:00 WARNING [11311| gw_master] [test.utils.metrics_collector]: No show_session_*.json files found in /home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_4096_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_0_tp_q_1_tp_k_0_tp_out_1_sw_0_nps_16/infer_result (metrics_collector.py:731)
+------------------------------ Captured log call -------------------------------
+2026-11-24 17:28:59 INFO [11311| __worker_id__] [root]: neuronx-cc jobs capped to 192 (test_orchestrator.py:287)
+2026-11-24 17:28:59 INFO [11311| __worker_id__] [root]: Running compilation for self.fs_config.artifacts_output_directory_path='/home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_4096_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_0_tp_q_1_tp_k_0_tp_out_1_sw_0_nps_16' (test_orchestrator.py:508)
+2026-11-24 17:29:00 ERROR [11311| __worker_id__] [root]: Compilation failed with exception: AssertionError: [INTERNAL_ERROR] [NCC_INKI016] Kernel validation exception: range_select path doesn't support scale != 1.0 - Please check the validation message and adjust kernel inputs accordingly
+
+Full traceback:
+  File "/home/ubuntu/work/before_newtests/test/utils/test_orchestrator.py", line 520, in _run_compilation
+    self._compiled_kernel = trace_kernel(
+                            ^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/test/utils/kernel_tracer.py", line 250, in trace_kernel
+    result = compile_to_bir(
+             ^^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 98, in compile_to_bir
+    compilation_result = _trace()
+                         ^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/driver.py", line 80, in _trace
+    return frontend.compile(
+           ^^^^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 197, in compile
+    result = self._compile(
+             ^^^^^^^^^^^^^^
+  File "/opt/aws_neuronx_venv_torch_neuronx_2_14_0/lib/python3.12/site-packages/nki/compiler/frontend.py", line 520, in _compile
+    result = kernel.func(**kernel_args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 430, in attention_cte
+    return _attention_cte(
+           ^^^^^^^^^^^^^^^
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 965, in _attention_cte
+    _attention_cte_impl(
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 1446, in _attention_cte_impl
+    _qk_and_max_impl(shard_seqlen_q_start, ac, atp, sp, bufs, batch_id)
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 3111, in _qk_and_max_impl
+    _qk_and_max_large_tile_impl(grp_i, large_tile_idx, ac, atp, sp, bufs, batch_id)
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/attention/attention_cte.py", line 4290, in _qk_and_max_large_tile_impl
+    kernel_assert(ac.scale == 1.0, "range_select path doesn't support scale != 1.0")
+  File "/home/ubuntu/work/before_newtests/src/nkilib_src/nkilib/core/utils/kernel_assert.py", line 17, in kernel_assert
+    assert condition, (  # noqa: S101
+           ^^^^^^^^^
+ (test_orchestrator.py:550)
+2026-11-24 17:29:00 WARNING [11311| __worker_id__] [test.utils.metrics_collector]: Failed to parse info.json: [Errno 2] No such file or directory: '/home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_4096_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_0_tp_q_1_tp_k_0_tp_out_1_sw_0_nps_16/info.json' (metrics_collector.py:688)
+2026-11-24 17:29:00 WARNING [11311| __worker_id__] [test.utils.metrics_collector]: log-infer.txt not found (metrics_collector.py:625)
+2026-11-24 17:29:00 WARNING [11311| __worker_id__] [test.utils.metrics_collector]: No show_session_*.json files found in /home/ubuntu/results/out_before/out-test_attention_cte_seq_pack_unit_trn2_lnc_1_b_1_bkv_1_s_4096_d_128_sc_0.08838834764831845_dtype_bfloat16_cm_0_tp_q_1_tp_k_0_tp_out_1_sw_0_nps_16/infer_result (metrics_collector.py:731)
+=============================== warnings summary ===============================
+../../../../source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/python_ops/nki_kernels/_grouped_mm_2d_2d.py:29
+  /source-repos/aws_neuronx_venv_torch_neuronx_2_14_0/torch-neuronx/torch_neuronx/python_ops/nki_kernels/_grouped_mm_2d_2d.py:29: DeprecationWarning: nki.jit 'mode' parameter is deprecated, and its value is ignored.
+    @nki.jit(mode="trace")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED test/integration/nkilib/core/attention/test_attention_cte.py::TestRangedAttentionCTEKernels::test_attention_cte_seq_pack_unit[trn2-lnc-1_b-1_bkv-1_s-2048_d-128_sc-0.08838834764831845_dtype-bfloat16_cm-1_tp_q-1_tp_k-0_tp_out-0_sw-0_nps-8]
+FAILED test/integration/nkilib/core/attention/test_attention_cte.py::TestRangedAttentionCTEKernels::test_attention_cte_seq_pack_unit[trn2-lnc-1_b-1_bkv-1_s-4096_d-128_sc-0.08838834764831845_dtype-bfloat16_cm-0_tp_q-1_tp_k-0_tp_out-1_sw-0_nps-16]
+2 failed, 7 passed, 1 skipped, 643 deselected, 1 warning in 149.45s (0:02:29)
+EXIT 1

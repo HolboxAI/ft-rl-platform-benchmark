@@ -1,0 +1,758 @@
+[
+ {
+  "d": 64,
+  "scale": 0.125,
+  "pow2": true,
+  "scenario": "plain causal",
+  "before": {
+   "where": "Q, bf16, exact",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "Q, bf16, exact",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 64,
+  "scale": 0.125,
+  "pow2": true,
+  "scenario": "prefix caching",
+  "before": {
+   "where": "Q, bf16, exact",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "Q, bf16, exact",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 64,
+  "scale": 0.125,
+  "pow2": true,
+  "scenario": "sliding window",
+  "before": {
+   "where": "Q, bf16, exact",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "Q, bf16, exact",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 64,
+  "scale": 0.125,
+  "pow2": true,
+  "scenario": "context parallel",
+  "before": {
+   "where": "Q, bf16, exact",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "Q, bf16, exact",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 64,
+  "scale": 0.125,
+  "pow2": true,
+  "scenario": "sequence packing",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": false,
+   "note": "assert ac.scale == 1.0 (L4290)"
+  },
+  "after": {
+   "where": "Q, bf16, exact",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 64,
+  "scale": 0.125,
+  "pow2": true,
+  "scenario": "plain causal + position_bias",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 64,
+  "scale": 0.125,
+  "pow2": true,
+  "scenario": "prefix caching + position_bias",
+  "before": {
+   "where": "Q, bf16, exact",
+   "fast_diag": true,
+   "runs": false,
+   "note": "assert: position_bias needs scale=1 / >0"
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 80,
+  "scale": 0.11180339887498948,
+  "pow2": false,
+  "scenario": "plain causal",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 80,
+  "scale": 0.11180339887498948,
+  "pow2": false,
+  "scenario": "prefix caching",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 80,
+  "scale": 0.11180339887498948,
+  "pow2": false,
+  "scenario": "sliding window",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 80,
+  "scale": 0.11180339887498948,
+  "pow2": false,
+  "scenario": "context parallel",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 80,
+  "scale": 0.11180339887498948,
+  "pow2": false,
+  "scenario": "sequence packing",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": false,
+   "note": "assert ac.scale == 1.0 (L4290)"
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 80,
+  "scale": 0.11180339887498948,
+  "pow2": false,
+  "scenario": "plain causal + position_bias",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 80,
+  "scale": 0.11180339887498948,
+  "pow2": false,
+  "scenario": "prefix caching + position_bias",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": true,
+   "runs": false,
+   "note": "assert: position_bias needs scale=1 / >0"
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 96,
+  "scale": 0.10206207261596577,
+  "pow2": false,
+  "scenario": "plain causal",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 96,
+  "scale": 0.10206207261596577,
+  "pow2": false,
+  "scenario": "prefix caching",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 96,
+  "scale": 0.10206207261596577,
+  "pow2": false,
+  "scenario": "sliding window",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 96,
+  "scale": 0.10206207261596577,
+  "pow2": false,
+  "scenario": "context parallel",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 96,
+  "scale": 0.10206207261596577,
+  "pow2": false,
+  "scenario": "sequence packing",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": false,
+   "note": "assert ac.scale == 1.0 (L4290)"
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 96,
+  "scale": 0.10206207261596577,
+  "pow2": false,
+  "scenario": "plain causal + position_bias",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 96,
+  "scale": 0.10206207261596577,
+  "pow2": false,
+  "scenario": "prefix caching + position_bias",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": true,
+   "runs": false,
+   "note": "assert: position_bias needs scale=1 / >0"
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 128,
+  "scale": 0.08838834764831843,
+  "pow2": false,
+  "scenario": "plain causal",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 128,
+  "scale": 0.08838834764831843,
+  "pow2": false,
+  "scenario": "prefix caching",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 128,
+  "scale": 0.08838834764831843,
+  "pow2": false,
+  "scenario": "sliding window",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 128,
+  "scale": 0.08838834764831843,
+  "pow2": false,
+  "scenario": "context parallel",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 128,
+  "scale": 0.08838834764831843,
+  "pow2": false,
+  "scenario": "sequence packing",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": false,
+   "note": "assert ac.scale == 1.0 (L4290)"
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 128,
+  "scale": 0.08838834764831843,
+  "pow2": false,
+  "scenario": "plain causal + position_bias",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 128,
+  "scale": 0.08838834764831843,
+  "pow2": false,
+  "scenario": "prefix caching + position_bias",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": true,
+   "runs": false,
+   "note": "assert: position_bias needs scale=1 / >0"
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 192,
+  "scale": 0.07216878364870323,
+  "pow2": false,
+  "scenario": "plain causal",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 192,
+  "scale": 0.07216878364870323,
+  "pow2": false,
+  "scenario": "prefix caching",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 192,
+  "scale": 0.07216878364870323,
+  "pow2": false,
+  "scenario": "sliding window",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 192,
+  "scale": 0.07216878364870323,
+  "pow2": false,
+  "scenario": "context parallel",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 192,
+  "scale": 0.07216878364870323,
+  "pow2": false,
+  "scenario": "sequence packing",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": false,
+   "note": "assert ac.scale == 1.0 (L4290)"
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 192,
+  "scale": 0.07216878364870323,
+  "pow2": false,
+  "scenario": "plain causal + position_bias",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 192,
+  "scale": 0.07216878364870323,
+  "pow2": false,
+  "scenario": "prefix caching + position_bias",
+  "before": {
+   "where": "Q, bf16, rounded",
+   "fast_diag": true,
+   "runs": false,
+   "note": "assert: position_bias needs scale=1 / >0"
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 256,
+  "scale": 0.0625,
+  "pow2": true,
+  "scenario": "plain causal",
+  "before": {
+   "where": "Q, bf16, exact",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "Q, bf16, exact",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 256,
+  "scale": 0.0625,
+  "pow2": true,
+  "scenario": "prefix caching",
+  "before": {
+   "where": "Q, bf16, exact",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "Q, bf16, exact",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 256,
+  "scale": 0.0625,
+  "pow2": true,
+  "scenario": "sliding window",
+  "before": {
+   "where": "Q, bf16, exact",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "Q, bf16, exact",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 256,
+  "scale": 0.0625,
+  "pow2": true,
+  "scenario": "context parallel",
+  "before": {
+   "where": "Q, bf16, exact",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "Q, bf16, exact",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 256,
+  "scale": 0.0625,
+  "pow2": true,
+  "scenario": "sequence packing",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": false,
+   "note": "assert ac.scale == 1.0 (L4290)"
+  },
+  "after": {
+   "where": "Q, bf16, exact",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 256,
+  "scale": 0.0625,
+  "pow2": true,
+  "scenario": "plain causal + position_bias",
+  "before": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  },
+  "after": {
+   "where": "MM1 evict, fp32",
+   "fast_diag": false,
+   "runs": true,
+   "note": ""
+  }
+ },
+ {
+  "d": 256,
+  "scale": 0.0625,
+  "pow2": true,
+  "scenario": "prefix caching + position_bias",
+  "before": {
+   "where": "Q, bf16, exact",
+   "fast_diag": true,
+   "runs": false,
+   "note": "assert: position_bias needs scale=1 / >0"
+  },
+  "after": {
+   "where": "exp, fp32",
+   "fast_diag": true,
+   "runs": true,
+   "note": ""
+  }
+ }
+]
