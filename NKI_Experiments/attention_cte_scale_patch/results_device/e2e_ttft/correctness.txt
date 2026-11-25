@@ -1,0 +1,11 @@
+# Restored from the console output of check.py run at 11:21 UTC (the final copy step failed and had emptied this file).
+# Covers 9 of the 18 copied timed runs. Reference = plain PyTorch float32 attention on the same device.
+after_512_r1 max_rel_diff 0.0075 same_first_token True top10_overlap 10
+before_512_r1 max_rel_diff 0.0104 same_first_token True top10_overlap 10
+after_2048_r1 max_rel_diff 0.0098 same_first_token True top10_overlap 10
+after_2048_r2 max_rel_diff 0.0098 same_first_token True top10_overlap 10
+before_2048_r1 max_rel_diff 0.0118 same_first_token True top10_overlap 10
+before_2048_r2 max_rel_diff 0.0118 same_first_token True top10_overlap 10
+after_4096_r1 max_rel_diff 0.0106 same_first_token True top10_overlap 10
+after_4096_r2 max_rel_diff 0.0106 same_first_token True top10_overlap 10
+before_4096_r1 max_rel_diff 0.0124 same_first_token True top10_overlap 10

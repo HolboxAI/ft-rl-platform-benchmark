@@ -1,0 +1,402 @@
+[
+ {
+  "scale": "real",
+  "seqlen": 512,
+  "n": 5,
+  "before_ms": 0.1066565,
+  "after_ms": 0.101334842,
+  "before_range": [
+   0.102325673,
+   0.108359831
+  ],
+  "after_range": [
+   0.098423179,
+   0.108841496
+  ],
+  "delta_pct": -4.989529939572368,
+  "paired_delta_pct": [
+   -8.712056938321366,
+   -9.170051215749853,
+   -4.989529939572368,
+   3.626565806570814,
+   6.367730413070416
+  ],
+  "counts": {
+   "tensor_engine_instruction_count": [
+    667,
+    665
+   ],
+   "vector_engine_instruction_count": [
+    665,
+    696
+   ],
+   "scalar_engine_instruction_count": [
+    240,
+    236
+   ],
+   "gpsimd_engine_instruction_count": [
+    375,
+    317
+   ]
+  }
+ },
+ {
+  "scale": "real",
+  "seqlen": 1024,
+  "n": 5,
+  "before_ms": 0.216040496,
+  "after_ms": 0.218847158,
+  "before_range": [
+   0.213397167,
+   0.22173131999999998
+  ],
+  "after_range": [
+   0.217338827,
+   0.22225715199999999
+  ],
+  "delta_pct": 1.2991369914277628,
+  "paired_delta_pct": [
+   1.2991369914277628,
+   1.847100435030602,
+   -0.37733280079692566,
+   -1.4421433622493152,
+   3.890604344007609
+  ],
+  "counts": {
+   "tensor_engine_instruction_count": [
+    1953,
+    1897
+   ],
+   "vector_engine_instruction_count": [
+    1355,
+    1324
+   ],
+   "scalar_engine_instruction_count": [
+    515,
+    521
+   ],
+   "gpsimd_engine_instruction_count": [
+    733,
+    612
+   ]
+  }
+ },
+ {
+  "scale": "real",
+  "seqlen": 2048,
+  "n": 5,
+  "before_ms": 0.50516671,
+  "after_ms": 0.534741664,
+  "before_range": [
+   0.502635048,
+   0.508096707
+  ],
+  "after_range": [
+   0.527500842,
+   0.535987496
+  ],
+  "delta_pct": 5.854493856097531,
+  "paired_delta_pct": [
+   6.101111848799379,
+   3.818984601291664,
+   5.7605730717217085,
+   6.633364333161262,
+   5.539199789214355
+  ],
+  "counts": {
+   "tensor_engine_instruction_count": [
+    6262,
+    6161
+   ],
+   "vector_engine_instruction_count": [
+    2964,
+    3021
+   ],
+   "scalar_engine_instruction_count": [
+    1271,
+    1297
+   ],
+   "gpsimd_engine_instruction_count": [
+    1365,
+    1137
+   ]
+  }
+ },
+ {
+  "scale": "real",
+  "seqlen": 4096,
+  "n": 5,
+  "before_ms": 1.354177884,
+  "after_ms": 1.330467088,
+  "before_range": [
+   1.3463987290000001,
+   1.35878871
+  ],
+  "after_range": [
+   1.325607929,
+   1.3325029179999999
+  ],
+  "delta_pct": -1.750936585226348,
+  "paired_delta_pct": [
+   -1.032072498339387,
+   -2.084328622365439,
+   -1.8387234095278315,
+   -1.9957785288979513,
+   -1.8380742511077575
+  ],
+  "counts": {
+   "tensor_engine_instruction_count": [
+    21669,
+    21708
+   ],
+   "vector_engine_instruction_count": [
+    7509,
+    7745
+   ],
+   "scalar_engine_instruction_count": [
+    3472,
+    3498
+   ],
+   "gpsimd_engine_instruction_count": [
+    3011,
+    2535
+   ]
+  }
+ },
+ {
+  "scale": "real",
+  "seqlen": 8192,
+  "n": 5,
+  "before_ms": 4.427159749,
+  "after_ms": 4.397279796,
+  "before_range": [
+   4.417675597,
+   4.448760549
+  ],
+  "after_range": [
+   4.389587308,
+   4.4117722729999995
+  ],
+  "delta_pct": -0.6749237591155199,
+  "paired_delta_pct": [
+   -0.4616862545056666,
+   -0.9055555378596036,
+   -0.8362864350856092,
+   -0.3475699290832246,
+   -0.8625984603425452
+  ],
+  "counts": {
+   "tensor_engine_instruction_count": [
+    82301,
+    82583
+   ],
+   "vector_engine_instruction_count": [
+    23091,
+    23845
+   ],
+   "scalar_engine_instruction_count": [
+    10500,
+    10640
+   ],
+   "gpsimd_engine_instruction_count": [
+    6187,
+    5137
+   ]
+  }
+ },
+ {
+  "scale": "ctrl",
+  "seqlen": 512,
+  "n": 3,
+  "before_ms": 0.101431508,
+  "after_ms": 0.101612341,
+  "before_range": [
+   0.099038178,
+   0.105259835
+  ],
+  "after_range": [
+   0.096195683,
+   0.102979839
+  ],
+  "delta_pct": 0.17828089472946562,
+  "paired_delta_pct": [
+   0.17828089472946562,
+   3.979940947621219,
+   -8.611216234568476
+  ],
+  "counts": {
+   "tensor_engine_instruction_count": [
+    693,
+    682
+   ],
+   "vector_engine_instruction_count": [
+    619,
+    609
+   ],
+   "scalar_engine_instruction_count": [
+    244,
+    233
+   ],
+   "gpsimd_engine_instruction_count": [
+    321,
+    306
+   ]
+  }
+ },
+ {
+  "scale": "ctrl",
+  "seqlen": 1024,
+  "n": 3,
+  "before_ms": 0.21544383,
+  "after_ms": 0.212962168,
+  "before_range": [
+   0.213724666,
+   0.21682716100000002
+  ],
+  "after_range": [
+   0.212823,
+   0.21539633
+  ],
+  "delta_pct": -1.1518835327054777,
+  "paired_delta_pct": [
+   -1.1518835327054777,
+   -0.6598947260117449,
+   -0.421882048934874
+  ],
+  "counts": {
+   "tensor_engine_instruction_count": [
+    1901,
+    1890
+   ],
+   "vector_engine_instruction_count": [
+    1215,
+    1207
+   ],
+   "scalar_engine_instruction_count": [
+    541,
+    535
+   ],
+   "gpsimd_engine_instruction_count": [
+    621,
+    610
+   ]
+  }
+ },
+ {
+  "scale": "ctrl",
+  "seqlen": 2048,
+  "n": 3,
+  "before_ms": 0.5068917079999999,
+  "after_ms": 0.507120041,
+  "before_range": [
+   0.502901714,
+   0.5111050349999999
+  ],
+  "after_range": [
+   0.501576716,
+   0.5104175360000001
+  ],
+  "delta_pct": 0.045045716155223126,
+  "paired_delta_pct": [
+   1.4944912277630396,
+   -1.0485458562679906,
+   -0.7796820080240408
+  ],
+  "counts": {
+   "tensor_engine_instruction_count": [
+    6139,
+    6147
+   ],
+   "vector_engine_instruction_count": [
+    2777,
+    2785
+   ],
+   "scalar_engine_instruction_count": [
+    1291,
+    1297
+   ],
+   "gpsimd_engine_instruction_count": [
+    1129,
+    1141
+   ]
+  }
+ },
+ {
+  "scale": "ctrl",
+  "seqlen": 4096,
+  "n": 3,
+  "before_ms": 1.367019531,
+  "after_ms": 1.3638853690000001,
+  "before_range": [
+   1.366497865,
+   1.373832854
+  ],
+  "after_range": [
+   1.362853704,
+   1.372116189
+  ],
+  "delta_pct": -0.2292697308945657,
+  "paired_delta_pct": [
+   0.37282993288849653,
+   -0.191181857426459,
+   -0.7991619917978698
+  ],
+  "counts": {
+   "tensor_engine_instruction_count": [
+    21694,
+    21697
+   ],
+   "vector_engine_instruction_count": [
+    7205,
+    7205
+   ],
+   "scalar_engine_instruction_count": [
+    3525,
+    3526
+   ],
+   "gpsimd_engine_instruction_count": [
+    2523,
+    2525
+   ]
+  }
+ },
+ {
+  "scale": "ctrl",
+  "seqlen": 8192,
+  "n": 3,
+  "before_ms": 4.404904784,
+  "after_ms": 4.407083114000001,
+  "before_range": [
+   4.402698954,
+   4.407856446
+  ],
+  "after_range": [
+   4.4027564539999995,
+   4.417593931
+  ],
+  "delta_pct": 0.049452374269542965,
+  "paired_delta_pct": [
+   -0.017544400764257784,
+   -0.04877131528026046,
+   0.3383146827803829
+  ],
+  "counts": {
+   "tensor_engine_instruction_count": [
+    82666,
+    82669
+   ],
+   "vector_engine_instruction_count": [
+    22893,
+    22895
+   ],
+   "scalar_engine_instruction_count": [
+    10713,
+    10714
+   ],
+   "gpsimd_engine_instruction_count": [
+    5147,
+    5151
+   ]
+  }
+ }
+]

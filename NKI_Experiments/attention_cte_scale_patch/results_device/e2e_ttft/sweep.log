@@ -1,0 +1,22 @@
+11:12:56 ref_512 RESULT 512 torch compile_s 48 ttft_ms 12.23 decode_tps nan e2e_tps nan
+11:13:51 ref_2048 RESULT 2048 torch compile_s 36 ttft_ms 75.82 decode_tps nan e2e_tps nan
+11:14:46 ref_4096 RESULT 4096 torch compile_s 29 ttft_ms 314.41 decode_tps nan e2e_tps nan
+REF_DONE
+11:15:36 before_2048_r1 RESULT 2048 nki compile_s 33 ttft_ms 36.88 decode_tps nan e2e_tps nan
+11:16:27 after_2048_r1 RESULT 2048 nki compile_s 33 ttft_ms 37.21 decode_tps nan e2e_tps nan
+11:17:17 before_4096_r1 RESULT 4096 nki compile_s 32 ttft_ms 94.54 decode_tps nan e2e_tps nan
+11:18:05 after_4096_r1 RESULT 4096 nki compile_s 31 ttft_ms 94.06 decode_tps nan e2e_tps nan
+11:19:08 before_512_r1 RESULT 512 nki compile_s 46 ttft_ms 13.37 decode_tps nan e2e_tps nan
+11:19:33 after_512_r1 RESULT 512 nki compile_s 10 ttft_ms 13.34 decode_tps nan e2e_tps nan
+11:20:02 after_2048_r2 RESULT 2048 nki compile_s 12 ttft_ms 37.13 decode_tps nan e2e_tps nan
+11:20:31 before_2048_r2 RESULT 2048 nki compile_s 12 ttft_ms 36.86 decode_tps nan e2e_tps nan
+11:21:00 after_4096_r2 RESULT 4096 nki compile_s 12 ttft_ms 94.04 decode_tps nan e2e_tps nan
+11:21:31 before_4096_r2 RESULT 4096 nki compile_s 11 ttft_ms 94.66 decode_tps nan e2e_tps nan
+11:21:57 after_512_r2 RESULT 512 nki compile_s 10 ttft_ms 13.37 decode_tps nan e2e_tps nan
+11:22:24 before_512_r2 RESULT 512 nki compile_s 10 ttft_ms 13.43 decode_tps nan e2e_tps nan
+11:22:53 before_2048_r3 RESULT 2048 nki compile_s 12 ttft_ms 37.00 decode_tps nan e2e_tps nan
+11:23:22 after_2048_r3 RESULT 2048 nki compile_s 12 ttft_ms 37.24 decode_tps nan e2e_tps nan
+11:23:52 before_4096_r3 RESULT 4096 nki compile_s 12 ttft_ms 94.71 decode_tps nan e2e_tps nan
+11:24:22 after_4096_r3 RESULT 4096 nki compile_s 11 ttft_ms 94.05 decode_tps nan e2e_tps nan
+11:24:48 before_512_r3 RESULT 512 nki compile_s 10 ttft_ms 13.39 decode_tps nan e2e_tps nan
+11:25:15 after_512_r3 RESULT 512 nki compile_s 10 ttft_ms 13.37 decode_tps nan e2e_tps nan
